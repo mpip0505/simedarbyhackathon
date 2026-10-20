@@ -7,7 +7,9 @@ import json
 from collections import Counter
 from datetime import datetime, timezone
 
+from backend import atomic
 from backend.gee.composites import end_exclusive, get_aoi, landsat_clear, sentinel2_clear
+from backend.gee.safe import get_info
 from backend.config import BASELINE_PERIOD, CACHE_DIR, ELMINA_BBOX, LATEST_PERIOD
 
 TARGET_CLEAR_OBS = 3      # clear observations per pixel we want for a stable median
@@ -51,10 +53,11 @@ def overall_verdict(results: dict) -> tuple[str, list]:
 
 def _measure(ee, aoi, coll, band: str, start: str, end: str, cloud_prop: str) -> dict:
     """Scene counts (one getInfo) and per-pixel clear-observation coverage (one getInfo)."""
-    info = coll.aggregate_array("system:time_start").getInfo(), coll.aggregate_array(cloud_prop).getInfo()
+    info = (get_info(coll.aggregate_array("system:time_start"), "scene dates"),
+            get_info(coll.aggregate_array(cloud_prop), "scene cloud cover"))
     count = coll.select(band).count()  # masked pixels are not counted
-    cover = ee.Image.cat(count.gte(1).rename("ge1"), count.gte(TARGET_CLEAR_OBS).rename("ge_t")).reduceRegion(
-        ee.Reducer.mean(), aoi, scale=30, bestEffort=True, maxPixels=1e9, tileScale=4).getInfo()
+    cover = get_info(ee.Image.cat(count.gte(1).rename("ge1"), count.gte(TARGET_CLEAR_OBS).rename("ge_t")).reduceRegion(
+        ee.Reducer.mean(), aoi, scale=30, bestEffort=True, maxPixels=1e9, tileScale=4), "clear-observation coverage")
     monthly = monthly_counts(*info)
     return {"n_scenes": len(info[0]), "n_usable_scenes": sum(monthly.values()), "monthly_usable": monthly,
             "frac_ge1": cover.get("ge1") or 0.0, "frac_ge_target": cover.get("ge_t") or 0.0}
@@ -95,9 +98,9 @@ def report(results: dict) -> str:
 def main() -> None:
     results = run()
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    (CACHE_DIR / "imagery_check.json").write_text(json.dumps(results, indent=1), encoding="utf-8")
+    atomic.write_json(CACHE_DIR / "imagery_check.json", results, indent=1)
     text = report(results)
-    (CACHE_DIR / "imagery_check.txt").write_text(text, encoding="utf-8")
+    atomic.write_text(CACHE_DIR / "imagery_check.txt", text)
     print(text)
 
 

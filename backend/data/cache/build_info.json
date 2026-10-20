@@ -1,8 +1,8 @@
 {
- "generated_at": "2026-10-20T16:17:45+00:00",
+ "generated_at": "2026-10-20T16:55:45+00:00",
  "sources_built": {
-  "osm": "2026-10-20T15:51:33+00:00",
-  "satellite": "2026-10-20T16:03:48+00:00"
+  "osm": "2026-10-20T16:47:42+00:00",
+  "satellite": "2026-10-20T16:47:42+00:00"
  },
  "periods": {
   "baseline": [
@@ -17,15 +17,15 @@
  "steps": [
   {
    "step": "corridor",
-   "seconds": 7.0
+   "seconds": 6.7
   },
   {
    "step": "overlays",
-   "seconds": 1.8
+   "seconds": 1.6
   },
   {
    "step": "sites",
-   "seconds": 14.4
+   "seconds": 26.9
   }
  ]
 }

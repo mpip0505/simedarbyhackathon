@@ -1,7 +1,8 @@
 # Backend handoff (for ML, Frontend and the pitch writers)
 
 Status: the backend runs end to end on real Elmina data. Everything below is from the cached files in
-`backend/data/cache/`, rebuilt by `python -m backend.build_cache`.
+`backend/data/cache/`, rebuilt by `python -m backend.build_cache` (a full rebuild from a fresh download takes about
+4 minutes and reproduced the committed data exactly). 138 tests pass.
 
 ## 1. Imagery go/no-go: GO
 Enough clear Sentinel-2 and Landsat 8/9 observations exist over City of Elmina for both periods, **using multi-date
@@ -17,7 +18,7 @@ uvicorn backend.api.main:app --port 8000        # http://localhost:8000/docs
 Works with no internet and no Earth Engine. Field list: `docs/data-contract.md`.
 
 ## 3. For Frontend
-- `GET /sites` returns the ranked GeoJSON (564 simulated sites). Colour by `score_total`; the detail panel uses
+- `GET /sites` returns the ranked GeoJSON (564 simulated sites; IDs are stable across rebuilds). Colour by `score_total`; the detail panel uses
   `score_cooling`, `score_connectivity`, `score_shade` plus `ndvi_mean`, `lst_c_mean`, `dist_to_path_m`,
   `corridor_gap_dist_m`.
 - **Sliders:** call `GET /weights` once for the default weights, then `GET /sites?w_cooling=..&w_connectivity=..&w_shade=..`
@@ -31,28 +32,54 @@ Works with no internet and no Earth Engine. Field list: `docs/data-contract.md`.
 - Overlays, series and the corridor come from the cache folder. They do not exist in mock mode (404).
 
 ## 4. For ML
-- Input features per site (all measured, see the contract): `ndvi_mean`, `lst_c_mean`, `canopy_pct_baseline`,
-  `dist_to_path_m`, `path_length_within_50m`, `corridor_gap_flag`, `corridor_gap_dist_m`, `area_m2`, `origin`.
-- Deliver `backend/data/cache/scores.geojson`: features with `properties.site_id`, `score_cooling`,
-  `score_connectivity`, `score_shade`, `score_total`, `rank` (geometry may be null). The API merges it and flips
-  `score_source` to `ml`. No API change needed. Optionally write `weights.json` (`{"cooling":..,"connectivity":..,"shade":..}`)
-  in the same folder so the sliders start from your default.
+Start with [data-dictionary.md](data-dictionary.md). It lists every feature with units, ranges and cautions.
+```python
+from backend.ml_io import load_sites_df, write_scores
+df = load_sites_df()      # 564 rows: surroundings, shade, corridor, reliability and spatial-block features
+# ... compute score_cooling, score_connectivity, score_shade, score_total (0-100) and rank (1 = plant first) ...
+write_scores(df_scores)   # validates, stamps the data version, writes backend/data/cache/scores.geojson
+```
+- The API merges that file by `site_id`, flips `score_source` to `ml`, and `/meta` shows `scores_stale: true` if the
+  backend later rebuilds with different data. Site IDs are stable across rebuilds.
+- Check a file by hand: `python -m backend.validate_scores file.geojson`. Format example: `docs/scores.example.geojson`.
+- Optionally write `weights.json` (`{"cooling":..,"connectivity":..,"shade":..}`) in the cache folder so the sliders
+  start from your default.
 - Until you deliver, the API serves a simple placeholder score (`score_source: "placeholder"`). It is not your model.
-- Cautions that affect validation:
-  - `lst_c_mean` is ranking-grade (Landsat thermal is about 100 m native; gaps filled from neighbours within 100 m).
-  - `corridor_gap_*` comes from an approximate corridor (see section 6), so connectivity scores inherit that.
-  - Sites are simulated 30 m cells, so any "high-scoring sites are hotter" check partly reflects how they were drawn.
+- A bad or half-written scores file never breaks the API: it is ignored, logged, and shown in `/meta.scores_error`
+  (so check `/meta` after you write). `write_scores` refuses to write a file the validator rejects.
+- **Split by `block_id`** (e.g. `GroupKFold`). Neighbouring 30 m cells are correlated, so random splits flatter stability.
+- Cautions that affect your work:
+  - There are **no real labels**. Validation can only check consistency, not that the ranking is right.
+  - `lst_c_mean` is ranking-grade, and `lst_valid_frac < 1` means some of it was gap-filled (93 sites are below 0.5).
+  - Do not score on `ndvi_change` / `lst_change_c`: the baseline has haze artefacts (cold pixels, +15 C extremes).
+  - Connectivity is skewed: only about 16% of sites are within 50 m of a corridor gap, and the corridor is approximate.
+  - Sites are simulated cells, so "high scorers are hotter" is partly true by construction.
 
 ## 5. Numbers you can quote (and how)
 | Quantity | Value | How to say it |
 |---|---|---|
-| Canopy proxy (NDVI >= 0.6) | about 10% (baseline 9.7%, latest 10.4%) | "about 10%, range roughly 8 to 14% depending on the year and 18% at a looser threshold" |
-| Change in canopy | +0.7 points | **Not a result.** Canopy moves about 5 points between single years. Say "no detectable change". |
+| Canopy proxy (NDVI >= 0.6) | about 10% (baseline 9.7%, latest 10.4%) | "about 10% by our vegetation-index proxy; independent maps range from about 4% to 28%, so treat it as uncertain by a factor of several" |
+| Change in canopy | +0.7 points | **Not a result.** Canopy moves about 5 points between single years, and Dynamic World shows the opposite direction (7.1% to 4.4%). Say "no detectable change". |
 | Mean surface temperature | 38.6 C then 42.1 C | **Indicative only** (+3.5 C). Elmina is under construction so some warming is plausible, but different clear days and seasons feed each period. |
 | Simulated sites | 564 | "Candidate sites generated from open land, not Sime Darby Property's list." |
 
 Canopy at other thresholds: about 18% at NDVI 0.5, 10% at 0.6, 3% at 0.7 (`canopy_sensitivity.json`). The team still
-needs to agree on one threshold. The 10,266-trees-planted figure is unverified and is not used anywhere in the backend.
+needs to agree on one threshold; the cross-check below favours 0.6. The 10,266-trees-planted figure is unverified and is not used anywhere in the backend.
+
+### The independent cross-check (`backend/data/cache/crosscheck.json`)
+We compared our NDVI canopy mask with two independent satellite land-cover products over the same area (both are
+satellite maps, not field truth):
+
+| Reference | Tree cover it reports | Agreement with our NDVI >= 0.6 mask |
+|---|---|---|
+| ESA WorldCover (2021) | about 28% | when we say canopy it agrees 87% (baseline) / 68% (latest); we find only 30% / 25% of its trees |
+| Google Dynamic World, baseline window | about 7% | agrees 60%; we find 81% of its trees |
+| Google Dynamic World, latest window | about 4% | agrees 38%; we find 89% of its trees |
+
+What this means: the references disagree with each other by about 4x, our 10% sits between them, and Dynamic World's
+tree share *falls* between the windows while ours rises slightly. **Canopy % is not a number to quote precisely, and
+no trend is supported.** NDVI 0.6 gives the best average agreement of the thresholds tried (mean F1 0.51, against
+0.47 at 0.5 and 0.32 at 0.7), which supports keeping 0.6 for ranking.
 
 ## 6. Limits for the pitch's "limits" slide
 1. **Simulated sites.** 30 m cells on OSM open land plus non-park corridor land, minus buildings and roads. OSM tags
@@ -63,7 +90,9 @@ needs to agree on one threshold. The 10,266-trees-planted figure is unverified a
    `backend/data/input/corridor_official.geojson` and rebuild.
 3. **Tropical cloud.** Median composites over two-year windows; they can blur short-lived change.
 4. **Coarse thermal.** Rank with it, do not quote exact temperatures.
-5. **Canopy is a vegetation proxy,** not a tree count, and it is threshold-sensitive.
+5. **Canopy is a vegetation proxy,** not a tree count; it is threshold-sensitive and independent maps disagree about
+   the amount by a factor of several (see the cross-check above).
+   There is also **no ground truth** (no tree inventory, LiDAR or field plots).
 6. **Before/after is thin.** Two windows and a five-point yearly series; the signal is smaller than the noise for canopy.
    The honest pitch is "we can re-score every season at near-zero cost", not "we measured canopy growth".
 

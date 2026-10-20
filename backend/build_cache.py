@@ -12,6 +12,7 @@ import sys
 import time
 from datetime import datetime, timezone
 
+from backend import atomic
 from backend.config import BASELINE_PERIOD, CACHE_DIR, LATEST_PERIOD
 
 STEPS = {
@@ -21,17 +22,18 @@ STEPS = {
     "gee_export": ("backend.gee.export", "NDVI/LST composites, summary, rasters (Earth Engine)"),
     "series": ("backend.gee.series", "yearly canopy/LST series (Earth Engine)"),
     "sensitivity": ("backend.gee.sensitivity", "canopy threshold sensitivity (Earth Engine)"),
+    "crosscheck": ("backend.gee.crosscheck", "canopy cross-check vs WorldCover and Dynamic World (Earth Engine)"),
     "overlays": ("backend.overlays", "map overlay images from rasters"),
     "sites": ("backend.sites.generate", "generate simulated candidate sites"),
 }
-ORDER = ["osm_download", "osm_layers", "corridor", "gee_export", "series", "sensitivity", "overlays", "sites"]
+ORDER = ["osm_download", "osm_layers", "corridor", "gee_export", "series", "sensitivity", "crosscheck", "overlays", "sites"]
 
 
 def plan_steps(skip_gee: bool = False, offline: bool = False) -> list:
     """Step names to run. offline implies skipping both downloads (OSM and Earth Engine)."""
     skip = set()
     if skip_gee or offline:
-        skip |= {"gee_export", "series", "sensitivity"}
+        skip |= {"gee_export", "series", "sensitivity", "crosscheck"}
     if offline:
         skip |= {"osm_download", "osm_layers"}
     return [s for s in ORDER if s not in skip]
@@ -75,7 +77,7 @@ def main() -> None:
     fallback = {"osm": _mtime_iso(CACHE_DIR / "osm" / "summary.json"), "satellite": _mtime_iso(CACHE_DIR / "summary.json")}
     info = {"generated_at": now, "sources_built": update_sources_built(prev, [r["step"] for r in ran], now, fallback),
             "periods": {"baseline": BASELINE_PERIOD, "latest": LATEST_PERIOD}, "steps": ran}
-    (CACHE_DIR / "build_info.json").write_text(json.dumps(info, indent=1), encoding="utf-8")
+    atomic.write_json(CACHE_DIR / "build_info.json", info, indent=1)
     print("\nDone. Start the API:  uvicorn backend.api.main:app --port 8000")
 
 

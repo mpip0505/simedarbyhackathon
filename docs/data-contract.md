@@ -17,8 +17,15 @@ Docs UI: http://localhost:8000/docs. CORS is open for GET.
 | `GET /sites/{site_id}` | One Feature, or 404 |
 | `GET /summary` | Before/after: `baseline`, `latest`, `delta_canopy_pct_points`, `delta_mean_lst_c`, `caveats` |
 | `GET /layers/corridor` | Corridor polygon FeatureCollection (`approximate: true` unless official) |
-| `GET /meta` | `data_mode` (`mock` or `cache`), `site_count`, `corridor_approximate`, `score_source` (`mock`, `placeholder` or `ml`), `caveats` |
+| `GET /meta` | `data_mode` (`mock` or `cache`), `site_count`, `corridor_approximate`, `score_source` (`mock`, `placeholder` or `ml`), `data_version`, `scores_data_version`, `scores_stale` (true when ML scores were computed on different data; null if unknown), `scores_error` (set when `scores.geojson` was rejected and placeholders are served), `sources_built`, `generated_at`, `attribution`, `caveats` |
+| `GET /summary/series` | Yearly canopy (with `canopy_pct_low` / `canopy_pct_high` band) and mean temperature points. 404 in mock mode. |
+| `GET /layers/overlays` | Before/after map images: `url`, `bounds` as `[[south, west], [north, east]]`, shared colour range, unit. 404 in mock mode. |
+| `GET /layers/overlays/{name}.png` | The rendered image named in `/layers/overlays` |
+| `GET /weights` | `{"default": {cooling, connectivity, shade}, "source": "config" or "file"}`; start the sliders here |
 | `GET /health` | `{"status":"ok"}` |
+| `GET /health/deep` | Checks every data file against this contract. 200 when sound, 503 with `problems` listed. |
+
+Errors are small JSON bodies: `{"error": ..., "detail": ..., "request_id": ...}` (also the `X-Request-ID` header).
 
 ## Site feature properties
 | Field | Type | Owner | Notes |
@@ -38,7 +45,16 @@ Docs UI: http://localhost:8000/docs. CORS is open for GET.
 | `rank` | int >= 1 or null | ML | 1 = plant first |
 | `score_source` | `ml`, `placeholder` or `mock` | API | **`placeholder` means ML scores are not merged yet: do not present as the model.** Show a badge in the UI when it is not `ml`. |
 
+## More site fields
+The table above is the core. Sites also carry surroundings (`lst_mean_250m`, `built_up_frac_250m`, ...), shade
+(`uncovered_path_length_50m`, ...), corridor distances, reliability (`lst_valid_frac`) and `block_id`. All are listed
+with units, ranges and cautions in [data-dictionary.md](data-dictionary.md). Site IDs are stable across rebuilds.
+
 ## How ML plugs in
+Use `backend.ml_io` (`load_sites_df`, `write_scores`): it validates the file and stamps it with the current
+`data_version`. Check a file by hand with `python -m backend.validate_scores <file>`. Format example:
+`docs/scores.example.geojson`.
+
 Drop `backend/data/cache/scores.geojson`: a FeatureCollection whose features have `properties.site_id` plus `score_cooling`, `score_connectivity`, `score_shade`, `score_total`, `rank` (geometry can be null). The API merges it by `site_id` on every request and flips `score_source` to `ml`; sites ML did not score keep placeholder scores. No API code changes needed.
 
 While ML is not delivered, the API fills a simple stand-in (`placeholder`) from the measured fields so the map is usable. It is not the ML model.

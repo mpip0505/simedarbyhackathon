@@ -6,7 +6,9 @@ Fair use: a single request for a ~4 km x 6 km box, identified with a User-Agent.
 """
 import requests
 
+from backend import atomic
 from backend.config import BACKEND_DIR, ELMINA_BBOX
+from backend.retry import retry
 from backend.osm.extract import OSM_DIR
 
 RAW_DIR = BACKEND_DIR / "data" / "raw_osm"
@@ -37,11 +39,15 @@ def main() -> None:
     bbox = bbox_for_request()
     check_bbox(bbox)
     RAW_DIR.mkdir(parents=True, exist_ok=True)
-    r = requests.get(URL, params={"bbox": ",".join(f"{x:.5f}" for x in bbox)}, headers=HEADERS, timeout=180)
-    if r.status_code == 400:
-        raise SystemExit("OSM API refused the box (too many nodes). Split the bbox into tiles.")
-    r.raise_for_status()
-    OUT_FILE.write_bytes(r.content)
+    def get():
+        resp = requests.get(URL, params={"bbox": ",".join(f"{x:.5f}" for x in bbox)}, headers=HEADERS, timeout=180)
+        if resp.status_code == 400:
+            raise SystemExit("OSM API refused the box (too many nodes). Split the bbox into tiles.")  # not retried
+        resp.raise_for_status()
+        return resp
+
+    r = retry(get, what="OSM map API download", wait=10)
+    atomic.write_bytes(OUT_FILE, r.content)
     print(f"saved {len(r.content) / 1e6:.1f} MB to {OUT_FILE}")
 
 

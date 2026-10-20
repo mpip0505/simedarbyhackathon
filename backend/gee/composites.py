@@ -76,6 +76,11 @@ def lst_composite(ee, aoi, start: str, end: str, fill_gaps: bool = False):
     return lst.clip(aoi)
 
 
+def lst_valid_mask(ee, aoi, start: str, end: str):
+    """1 where the UNFILLED temperature composite has a reliable pixel, 0 where it needed gap filling."""
+    return lst_composite(ee, aoi, start, end).mask().rename("LST_VALID").clip(aoi)
+
+
 def canopy_mask(ndvi, threshold: float = CANOPY_NDVI_THRESHOLD):
     """1 where NDVI >= threshold (a vegetation proxy for canopy, not a tree census); masked where no data."""
     return ndvi.gte(threshold).rename("CANOPY").updateMask(ndvi.mask())

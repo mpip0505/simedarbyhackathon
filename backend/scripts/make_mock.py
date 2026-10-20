@@ -7,6 +7,7 @@ import json
 import math
 import random
 
+from backend import atomic
 from backend.config import CAVEATS, DEFAULT_WEIGHTS, ELMINA_BBOX, MOCK_DIR
 
 N_SITES = 15
@@ -72,10 +73,9 @@ def main() -> None:
     }
 
     MOCK_DIR.mkdir(parents=True, exist_ok=True)
-    (MOCK_DIR / "sites.geojson").write_text(
-        json.dumps({"type": "FeatureCollection", "features": features}, indent=1), encoding="utf-8")
-    (MOCK_DIR / "corridor.geojson").write_text(json.dumps(corridor, indent=1), encoding="utf-8")
-    (MOCK_DIR / "summary.json").write_text(json.dumps(summary, indent=1), encoding="utf-8")
+    atomic.write_json(MOCK_DIR / "sites.geojson", {"type": "FeatureCollection", "features": features}, indent=1)
+    atomic.write_json(MOCK_DIR / "corridor.geojson", corridor, indent=1)
+    atomic.write_json(MOCK_DIR / "summary.json", summary, indent=1)
     print(f"Wrote {len(features)} mock sites to {MOCK_DIR}")
 
 

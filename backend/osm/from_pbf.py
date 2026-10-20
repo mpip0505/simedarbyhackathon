@@ -13,6 +13,7 @@ import osmium
 import shapely
 from shapely.geometry import box
 
+from backend import atomic
 from backend.config import BACKEND_DIR, ELMINA_BBOX
 from backend.osm.extract import KEEP_COLS, LAYERS, OSM_DIR
 
@@ -81,10 +82,10 @@ def main() -> None:
     summary = {"place": "Elmina (clipped from " + args.pbf.name + ")", "bbox_wsen": [round(x, 5) for x in aoi.bounds],
                "layers": {}}
     for name, gdf in layers.items():
-        gdf.to_file(OSM_DIR / f"{name}.geojson", driver="GeoJSON")
+        atomic.write_geodataframe(gdf, OSM_DIR / f"{name}.geojson")
         summary["layers"][name] = len(gdf)
         print(f"{name}: {len(gdf)} features")
-    (OSM_DIR / "summary.json").write_text(json.dumps(summary, indent=1), encoding="utf-8")
+    atomic.write_json(OSM_DIR / "summary.json", summary, indent=1)
 
 
 if __name__ == "__main__":

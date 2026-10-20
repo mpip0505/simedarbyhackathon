@@ -1,0 +1,148 @@
+{
+ "method": "Independent sanity check of our NDVI canopy proxy against two trusted free land-cover products.\n\nRun:  python -m backend.gee.crosscheck        (needs Earth Engine login)\nWrites backend/data/cache/crosscheck.json.\n\nReferences (both 10 m, both built from Sentinel-2, so they are NOT ground truth, only independent methods):\n- ESA WorldCover v200 (2021): pixels classed \"tree cover\".\n- Google Dynamic World: pixels whose mean \"trees\" probability over the same window is at least 0.5.\nOur mask: median Sentinel-2 NDVI >= threshold, for the baseline and latest windows, at NDVI 0.5 / 0.6 / 0.7.\nFor each combination we report canopy % from each product and agreement (precision, recall, F1, kappa).\nNote: WorldCover is a 2021 map, so the baseline window (2021-10 to 2023-09) is the closer match in time.",
+ "canopy_ndvi_threshold_in_use": 0.6,
+ "dynamic_world_tree_probability": 0.5,
+ "results": {
+  "baseline": {
+   "esa_worldcover_2021": {
+    "0.5": {
+     "pixels": 122738,
+     "ours_canopy_pct": 17.59,
+     "reference_tree_pct": 27.68,
+     "agreement": 0.786,
+     "precision": 0.678,
+     "recall": 0.431,
+     "f1": 0.527,
+     "kappa": 0.398
+    },
+    "0.6": {
+     "pixels": 122738,
+     "ours_canopy_pct": 9.62,
+     "reference_tree_pct": 27.68,
+     "agreement": 0.793,
+     "precision": 0.865,
+     "recall": 0.301,
+     "f1": 0.446,
+     "kappa": 0.354
+    },
+    "0.7": {
+     "pixels": 122738,
+     "ours_canopy_pct": 2.84,
+     "reference_tree_pct": 27.68,
+     "agreement": 0.75,
+     "precision": 0.98,
+     "recall": 0.101,
+     "f1": 0.182,
+     "kappa": 0.138
+    }
+   },
+   "dynamic_world_same_window": {
+    "0.5": {
+     "pixels": 122738,
+     "ours_canopy_pct": 17.66,
+     "reference_tree_pct": 7.11,
+     "agreement": 0.889,
+     "precision": 0.386,
+     "recall": 0.958,
+     "f1": 0.55,
+     "kappa": 0.499
+    },
+    "0.6": {
+     "pixels": 122738,
+     "ours_canopy_pct": 9.65,
+     "reference_tree_pct": 7.11,
+     "agreement": 0.948,
+     "precision": 0.598,
+     "recall": 0.812,
+     "f1": 0.688,
+     "kappa": 0.661
+    },
+    "0.7": {
+     "pixels": 122738,
+     "ours_canopy_pct": 2.85,
+     "reference_tree_pct": 7.11,
+     "agreement": 0.949,
+     "precision": 0.855,
+     "recall": 0.343,
+     "f1": 0.49,
+     "kappa": 0.468
+    }
+   }
+  },
+  "latest": {
+   "esa_worldcover_2021": {
+    "0.5": {
+     "pixels": 122738,
+     "ours_canopy_pct": 18.32,
+     "reference_tree_pct": 27.68,
+     "agreement": 0.728,
+     "precision": 0.513,
+     "recall": 0.339,
+     "f1": 0.408,
+     "kappa": 0.241
+    },
+    "0.6": {
+     "pixels": 122738,
+     "ours_canopy_pct": 10.34,
+     "reference_tree_pct": 27.68,
+     "agreement": 0.76,
+     "precision": 0.677,
+     "recall": 0.253,
+     "f1": 0.369,
+     "kappa": 0.257
+    },
+    "0.7": {
+     "pixels": 122738,
+     "ours_canopy_pct": 2.81,
+     "reference_tree_pct": 27.68,
+     "agreement": 0.742,
+     "precision": 0.841,
+     "recall": 0.085,
+     "f1": 0.155,
+     "kappa": 0.11
+    }
+   },
+   "dynamic_world_same_window": {
+    "0.5": {
+     "pixels": 122738,
+     "ours_canopy_pct": 18.37,
+     "reference_tree_pct": 4.43,
+     "agreement": 0.859,
+     "precision": 0.236,
+     "recall": 0.979,
+     "f1": 0.38,
+     "kappa": 0.333
+    },
+    "0.6": {
+     "pixels": 122738,
+     "ours_canopy_pct": 10.4,
+     "reference_tree_pct": 4.43,
+     "agreement": 0.931,
+     "precision": 0.381,
+     "recall": 0.894,
+     "f1": 0.534,
+     "kappa": 0.503
+    },
+    "0.7": {
+     "pixels": 122738,
+     "ours_canopy_pct": 2.81,
+     "reference_tree_pct": 4.43,
+     "agreement": 0.959,
+     "precision": 0.555,
+     "recall": 0.352,
+     "f1": 0.431,
+     "kappa": 0.411
+    }
+   }
+  }
+ },
+ "threshold_comparison": {
+  "mean_f1_by_threshold": {
+   "0.5": 0.466,
+   "0.6": 0.509,
+   "0.7": 0.315
+  },
+  "best": "0.6"
+ },
+ "caveat": "Both references are satellite-derived maps, not field truth. They show whether our proxy agrees with independent methods, not whether it counts trees correctly."
+}

@@ -11,6 +11,7 @@ import time
 import geopandas as gpd
 import osmnx as ox
 
+from backend import atomic
 from backend.config import CACHE_DIR
 
 OSM_DIR = CACHE_DIR / "osm"
@@ -59,7 +60,7 @@ def fetch_layer(name: str, polygon, refresh: bool = False) -> gpd.GeoDataFrame:
             time.sleep(5)
     else:
         raise RuntimeError(f"Could not download OSM layer '{name}': {last}")
-    gdf.to_file(path, driver="GeoJSON")
+    atomic.write_geodataframe(gdf, path)
     return gdf
 
 
@@ -70,13 +71,13 @@ def main() -> None:
     ox.settings.requests_timeout = 60  # fail fast, then rotate to the next mirror
     poly = area_polygon()
     OSM_DIR.mkdir(parents=True, exist_ok=True)
-    gpd.GeoSeries([poly], crs=4326).to_file(OSM_DIR / "aoi.geojson", driver="GeoJSON")
+    atomic.write_geodataframe(gpd.GeoSeries([poly], crs=4326), OSM_DIR / "aoi.geojson")
     summary = {"place": PLACE, "bbox_wsen": [round(x, 5) for x in poly.bounds], "layers": {}}
     for name in LAYERS:
         gdf = fetch_layer(name, poly, args.refresh)
         summary["layers"][name] = len(gdf)
         print(f"{name}: {len(gdf)} features")
-    (OSM_DIR / "summary.json").write_text(json.dumps(summary, indent=1), encoding="utf-8")
+    atomic.write_json(OSM_DIR / "summary.json", summary, indent=1)
 
 
 if __name__ == "__main__":

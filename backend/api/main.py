@@ -1,20 +1,70 @@
-"""FastAPI service. Run:  uvicorn backend.api.main:app --reload --port 8000"""
+"""FastAPI service. Run:  uvicorn backend.api.main:app --reload --port 8000
+
+Errors are always small JSON bodies with a request id (also sent as the X-Request-ID header); details and stack
+traces go to the log, never to the client.
+"""
+import logging
+import time
+import uuid
+from contextlib import asynccontextmanager
 from typing import Optional
 
-from fastapi import FastAPI, HTTPException, Query
+from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse
+from fastapi.responses import FileResponse, JSONResponse
 
-from backend.api import scoring, store
+from backend import logging_config
+from backend.api import scoring, selfcheck, store
 from backend.config import ATTRIBUTION, CAVEATS
 from backend.schema import Meta, Summary
 
-app = FastAPI(title="Elmina Canopy Prioritiser API", version="0.2.0")
+logging_config.setup()
+log = logging.getLogger("backend.api")
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Check the data once at startup and say clearly what is being served."""
+    result = selfcheck.check()
+    log.info("startup: data_mode=%s sites=%d ok=%s", result["data_mode"], result["site_count"], result["ok"])
+    for w in result["warnings"]:
+        log.warning("startup warning: %s", w)
+    for p in result["problems"]:
+        log.error("startup PROBLEM: %s", p)
+    yield
+
+
+app = FastAPI(title="Elmina Canopy Prioritiser API", version="0.3.0", lifespan=lifespan)
 app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["GET"], allow_headers=["*"])
 
 
-def _ranked_features(weights: Optional[dict] = None) -> list[dict]:
-    feats = store.load_sites()["features"]
+@app.middleware("http")
+async def request_context(request: Request, call_next):
+    """Request id on every response, one log line per request, and no unhandled exception ever reaches the client."""
+    rid = uuid.uuid4().hex[:8]
+    request.state.request_id = rid
+    start = time.perf_counter()
+    try:
+        response = await call_next(request)
+    except Exception:
+        log.exception("unhandled error [%s] %s %s", rid, request.method, request.url.path)
+        response = JSONResponse({"error": "internal_error", "detail": "Something went wrong on the server.",
+                                 "request_id": rid}, status_code=500)
+    response.headers["X-Request-ID"] = rid
+    log.info("%s %s -> %d (%.0f ms) [%s]", request.method, request.url.path, response.status_code,
+             (time.perf_counter() - start) * 1000, rid)
+    return response
+
+
+@app.exception_handler(store.DataUnavailable)
+async def data_unavailable(request: Request, exc: store.DataUnavailable):
+    rid = getattr(request.state, "request_id", None)
+    log.error("data unavailable [%s]: %s", rid, exc)
+    return JSONResponse({"error": "data_unavailable", "detail": str(exc), "request_id": rid}, status_code=503)
+
+
+def _ranked_features(data: dict, weights: Optional[dict] = None) -> list[dict]:
+    feats = data["features"]
     if weights:
         scoring.retotal(feats, weights)
     return sorted(feats, key=lambda f: f["properties"]["rank"])
@@ -25,19 +75,29 @@ def health() -> dict:
     return {"status": "ok"}
 
 
+@app.get("/health/deep")
+def health_deep() -> JSONResponse:
+    """Checks every data file against the contract. 200 when sound, 503 with the problems listed otherwise."""
+    result = selfcheck.check()
+    return JSONResponse(result, status_code=200 if result["ok"] else 503)
+
+
 @app.get("/meta", response_model=Meta)
 def meta() -> Meta:
     corridor = store.load_corridor()["features"]
-    feats = store.load_sites()["features"]
+    data = store.load_sites()
+    feats = data["features"]
     return Meta(
         data_mode=store.data_mode(),
         site_count=len(feats),
         corridor_approximate=any(f["properties"].get("approximate", True) for f in corridor),
         score_source=store.score_source(feats),
         generated_at=store.generated_at(),
+        data_version=data.get("data_version"),
         sources_built=store.sources_built(),
         attribution=ATTRIBUTION,
         caveats=CAVEATS,
+        **store.scores_status(data),
     )
 
 
@@ -62,7 +122,7 @@ def sites(min_score: Optional[float] = Query(None, ge=0, le=100),
         chosen = {k: base[k] if v is None else v for k, v in given.items()}
         if sum(chosen.values()) <= 0:
             raise HTTPException(status_code=422, detail="weights must not all be zero")
-    feats = _ranked_features(chosen)
+    feats = _ranked_features(store.load_sites(), chosen)
     if min_score is not None:
         feats = [f for f in feats if (f["properties"].get("score_total") or 0) >= min_score]
     if limit is not None:

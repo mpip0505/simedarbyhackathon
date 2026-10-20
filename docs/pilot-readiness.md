@@ -1,0 +1,46 @@
+# From prototype to pilot: what Sime Darby Property would need
+
+Written for: the pitch writers, and anyone from Sime Darby Property who asks "could we use this?".
+Honest short answer: **this is a screening tool.** It ranks where to look first and shows the method working on real
+Elmina data. It is not yet something to base a climate disclosure or a planting contract on.
+
+## What exists today
+- A repeatable pipeline: free Sentinel-2 and Landsat imagery in Google Earth Engine, OpenStreetMap paths/roads/parks,
+  one command to rebuild (`python -m backend.build_cache`), tests, and a small API that serves ranked sites, a
+  before/after summary and map layers.
+- Site-level features for 564 **simulated** candidate cells: temperature, vegetation, surroundings, nearby walking
+  routes without shade, distance to an **approximate** corridor, and a data-reliability flag per site.
+- Checks that guard the numbers: an imagery go/no-go, a canopy-threshold sensitivity run, an independent comparison
+  with ESA WorldCover and Dynamic World (see `backend/data/cache/crosscheck.json`), and a data version on every build.
+
+## What it is not (say this before a judge does)
+- Not Sime Darby Property's planting list: sites are simulated 30 m cells on OSM open land.
+- Not the official corridor: it is built from OSM parks (about 2 km of spine against the stated 5 km).
+- Not a tree count or carbon figure: canopy is a vegetation-index proxy, and it moves about 5 points between years.
+- Not validated against ground truth: nobody on the team has field plots, a tree inventory or LiDAR.
+- Temperature is for ranking, not quoting (Landsat thermal is about 100 m native; about 18% of the area is gap-filled).
+
+## What a pilot would need, and what each changes in the backend
+| Need | Why it matters | Backend change |
+|---|---|---|
+| **Their real planting-site list** (polygons or points, ideally with species and ERT flag) | The whole value is ranking *their* remaining sites, not our simulated ones | `--sites-file`: score a supplied list with the same features instead of generating cells; keep their IDs; drop the "simulated" label |
+| **Ground truth** (tree inventory, field plots, drone or LiDAR canopy height) for a sample of Elmina | Without it we can only show our proxy agrees with other satellite maps, not that it is right. Needed to choose the canopy threshold defensibly | A calibration step: fit and report error of the proxy against the sample; replace the fixed NDVI threshold |
+| **Official corridor polygon and precinct boundaries**, their own path/road GIS | Connectivity scoring currently inherits our approximation | Drop the polygon at `backend/data/input/corridor_official.geojson` (already supported); swap OSM paths for their layer |
+| **A seasonal rerun** that someone owns | "Re-score every season at near-zero cost" is the core claim; it needs scheduling, not a laptop | Scheduled job (cloud or on-prem), results archive, per-build data version (already stamped), failure alerts |
+| **Earth Engine licensing** | Our registration is *noncommercial* and says no payment is received for the work. A paid pilot or an internal commercial use changes that | Move to a commercial Earth Engine plan, or replace Earth Engine with a Sentinel Hub / open-data pipeline |
+| **Hosting, access control, audit trail** | A real user needs a stable URL, logins, and a record of which data version produced which number | Deploy behind authentication; keep the request and build logs the API already writes; store each build immutably |
+| **Methodology review by their sustainability and assurance people** | Disclosure-grade numbers need a reviewed method, uncertainty ranges and sign-off | Publish the method and its sensitivity (largely written: README, data dictionary, `canopy_sensitivity.json`); add uncertainty bands to every reported figure |
+| **Planting realities we do not model** | Soil, species suitability, irrigation, land ownership, construction schedule (some "brownfield" in OSM may be about to be built on), cost per site | Extra layers and a feasibility filter before ranking; a site-status field they maintain |
+
+## What we would honestly say to the judges
+1. We built a working, tested pipeline on real free data, and we know exactly where it is weak.
+2. The ranking is useful for *where to look first*; the before/after view is a demonstration, not a measurement of
+   growth (the change we detect is smaller than year-to-year noise).
+3. The pilot is small and concrete: their site list plus one afternoon of field plots turns a screening tool into
+   something they can test against their own records.
+
+## Questions only Sime Darby Property can answer
+- Is there a site list or planting schedule (polygons, species, status) that could be shared for a pilot?
+- Is there any tree inventory, LiDAR or drone survey of Elmina?
+- Which disclosure or internal report would use these numbers, and what level of evidence does it require?
+- Where must the data and the service live (their cloud, ours, on-premise)?

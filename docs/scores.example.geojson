@@ -1,0 +1,42 @@
+{
+ "type": "FeatureCollection",
+ "data_version": "482cd831d34a",
+ "features": [
+  {
+   "type": "Feature",
+   "geometry": null,
+   "properties": {
+    "site_id": "ELM-3672-11803",
+    "score_cooling": 80.0,
+    "score_connectivity": 70.0,
+    "score_shade": 60.0,
+    "score_total": 72.0,
+    "rank": 1
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": null,
+   "properties": {
+    "site_id": "ELM-3672-11804",
+    "score_cooling": 70.0,
+    "score_connectivity": 60.0,
+    "score_shade": 50.0,
+    "score_total": 62.0,
+    "rank": 2
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": null,
+   "properties": {
+    "site_id": "ELM-3672-11805",
+    "score_cooling": 60.0,
+    "score_connectivity": 50.0,
+    "score_shade": 40.0,
+    "score_total": 52.0,
+    "rank": 3
+   }
+  }
+ ]
+}

@@ -11,6 +11,7 @@ import numpy as np
 import rasterio
 from PIL import Image
 
+from backend import atomic
 from backend.config import CACHE_DIR
 
 matplotlib.use("Agg")
@@ -41,14 +42,14 @@ def main() -> None:
                 arr = src.read(1).astype("float32")
                 b = src.bounds
             name = f"{layer}_{period}"
-            Image.fromarray(to_rgba(arr, spec["vmin"], spec["vmax"], spec["cmap"]), "RGBA").save(
-                OVERLAY_DIR / f"{name}.png")
+            atomic.write_image(Image.fromarray(to_rgba(arr, spec["vmin"], spec["vmax"], spec["cmap"]), "RGBA"),
+                               OVERLAY_DIR / f"{name}.png")
             items.append({"name": name, "layer": layer, "period": period, "title": spec["title"],
                           "unit": spec["unit"], "vmin": spec["vmin"], "vmax": spec["vmax"], "cmap": spec["cmap"],
                           "bounds": [[b.bottom, b.left], [b.top, b.right]],  # Leaflet order: [[south, west], [north, east]]
                           "url": f"/layers/overlays/{name}.png",
                           "note": "gap-filled from neighbours within 100 m" if layer == "lst" else ""})
-    (OVERLAY_DIR / "overlays.json").write_text(json.dumps({"overlays": items}, indent=1), encoding="utf-8")
+    atomic.write_json(OVERLAY_DIR / "overlays.json", {"overlays": items}, indent=1)
     print(f"wrote {len(items)} overlays to {OVERLAY_DIR}")
 
 

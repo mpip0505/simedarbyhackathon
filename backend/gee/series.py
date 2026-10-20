@@ -7,7 +7,9 @@ Canopy comes with a low/high band from the NDVI 0.7 / 0.5 thresholds, because th
 import json
 from datetime import date
 
+from backend import atomic
 from backend.config import CACHE_DIR, CANOPY_NDVI_THRESHOLD
+from backend.gee.safe import get_info
 from backend.gee.composites import (canopy_mask, end_exclusive, get_aoi, landsat_clear, lst_composite,
                                     ndvi_composite)
 
@@ -37,11 +39,11 @@ def run() -> list:
         thresholds = (CANOPY_NDVI_THRESHOLD, *BAND)
         bands = [canopy_mask(ndvi, t).rename(f"c{round(t * 100)}") for t in thresholds]
         kw = dict(geometry=aoi, maxPixels=1e9, tileScale=4)
-        c = ee.Image.cat(bands).reduceRegion(ee.Reducer.mean(), scale=10, **kw).getInfo()
+        c = get_info(ee.Image.cat(bands).reduceRegion(ee.Reducer.mean(), scale=10, **kw), f"series canopy {label}")
         lst = lst_composite(ee, aoi, start, end)
-        t = lst.reduceRegion(ee.Reducer.mean(), scale=30, **kw).getInfo()["LST_C"]
-        obs = landsat_clear(ee, aoi, start, end_exclusive(end)).select("ST_B10").count().reduceRegion(
-            ee.Reducer.mean(), scale=30, **kw).getInfo()["ST_B10"]
+        t = get_info(lst.reduceRegion(ee.Reducer.mean(), scale=30, **kw), f"series LST {label}")["LST_C"]
+        obs = get_info(landsat_clear(ee, aoi, start, end_exclusive(end)).select("ST_B10").count().reduceRegion(
+            ee.Reducer.mean(), scale=30, **kw), f"series Landsat obs {label}")["ST_B10"]
         pts.append({"label": label, "start": start, "end": end,
                     "canopy_pct": round(c[f"c{round(CANOPY_NDVI_THRESHOLD * 100)}"] * 100, 2),
                     "canopy_pct_low": round(c[f"c{round(BAND[0] * 100)}"] * 100, 2),
@@ -58,7 +60,7 @@ def main() -> None:
            "note": "Single-year values are noisy: canopy moves about 5 points year to year and single-year Landsat "
                    "has few clear observations. Read the trend, not individual points.", "points": pts}
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    (CACHE_DIR / "series.json").write_text(json.dumps(out, indent=1), encoding="utf-8")
+    atomic.write_json(CACHE_DIR / "series.json", out, indent=1)
 
 
 if __name__ == "__main__":

@@ -46,4 +46,7 @@ CAVEATS = [
     "Canopy cover is an NDVI-threshold proxy, not a tree count, and it depends heavily on the threshold chosen.",
     "Canopy proxy values vary by about 5 percentage points between single years (see canopy_sensitivity.json), "
     "so small before/after differences in canopy are within noise and should not be reported as change.",
+    "Independent satellite land-cover maps disagree on Elmina's canopy share (crosscheck.json): ESA WorldCover (2021) "
+    "maps about 28% as tree cover, Google Dynamic World about 7% falling to about 4%, and our NDVI proxy about 10%. "
+    "Canopy % is therefore uncertain by a factor of several, and none of the references supports a direction of change.",
 ]

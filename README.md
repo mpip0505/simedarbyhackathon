@@ -1,59 +1,174 @@
-# Elmina Canopy Prioritiser (backend)
+# Elmina Canopy Prioritiser: backend
 
-Ranks where to plant trees first in City of Elmina (Selangor) and supplies before/after evidence.
-Sime Darby Property "Township of Tomorrow" hackathon, Planet track. This folder is the **backend**: satellite
-and map data in, a small API out. Candidate sites are **simulated** (we do not have Sime Darby Property's real list).
+A geospatial screening tool that ranks where to plant trees first in **City of Elmina (Selangor)** and shows a
+before/after view of vegetation and surface temperature. Built for the Sime Darby Property *Township of Tomorrow*
+hackathon (Planet / biodiversity track).
 
-## Run the demo (no Earth Engine, no internet needed)
-```
+This repository is the **backend**: satellite and map data in, a small tested API out. The scoring model (ML) and the
+web map (Frontend) are built by teammates against the API and data contract described here.
+
+> **Status: working prototype, screening-grade.** It ranks where to look first. It is **not** a tree count, a carbon
+> figure or disclosure-grade evidence. The candidate sites are **simulated** (we do not have Sime Darby Property's
+> real planting list). Read [Limitations](#limitations-read-this-before-quoting-any-number) before quoting any number.
+
+## Contents
+[Quick start](#quick-start) · [How it works](#how-it-works) · [API](#api) · [Rebuilding the data](#rebuilding-the-data) ·
+[For the ML teammate](#for-the-ml-teammate) · [For the Frontend teammate](#for-the-frontend-teammate) ·
+[Reliability](#reliability) · [Testing and CI](#testing-and-ci) · [Repository layout](#repository-layout) ·
+[Limitations](#limitations-read-this-before-quoting-any-number) · [Data credits](#data-credits)
+
+## Quick start
+Needs Python 3.12. The demo runs **offline**: no Earth Engine login and no internet.
+```bash
 pip install -r backend/requirements.txt
 uvicorn backend.api.main:app --port 8000
 ```
-Open http://localhost:8000/docs. The API serves the cached files in `backend/data/cache/`. If that folder has no
-`sites.geojson` it falls back to invented mock data in `backend/data/mock/` (`/meta` says which).
+Open http://localhost:8000/docs for the interactive API. The API serves the committed files in
+`backend/data/cache/`; if that folder is incomplete it says so in the log and serves invented mock data
+(`GET /meta` reports `data_mode`).
 
-Field-by-field contract for ML and Frontend: [docs/data-contract.md](docs/data-contract.md).
-Handoff note for teammates: [docs/team-handoff.md](docs/team-handoff.md).
+```bash
+curl "localhost:8000/sites?limit=3"                                   # top 3 ranked sites (GeoJSON)
+curl "localhost:8000/sites?w_cooling=0&w_connectivity=0&w_shade=1"    # re-rank live with different weights
+curl localhost:8000/summary                                           # before/after canopy and temperature
+curl localhost:8000/health/deep                                       # checks every data file against the contract
+```
 
-## Rebuild the data
+## How it works
 ```
-python -m backend.build_cache --offline     # corridor, overlays, sites from the cached OSM + rasters (no network)
-python -m backend.build_cache --skip-gee    # also re-downloads OSM
-python -m backend.build_cache               # everything, including Earth Engine
+ Sentinel-2 (NDVI)  ─┐                          ┌─> composites + rasters ─┐
+ Landsat 8/9 (LST)  ─┼─ Google Earth Engine ────┤                         │
+                     │   cloud-masked medians   └─> baseline/latest stats ┤
+ OpenStreetMap ──────┴─> paths, roads, parks, buildings ──> approximate    ├─> simulated candidate sites
+                                                            corridor ──────┘   + measured features
+                                                                                     │
+                       ML teammate: scores.geojson ──(validated, versioned)──────────┤
+                                                                                     v
+                                                         FastAPI  ──>  Frontend map and report view
 ```
-The full run needs a one-time Earth Engine login:
+1. **Imagery.** Sentinel-2 NDVI and Landsat 8/9 surface temperature, each a per-pixel **median of cloud-masked scenes**
+   over two-year windows (baseline 2021-10 to 2023-09, latest 2024-10 to 2026-09). Tropical cloud makes single scenes
+   unusable, so pooling dates is the method, and we say so. Go/no-go result: `backend/data/cache/imagery_check.txt`.
+2. **Map data.** Paths, roads, parks, open land and buildings from OpenStreetMap, clipped to the Elmina boundary.
+3. **Corridor.** An **approximate** Urban Biodiversity Corridor: the 9 largest OSM parks joined along footpaths and
+   roads where a sensible route exists. Drop the official polygon at `backend/data/input/corridor_official.geojson`
+   to replace it.
+4. **Candidate sites.** 30 m grid cells on open land and non-park corridor land, minus buildings and roads, labelled
+   `simulated` (564 sites). Each carries about 30 measured features (see the [data dictionary](docs/data-dictionary.md)):
+   temperature, vegetation, surroundings, unshaded nearby walking routes, corridor distances, a reliability flag.
+5. **Scores.** The ML teammate delivers `scores.geojson`. Until then the API serves a clearly labelled **placeholder**
+   score so the map is usable; it is not the model.
+6. **API.** Ranked sites, one site's detail, a before/after summary, yearly series, map overlays, health checks.
+
+## API
+All endpoints are `GET`. Errors are small JSON bodies with a `request_id` (also in the `X-Request-ID` header).
+
+| Endpoint | Returns |
+|---|---|
+| `/sites?min_score=&limit=&w_cooling=&w_connectivity=&w_shade=` | Ranked GeoJSON FeatureCollection. Any weight re-totals and re-ranks live (weights are normalised). All-zero weights give 422. |
+| `/sites/{site_id}` | One site, or 404 |
+| `/summary` | Baseline vs latest canopy % and mean temperature, deltas, caveats |
+| `/summary/series` | Yearly canopy (with a low/high band) and temperature for an "over time" chart |
+| `/layers/corridor` | Approximate corridor polygon |
+| `/layers/overlays` and `/layers/overlays/{name}.png` | Before/after NDVI and temperature images with map bounds and a shared colour range |
+| `/weights` | Default weights the sliders should start from |
+| `/meta` | Data mode, `score_source` (`ml`, `placeholder`, `mock`), `scores_stale`, `scores_error`, data version, build times, attribution, caveats |
+| `/health` and `/health/deep` | Liveness; and a full data check (200 sound, 503 with the problems listed) |
+
+Field-by-field contract: [docs/data-contract.md](docs/data-contract.md).
+
+## Rebuilding the data
+```bash
+python -m backend.build_cache --offline    # corridor, overlays, sites from cached OSM + rasters (no network)
+python -m backend.build_cache --skip-gee   # also re-downloads OpenStreetMap
+python -m backend.build_cache              # everything, including Earth Engine (about 4 minutes)
 ```
+The full run needs a one-time Earth Engine login and a Cloud project registered for Earth Engine:
+```bash
 earthengine authenticate
-$env:GEE_PROJECT = "<your-cloud-project-id>"     # PowerShell; use `export` on macOS/Linux
+export GEE_PROJECT=<your-project-id>       # PowerShell: $env:GEE_PROJECT = "<your-project-id>"
 ```
 Steps run in order and stop at the first failure: OSM download, OSM layers, corridor, Earth Engine composites and
-summary, yearly series, canopy sensitivity, map overlays, candidate sites. `backend/data/cache/build_info.json`
-records when OSM and satellite data were really built.
+summary, yearly series, canopy sensitivity, independent cross-check, map overlays, candidate sites.
+Builds are deterministic: a full rebuild from a fresh download reproduced the committed data exactly (same
+`data_version`, same 564 site IDs, same numbers). Network calls retry transient failures, and
+`backend/data/cache/build_info.json` records when OSM and satellite data were really fetched.
 
-## Layout
+## For the ML teammate
+Start here: [docs/data-dictionary.md](docs/data-dictionary.md) and [docs/ml-developer-prompt.md](docs/ml-developer-prompt.md).
+```python
+from backend.ml_io import load_sites_df, write_scores
+df = load_sites_df()     # one row per site: surroundings, shade, corridor, reliability, block_id, ...
+# compute score_cooling, score_connectivity, score_shade, score_total (0-100) and rank (1 = plant first)
+write_scores(df_scores)  # validates, stamps the data version, writes backend/data/cache/scores.geojson
+```
+- Check a file by hand: `python -m backend.validate_scores file.geojson`. Format example: `docs/scores.example.geojson`.
+- A bad scores file can never break the API: it is ignored, logged, and reported in `/meta.scores_error`.
+- Split train/test by `block_id` (neighbouring cells are correlated). Site IDs are stable across rebuilds.
+- **There are no ground-truth labels.** Validation can only check consistency, not that the ranking is right.
+
+## For the Frontend teammate
+[docs/team-handoff.md](docs/team-handoff.md) has the screen-by-screen guide. Short version: colour sites by
+`score_total`; start sliders from `/weights`; draw overlays with `L.imageOverlay(url, bounds)`; always show the
+"simulated sites" label, the caveats and attribution from `/meta`, and a badge when `score_source` is not `ml`.
+
+## Reliability
+- **Offline by design.** The demo needs only the committed cache. The API never imports Earth Engine or OSM libraries
+  (a test enforces it).
+- **Atomic writes.** Every cache file is written to a temp file and swapped in, so a reader never sees a half-written
+  file. (Verified: plain writes produced corrupt reads in a race test; the atomic version produced none.)
+- **Graceful degradation.** A bad ML file is ignored; an unreadable file after a good read keeps serving the last good
+  copy; an incomplete cache falls back to mock data loudly; unexpected errors return small JSON, not stack traces.
+- **Self-check.** The API checks every data file against the contract at startup and on `/health/deep`.
+- **Logging.** One line per request and per fallback decision (`LOG_LEVEL` sets the level).
+- **Stale-score detection.** Scores carry the data version they were computed on; `/meta.scores_stale` flags a mismatch.
+
+## Testing and CI
+```bash
+python -m pytest backend/tests -q          # 138 tests, no Earth Engine or network needed
+python -m backend.api.selfcheck            # deep check of the committed data
+python -m backend.scripts.qa_plot          # draws docs/qa-map.png: sites, corridor, parks, paths, buildings
+```
+GitHub Actions (`.github/workflows/tests.yml`) runs the tests and the data check on every push and pull request
+(the workflow only runs once pushed to GitHub; it has not been run yet). Live Earth Engine steps cannot run in CI;
+they are exercised by `python -m backend.build_cache` with your login.
+
+## Repository layout
 | Path | What |
 |---|---|
-| `backend/api/` | FastAPI service, score merge and weights |
-| `backend/gee/` | Earth Engine: imagery check, composites, summary, series, sensitivity |
-| `backend/osm/` | OpenStreetMap download, clipping, approximate corridor |
-| `backend/sites/` | simulated candidate site generator |
-| `backend/overlays.py` | NDVI / temperature map images |
-| `backend/data/cache/` | generated files the API serves (committed so the demo works offline) |
-| `backend/tests/` | `python -m pytest backend/tests -q` |
+| `backend/api/` | FastAPI app, data store, score merge and weights, self-check |
+| `backend/gee/` | Earth Engine: imagery check, composites, summary, yearly series, sensitivity, cross-check |
+| `backend/osm/` | OpenStreetMap download, clipping into layers, approximate corridor |
+| `backend/sites/` | Simulated candidate-site generator and feature extraction |
+| `backend/ml_io.py`, `backend/validate_scores.py` | ML hand-off: feature table in, validated scores out |
+| `backend/build_cache.py` | One-command rebuild |
+| `backend/atomic.py`, `retry.py`, `logging_config.py` | Atomic writes, transient-failure retries, logging |
+| `backend/data/cache/` | Generated files the API serves (committed so the demo works offline) |
+| `backend/data/mock/` | Invented placeholder data for development |
+| `backend/tests/` | Test suite |
+| `docs/` | Data contract, data dictionary, team handoff, ML prompt, pilot-readiness, QA map |
 
-## Honest limits (say these in the pitch)
-- **Simulated sites.** 30 m cells on OSM open land and corridor land, not a real planting list.
-- **Approximate corridor.** Built from the 9 largest OSM parks, joined along footpaths/roads where a sensible route
-  exists. Its connecting spine is only about 2 km against the stated 5 km corridor, and one park (north-west) is left
-  unlinked. Replace it by dropping the official polygon at `backend/data/input/corridor_official.geojson`.
-- **Tropical cloud.** Imagery is a multi-date median. Go/no-go result: `backend/data/cache/imagery_check.txt`.
-- **Landsat thermal is coarse** (about 100 m native). Use it to rank sites, not to quote temperatures. About 18%
-  of the area has no reliable pixel and is filled from neighbours within 100 m for site scoring.
+## Limitations (read this before quoting any number)
+- **Simulated sites.** 30 m cells on OSM open land, not a real planting list. OSM tags little undeveloped land in the
+  west of Elmina, so the map under-represents it.
+- **Approximate corridor.** About 2 km of connecting spine against the stated 5 km, and one park (north-west) left
+  unlinked. Connectivity features inherit this.
+- **Tropical cloud.** Median composites over two-year windows; they can blur short-lived change.
+- **Coarse thermal.** Landsat surface temperature is about 100 m native. Use it to rank sites, not to quote
+  temperatures. About 18% of the area has no reliable pixel and is filled from neighbours within 100 m for site scoring.
 - **Canopy is a proxy**, NDVI >= 0.6, not a tree count. It moves about 5 points between single years and depends
   strongly on the threshold (about 18%, 10% and 3% at 0.5, 0.6 and 0.7), so the baseline-to-latest change is within
-  noise. See `backend/data/cache/canopy_sensitivity.json`.
-- **Scores:** until ML delivers `scores.geojson`, the API serves a labelled placeholder (`score_source: "placeholder"`).
+  noise: **read it as "no detectable change", not as growth.**
+- **Independent maps disagree about canopy.** ESA WorldCover (2021) maps about 28% of Elmina as tree cover; Google
+  Dynamic World about 7% (baseline window) falling to about 4% (latest); our proxy says about 10%. So canopy % is
+  uncertain by a factor of several, and none of the references supports a direction of change. NDVI 0.6 gives the best
+  average agreement of the three thresholds tried (F1 0.51, against 0.47 at 0.5 and 0.32 at 0.7). Both references are
+  satellite-derived, not field truth. Details: `backend/data/cache/crosscheck.json`.
+- **No ground truth.** No tree inventory, LiDAR or field plots exist for this project.
+- **Scores.** Until ML delivers `scores.geojson` the API serves a labelled placeholder.
+- **Not disclosure-grade.** What a real pilot would need: [docs/pilot-readiness.md](docs/pilot-readiness.md).
 
 ## Data credits
-Map data (c) OpenStreetMap contributors (ODbL). Contains modified Copernicus Sentinel-2 data. Landsat 8/9 Collection 2
-Level-2 courtesy of the U.S. Geological Survey. Processed with Google Earth Engine (noncommercial use).
+Map data (c) OpenStreetMap contributors (ODbL). Contains modified Copernicus Sentinel-2 data (European Space Agency).
+Landsat 8/9 Collection 2 Level-2 data courtesy of the U.S. Geological Survey. ESA WorldCover and Google Dynamic World
+used for the cross-check. Processed with Google Earth Engine (noncommercial use).

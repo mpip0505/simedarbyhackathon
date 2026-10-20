@@ -7,6 +7,7 @@ import json
 
 import geopandas as gpd
 
+from backend import atomic
 from backend.config import CACHE_DIR
 from backend.osm.corridor import build_corridor
 from backend.osm.extract import OSM_DIR
@@ -19,9 +20,9 @@ def main() -> None:
     out = build_corridor(parks, paths=gpd.read_file(OSM_DIR / "paths.geojson"),
                          roads=gpd.read_file(OSM_DIR / "roads.geojson"))
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
-    (CACHE_DIR / "corridor.geojson").write_text(json.dumps(out["corridor"]), encoding="utf-8")
-    (CACHE_DIR / "corridor_spine.geojson").write_text(json.dumps(out["spine"]), encoding="utf-8")
-    (CACHE_DIR / "corridor_stats.json").write_text(json.dumps(out["stats"], indent=1), encoding="utf-8")
+    atomic.write_json(CACHE_DIR / "corridor.geojson", out["corridor"])
+    atomic.write_json(CACHE_DIR / "corridor_spine.geojson", out["spine"])
+    atomic.write_json(CACHE_DIR / "corridor_stats.json", out["stats"], indent=1)
     names = sorted({str(n) for n in parks["name"].dropna()}) if "name" in parks else []
     print(json.dumps(out["stats"], indent=1))
     print(f"{len(parks)} park features, {len(names)} named: {names[:15]}")

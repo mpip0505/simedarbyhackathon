@@ -1,0 +1,25 @@
+name: tests
+
+# Runs the backend test suite on every push and pull request.
+# No Earth Engine login or live network is needed: tests use synthetic data and the committed cache.
+on:
+  push:
+  pull_request:
+
+jobs:
+  backend:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: backend/requirements.txt
+      - name: Install pinned requirements
+        run: pip install -r backend/requirements.txt
+      - name: Run tests
+        run: python -m pytest backend/tests -q
+      - name: Check the committed data is sound
+        run: python -m backend.api.selfcheck
