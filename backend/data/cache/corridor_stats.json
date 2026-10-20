@@ -1,0 +1,7 @@
+{
+ "approximate": true,
+ "n_parks_used": 9,
+ "spine_length_m": 4213.2,
+ "buffer_m": 40,
+ "method": "MST of park polygons, buffered"
+}

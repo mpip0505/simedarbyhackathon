@@ -1,0 +1,16 @@
+{
+ "place": "Elmina (clipped from elmina_api.osm)",
+ "bbox_wsen": [
+  101.49249,
+  3.16025,
+  101.5289,
+  3.21351
+ ],
+ "layers": {
+  "parks": 17,
+  "open_land": 25,
+  "paths": 361,
+  "roads": 949,
+  "buildings": 1189
+ }
+}

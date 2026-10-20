@@ -1,0 +1,710 @@
+{
+ "type": "FeatureCollection",
+ "features": [
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       101.504798,
+       3.235012
+      ],
+      [
+       101.505158,
+       3.235012
+      ],
+      [
+       101.505158,
+       3.235371
+      ],
+      [
+       101.504798,
+       3.235371
+      ],
+      [
+       101.504798,
+       3.235012
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "site_id": "MOCK-005",
+    "source": "mock",
+    "area_m2": 1600.0,
+    "ndvi_mean": 0.468,
+    "lst_c_mean": 35.3,
+    "canopy_pct_baseline": 40.2,
+    "dist_to_path_m": 10.2,
+    "path_length_within_50m": 32.6,
+    "corridor_gap_flag": true,
+    "corridor_gap_dist_m": 6.1,
+    "score_cooling": 75.0,
+    "score_connectivity": 66.6,
+    "score_shade": 93.3,
+    "score_total": 76.6,
+    "rank": 1
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       101.512816,
+       3.199093
+      ],
+      [
+       101.513176,
+       3.199093
+      ],
+      [
+       101.513176,
+       3.199453
+      ],
+      [
+       101.512816,
+       3.199453
+      ],
+      [
+       101.512816,
+       3.199093
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "site_id": "MOCK-003",
+    "source": "mock",
+    "area_m2": 1600.0,
+    "ndvi_mean": 0.593,
+    "lst_c_mean": 35.3,
+    "canopy_pct_baseline": 58.9,
+    "dist_to_path_m": 62.6,
+    "path_length_within_50m": 13.0,
+    "corridor_gap_flag": true,
+    "corridor_gap_dist_m": 5.8,
+    "score_cooling": 70.0,
+    "score_connectivity": 93.3,
+    "score_shade": 62.0,
+    "score_total": 76.2,
+    "rank": 2
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       101.490495,
+       3.225519
+      ],
+      [
+       101.490855,
+       3.225519
+      ],
+      [
+       101.490855,
+       3.225878
+      ],
+      [
+       101.490495,
+       3.225878
+      ],
+      [
+       101.490495,
+       3.225519
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "site_id": "MOCK-006",
+    "source": "mock",
+    "area_m2": 1600.0,
+    "ndvi_mean": 0.351,
+    "lst_c_mean": 32.3,
+    "canopy_pct_baseline": 22.6,
+    "dist_to_path_m": 39.3,
+    "path_length_within_50m": 85.3,
+    "corridor_gap_flag": true,
+    "corridor_gap_dist_m": 10.3,
+    "score_cooling": 52.7,
+    "score_connectivity": 92.5,
+    "score_shade": 67.4,
+    "score_total": 70.3,
+    "rank": 3
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       101.499845,
+       3.206324
+      ],
+      [
+       101.500205,
+       3.206324
+      ],
+      [
+       101.500205,
+       3.206683
+      ],
+      [
+       101.499845,
+       3.206683
+      ],
+      [
+       101.499845,
+       3.206324
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "site_id": "MOCK-013",
+    "source": "mock",
+    "area_m2": 1600.0,
+    "ndvi_mean": 0.652,
+    "lst_c_mean": 36.8,
+    "canopy_pct_baseline": 67.8,
+    "dist_to_path_m": 55.1,
+    "path_length_within_50m": 106.8,
+    "corridor_gap_flag": false,
+    "corridor_gap_dist_m": 0.0,
+    "score_cooling": 81.1,
+    "score_connectivity": 32.4,
+    "score_shade": 69.4,
+    "score_total": 61.1,
+    "rank": 4
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       101.495595,
+       3.208032
+      ],
+      [
+       101.495955,
+       3.208032
+      ],
+      [
+       101.495955,
+       3.208391
+      ],
+      [
+       101.495595,
+       3.208391
+      ],
+      [
+       101.495595,
+       3.208032
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "site_id": "MOCK-010",
+    "source": "mock",
+    "area_m2": 1600.0,
+    "ndvi_mean": 0.699,
+    "lst_c_mean": 33.6,
+    "canopy_pct_baseline": 74.8,
+    "dist_to_path_m": 18.2,
+    "path_length_within_50m": 110.9,
+    "corridor_gap_flag": true,
+    "corridor_gap_dist_m": 25.3,
+    "score_cooling": 50.4,
+    "score_connectivity": 59.4,
+    "score_shade": 78.4,
+    "score_total": 60.6,
+    "rank": 5
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       101.509443,
+       3.205683
+      ],
+      [
+       101.509803,
+       3.205683
+      ],
+      [
+       101.509803,
+       3.206043
+      ],
+      [
+       101.509443,
+       3.206043
+      ],
+      [
+       101.509443,
+       3.205683
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "site_id": "MOCK-007",
+    "source": "mock",
+    "area_m2": 1600.0,
+    "ndvi_mean": 0.359,
+    "lst_c_mean": 37.9,
+    "canopy_pct_baseline": 23.8,
+    "dist_to_path_m": 115.9,
+    "path_length_within_50m": 108.6,
+    "corridor_gap_flag": false,
+    "corridor_gap_dist_m": 0.0,
+    "score_cooling": 100,
+    "score_connectivity": 35.8,
+    "score_shade": 25.2,
+    "score_total": 58.8,
+    "rank": 6
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       101.501474,
+       3.231523
+      ],
+      [
+       101.501834,
+       3.231523
+      ],
+      [
+       101.501834,
+       3.231882
+      ],
+      [
+       101.501474,
+       3.231882
+      ],
+      [
+       101.501474,
+       3.231523
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "site_id": "MOCK-014",
+    "source": "mock",
+    "area_m2": 1600.0,
+    "ndvi_mean": 0.442,
+    "lst_c_mean": 29.0,
+    "canopy_pct_baseline": 36.3,
+    "dist_to_path_m": 59.7,
+    "path_length_within_50m": 116.4,
+    "corridor_gap_flag": true,
+    "corridor_gap_dist_m": 18.5,
+    "score_cooling": 19.3,
+    "score_connectivity": 92.2,
+    "score_shade": 52.6,
+    "score_total": 53.1,
+    "rank": 7
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       101.48844,
+       3.200169
+      ],
+      [
+       101.4888,
+       3.200169
+      ],
+      [
+       101.4888,
+       3.200528
+      ],
+      [
+       101.48844,
+       3.200528
+      ],
+      [
+       101.48844,
+       3.200169
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "site_id": "MOCK-008",
+    "source": "mock",
+    "area_m2": 1600.0,
+    "ndvi_mean": 0.323,
+    "lst_c_mean": 31.4,
+    "canopy_pct_baseline": 18.4,
+    "dist_to_path_m": 39.6,
+    "path_length_within_50m": 91.8,
+    "corridor_gap_flag": false,
+    "corridor_gap_dist_m": 0.0,
+    "score_cooling": 45.7,
+    "score_connectivity": 44.4,
+    "score_shade": 73.9,
+    "score_total": 52.3,
+    "rank": 8
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       101.481253,
+       3.235697
+      ],
+      [
+       101.481613,
+       3.235697
+      ],
+      [
+       101.481613,
+       3.236056
+      ],
+      [
+       101.481253,
+       3.236056
+      ],
+      [
+       101.481253,
+       3.235697
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "site_id": "MOCK-015",
+    "source": "mock",
+    "area_m2": 1600.0,
+    "ndvi_mean": 0.671,
+    "lst_c_mean": 29.8,
+    "canopy_pct_baseline": 70.7,
+    "dist_to_path_m": 88.5,
+    "path_length_within_50m": 18.0,
+    "corridor_gap_flag": true,
+    "corridor_gap_dist_m": 28.5,
+    "score_cooling": 17.4,
+    "score_connectivity": 85.4,
+    "score_shade": 40.4,
+    "score_total": 47.0,
+    "rank": 9
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       101.514415,
+       3.224177
+      ],
+      [
+       101.514775,
+       3.224177
+      ],
+      [
+       101.514775,
+       3.224536
+      ],
+      [
+       101.514415,
+       3.224536
+      ],
+      [
+       101.514415,
+       3.224177
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "site_id": "MOCK-004",
+    "source": "mock",
+    "area_m2": 1600.0,
+    "ndvi_mean": 0.594,
+    "lst_c_mean": 35.6,
+    "canopy_pct_baseline": 59.1,
+    "dist_to_path_m": 97.4,
+    "path_length_within_50m": 116.1,
+    "corridor_gap_flag": false,
+    "corridor_gap_dist_m": 0.0,
+    "score_cooling": 72.6,
+    "score_connectivity": 22.0,
+    "score_shade": 40.3,
+    "score_total": 46.8,
+    "rank": 10
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       101.505676,
+       3.199871
+      ],
+      [
+       101.506036,
+       3.199871
+      ],
+      [
+       101.506036,
+       3.20023
+      ],
+      [
+       101.505676,
+       3.20023
+      ],
+      [
+       101.505676,
+       3.199871
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "site_id": "MOCK-001",
+    "source": "mock",
+    "area_m2": 1600.0,
+    "ndvi_mean": 0.301,
+    "lst_c_mean": 31.0,
+    "canopy_pct_baseline": 15.1,
+    "dist_to_path_m": 133.1,
+    "path_length_within_50m": 59.1,
+    "corridor_gap_flag": false,
+    "corridor_gap_dist_m": 0.0,
+    "score_cooling": 43.0,
+    "score_connectivity": 45.1,
+    "score_shade": 31.7,
+    "score_total": 40.9,
+    "rank": 11
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       101.495437,
+       3.237231
+      ],
+      [
+       101.495796,
+       3.237231
+      ],
+      [
+       101.495796,
+       3.237591
+      ],
+      [
+       101.495437,
+       3.237591
+      ],
+      [
+       101.495437,
+       3.237231
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "site_id": "MOCK-009",
+    "source": "mock",
+    "area_m2": 1600.0,
+    "ndvi_mean": 0.402,
+    "lst_c_mean": 31.4,
+    "canopy_pct_baseline": 30.3,
+    "dist_to_path_m": 45.9,
+    "path_length_within_50m": 125.7,
+    "corridor_gap_flag": false,
+    "corridor_gap_dist_m": 0.0,
+    "score_cooling": 42.5,
+    "score_connectivity": 16.8,
+    "score_shade": 65.4,
+    "score_total": 39.2,
+    "rank": 12
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       101.480072,
+       3.208003
+      ],
+      [
+       101.480431,
+       3.208003
+      ],
+      [
+       101.480431,
+       3.208362
+      ],
+      [
+       101.480072,
+       3.208362
+      ],
+      [
+       101.480072,
+       3.208003
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "site_id": "MOCK-002",
+    "source": "mock",
+    "area_m2": 1600.0,
+    "ndvi_mean": 0.428,
+    "lst_c_mean": 29.2,
+    "canopy_pct_baseline": 34.2,
+    "dist_to_path_m": 37.4,
+    "path_length_within_50m": 82.5,
+    "corridor_gap_flag": false,
+    "corridor_gap_dist_m": 0.0,
+    "score_cooling": 21.7,
+    "score_connectivity": 29.5,
+    "score_shade": 76.9,
+    "score_total": 38.2,
+    "rank": 13
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       101.501373,
+       3.210027
+      ],
+      [
+       101.501733,
+       3.210027
+      ],
+      [
+       101.501733,
+       3.210386
+      ],
+      [
+       101.501373,
+       3.210386
+      ],
+      [
+       101.501373,
+       3.210027
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "site_id": "MOCK-012",
+    "source": "mock",
+    "area_m2": 1600.0,
+    "ndvi_mean": 0.503,
+    "lst_c_mean": 30.0,
+    "canopy_pct_baseline": 45.4,
+    "dist_to_path_m": 79.4,
+    "path_length_within_50m": 36.9,
+    "corridor_gap_flag": false,
+    "corridor_gap_dist_m": 0.0,
+    "score_cooling": 25.9,
+    "score_connectivity": 47.9,
+    "score_shade": 42.8,
+    "score_total": 37.8,
+    "rank": 14
+   }
+  },
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       101.481488,
+       3.214848
+      ],
+      [
+       101.481848,
+       3.214848
+      ],
+      [
+       101.481848,
+       3.215208
+      ],
+      [
+       101.481488,
+       3.215208
+      ],
+      [
+       101.481488,
+       3.214848
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "site_id": "MOCK-011",
+    "source": "mock",
+    "area_m2": 1600.0,
+    "ndvi_mean": 0.698,
+    "lst_c_mean": 33.8,
+    "canopy_pct_baseline": 74.7,
+    "dist_to_path_m": 174.9,
+    "path_length_within_50m": 95.4,
+    "corridor_gap_flag": false,
+    "corridor_gap_dist_m": 0.0,
+    "score_cooling": 52.3,
+    "score_connectivity": 5.5,
+    "score_shade": 0,
+    "score_total": 22.8,
+    "rank": 15
+   }
+  }
+ ]
+}

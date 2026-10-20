@@ -1,0 +1,10 @@
+Imagery check for AOI (101.4925, 3.1603, 101.5289, 3.2135) (UNVERIFIED bbox)
+Baseline ('2021-10-01', '2023-09-30'), latest ('2024-10-01', '2026-09-30')
+Pixel masks: Sentinel-2 Cloud Score+ cs_cdf>=0.6; Landsat QA_PIXEL cloud/shadow/dilated.
+
+baseline sentinel2   scenes=144 usable(<= 40% cloud)= 27 cover>=1 obs=100% cover>=3 obs=100% -> GO
+baseline landsat8_9  scenes= 80 usable(<= 40% cloud)= 21 cover>=1 obs=100% cover>=3 obs=93% -> GO
+latest   sentinel2   scenes=171 usable(<= 40% cloud)= 36 cover>=1 obs=100% cover>=3 obs=100% -> GO
+latest   landsat8_9  scenes= 78 usable(<= 40% cloud)= 26 cover>=1 obs=100% cover>=3 obs=100% -> GO
+
+GO: enough clear observations for stable composites.

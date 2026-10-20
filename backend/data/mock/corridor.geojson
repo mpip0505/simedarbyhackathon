@@ -1,0 +1,39 @@
+{
+ "type": "FeatureCollection",
+ "features": [
+  {
+   "type": "Feature",
+   "geometry": {
+    "type": "Polygon",
+    "coordinates": [
+     [
+      [
+       101.48,
+       3.216
+      ],
+      [
+       101.52,
+       3.216
+      ],
+      [
+       101.52,
+       3.224
+      ],
+      [
+       101.48,
+       3.224
+      ],
+      [
+       101.48,
+       3.216
+      ]
+     ]
+    ]
+   },
+   "properties": {
+    "name": "Urban Biodiversity Corridor (MOCK, not real geometry)",
+    "approximate": true
+   }
+  }
+ ]
+}
