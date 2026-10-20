@@ -1,0 +1,92 @@
+{
+ "overlays": [
+  {
+   "name": "ndvi_baseline",
+   "layer": "ndvi",
+   "period": "baseline",
+   "title": "Vegetation (NDVI)",
+   "unit": "NDVI",
+   "vmin": -0.1,
+   "vmax": 0.8,
+   "cmap": "YlGn",
+   "bounds": [
+    [
+     3.1601833380040647,
+     101.49246928357924
+    ],
+    [
+     3.213543265880764,
+     101.52894088411449
+    ]
+   ],
+   "url": "/layers/overlays/ndvi_baseline.png",
+   "note": ""
+  },
+  {
+   "name": "ndvi_latest",
+   "layer": "ndvi",
+   "period": "latest",
+   "title": "Vegetation (NDVI)",
+   "unit": "NDVI",
+   "vmin": -0.1,
+   "vmax": 0.8,
+   "cmap": "YlGn",
+   "bounds": [
+    [
+     3.1601833380040647,
+     101.49246928357924
+    ],
+    [
+     3.213543265880764,
+     101.52894088411449
+    ]
+   ],
+   "url": "/layers/overlays/ndvi_latest.png",
+   "note": ""
+  },
+  {
+   "name": "lst_baseline",
+   "layer": "lst",
+   "period": "baseline",
+   "title": "Surface temperature (ranking-grade)",
+   "unit": "deg C",
+   "vmin": 32.0,
+   "vmax": 50.0,
+   "cmap": "YlOrRd",
+   "bounds": [
+    [
+     3.160093506475653,
+     101.49246928357925
+    ],
+    [
+     3.2137229289375884,
+     101.52912054717133
+    ]
+   ],
+   "url": "/layers/overlays/lst_baseline.png",
+   "note": "gap-filled from neighbours within 100 m"
+  },
+  {
+   "name": "lst_latest",
+   "layer": "lst",
+   "period": "latest",
+   "title": "Surface temperature (ranking-grade)",
+   "unit": "deg C",
+   "vmin": 32.0,
+   "vmax": 50.0,
+   "cmap": "YlOrRd",
+   "bounds": [
+    [
+     3.160093506475653,
+     101.49246928357925
+    ],
+    [
+     3.2137229289375884,
+     101.52912054717133
+    ]
+   ],
+   "url": "/layers/overlays/lst_latest.png",
+   "note": "gap-filled from neighbours within 100 m"
+  }
+ ]
+}

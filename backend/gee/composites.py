@@ -11,6 +11,7 @@ CS_CLEAR = 0.6
 # Landsat Collection 2 Level-2 surface temperature: kelvin = DN * 0.00341802 + 149.0
 ST_SCALE, ST_OFFSET, KELVIN = 0.00341802, 149.0, 273.15
 ST_QA_SCALE, ST_QA_MAX_K = 0.01, 4.0
+LST_FILL_RADIUS_M = 100
 AOI_FILE = CACHE_DIR / "osm" / "aoi.geojson"
 
 
@@ -61,11 +62,18 @@ def ndvi_composite(ee, aoi, start: str, end: str):
     return coll.map(lambda im: im.normalizedDifference(["B8", "B4"]).rename("NDVI")).median().clip(aoi)
 
 
-def lst_composite(ee, aoi, start: str, end: str):
-    """Median land surface temperature in deg C (30 m resampled from ~100 m thermal: ranking use only)."""
+def lst_composite(ee, aoi, start: str, end: str, fill_gaps: bool = False):
+    """Median land surface temperature in deg C (30 m resampled from ~100 m thermal: ranking use only).
+
+    fill_gaps=True fills pixels with no reliable observation from the mean of neighbours within 100 m
+    (the native thermal resolution). Used for site rasters only; reported averages stay unfilled.
+    """
     coll = landsat_clear(ee, aoi, start, end_exclusive(end))
     to_c = lambda im: im.select("ST_B10").multiply(ST_SCALE).add(ST_OFFSET).subtract(KELVIN).rename("LST_C")
-    return coll.map(to_c).median().clip(aoi)
+    lst = coll.map(to_c).median()
+    if fill_gaps:
+        lst = lst.unmask(lst.focalMean(radius=LST_FILL_RADIUS_M, kernelType="circle", units="meters"))
+    return lst.clip(aoi)
 
 
 def canopy_mask(ndvi, threshold: float = CANOPY_NDVI_THRESHOLD):

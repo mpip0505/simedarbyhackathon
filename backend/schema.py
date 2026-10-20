@@ -8,6 +8,7 @@ class SiteProperties(BaseModel):
     site_id: str
     source: Literal["simulated", "mock"]
     area_m2: float = Field(gt=0)
+    origin: Optional[Literal["open_land", "corridor_edge"]] = None  # where the candidate cell came from
 
     # Backend-measured (from satellite + OSM)
     ndvi_mean: float = Field(ge=-1, le=1)
@@ -24,6 +25,7 @@ class SiteProperties(BaseModel):
     score_shade: Optional[float] = Field(default=None, ge=0, le=100)
     score_total: Optional[float] = Field(default=None, ge=0, le=100)
     rank: Optional[int] = Field(default=None, ge=1)
+    score_source: Optional[Literal["ml", "placeholder", "mock"]] = None  # who produced the scores
 
 
 class Period(BaseModel):
@@ -46,4 +48,8 @@ class Meta(BaseModel):
     data_mode: Literal["mock", "cache"]
     site_count: int
     corridor_approximate: bool
+    score_source: Literal["ml", "placeholder", "mock"]
+    generated_at: Optional[str] = None  # when the cached data was built (None for mock data)
+    sources_built: Optional[dict] = None  # when OSM and satellite data were really downloaded/computed
+    attribution: list[str]
     caveats: list[str]

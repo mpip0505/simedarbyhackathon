@@ -20,6 +20,7 @@
   "The corridor polygon is APPROXIMATE (derived from OpenStreetMap) unless an official polygon is supplied.",
   "Land surface temperature comes from Landsat thermal bands (about 100 m native resolution). Use it to rank sites, not to quote exact temperatures.",
   "Imagery is a multi-date median composite to cope with tropical cloud cover; composites can blur short-lived changes.",
-  "Canopy cover is an NDVI-threshold proxy, not a tree count."
+  "Canopy cover is an NDVI-threshold proxy, not a tree count, and it depends heavily on the threshold chosen.",
+  "Canopy proxy values vary by about 5 percentage points between single years (see canopy_sensitivity.json), so small before/after differences in canopy are within noise and should not be reported as change."
  ]
 }

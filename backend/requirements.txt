@@ -1,14 +1,22 @@
-# API (needed now)
-fastapi>=0.115
-uvicorn>=0.34
-pydantic>=2.9
-httpx>=0.27
-pytest>=8
+# Tested on Python 3.12 / Windows. Install:  pip install -r backend/requirements.txt
 
-# Data pipeline (batches 1-4; install when you reach them)
-earthengine-api>=1.0
-geopandas>=1.0
-shapely>=2.0
-osmnx>=2.0
-numpy>=1.26
-rasterio>=1.3
+# API (enough to run the demo from cached data)
+fastapi==0.115.6
+uvicorn==0.34.0
+pydantic==2.11.4
+
+# Data pipeline (only needed to rebuild the cache)
+earthengine-api==1.7.49
+geopandas==1.2.0
+shapely==2.2.0
+osmnx==2.1.1
+osmium==4.3.2
+rasterio==1.5.2
+numpy==2.2.6
+matplotlib==3.10.0
+pillow==11.1.0
+requests==2.32.3
+
+# Tests
+pytest==9.0.3
+httpx==0.28.1

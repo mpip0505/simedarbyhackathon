@@ -27,11 +27,23 @@ CANOPY_NDVI_THRESHOLD = 0.6
 # Weights used only when the API re-totals scores (ML owns the real default).
 DEFAULT_WEIGHTS = {"cooling": 0.4, "connectivity": 0.35, "shade": 0.25}
 
+# Required credits (OpenStreetMap's licence requires attribution). Shown by /meta; show them in the UI footer.
+ATTRIBUTION = [
+    "Map data © OpenStreetMap contributors (ODbL)",
+    "Contains modified Copernicus Sentinel-2 data (European Space Agency)",
+    "Landsat 8/9 Collection 2 Level-2 data, courtesy of the U.S. Geological Survey",
+    "Processed with Google Earth Engine",
+]
+
 # Shown by /meta and /summary so no consumer can miss them.
 CAVEATS = [
     "Candidate planting sites are SIMULATED from open land; they are not Sime Darby Property's real site list.",
     "The corridor polygon is APPROXIMATE (derived from OpenStreetMap) unless an official polygon is supplied.",
     "Land surface temperature comes from Landsat thermal bands (about 100 m native resolution). Use it to rank sites, not to quote exact temperatures.",
+    "About 18% of the area has no reliable Landsat pixel after cloud and quality masking; site temperatures there "
+    "are filled from neighbouring pixels within 100 m. Reported before/after temperature averages are not filled.",
     "Imagery is a multi-date median composite to cope with tropical cloud cover; composites can blur short-lived changes.",
-    "Canopy cover is an NDVI-threshold proxy, not a tree count.",
+    "Canopy cover is an NDVI-threshold proxy, not a tree count, and it depends heavily on the threshold chosen.",
+    "Canopy proxy values vary by about 5 percentage points between single years (see canopy_sensitivity.json), "
+    "so small before/after differences in canopy are within noise and should not be reported as change.",
 ]

@@ -1,10 +1,17 @@
 import pytest
 from fastapi.testclient import TestClient
 
+from backend.api import store
 from backend.api.main import app
+from backend.config import MOCK_DIR
 from backend.schema import SiteProperties
 
 client = TestClient(app)
+
+
+@pytest.fixture(autouse=True)
+def use_mock_data(monkeypatch):
+    monkeypatch.setattr(store, "data_dir", lambda: MOCK_DIR)  # keep these tests independent of the cache
 
 
 def test_health():
@@ -52,7 +59,7 @@ def test_summary_shape():
 def test_corridor_and_meta():
     assert client.get("/layers/corridor").json()["features"]
     m = client.get("/meta").json()
-    assert m["data_mode"] in ("mock", "cache") and m["corridor_approximate"] is True
+    assert m["data_mode"] == "mock" and m["score_source"] == "mock" and m["corridor_approximate"] is True
     assert any("SIMULATED" in c for c in m["caveats"])
 
 

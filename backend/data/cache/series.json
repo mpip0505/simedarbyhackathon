@@ -1,0 +1,60 @@
+{
+ "canopy_ndvi_threshold": 0.6,
+ "canopy_band_thresholds": [
+  0.7,
+  0.5
+ ],
+ "note": "Single-year values are noisy: canopy moves about 5 points year to year and single-year Landsat has few clear observations. Read the trend, not individual points.",
+ "points": [
+  {
+   "label": "2021-10 to 2022-09",
+   "start": "2021-10-01",
+   "end": "2022-09-30",
+   "canopy_pct": 14.15,
+   "canopy_pct_low": 6.57,
+   "canopy_pct_high": 21.93,
+   "mean_lst_c": 37.0,
+   "lst_clear_obs_per_pixel": 1.6
+  },
+  {
+   "label": "2022-10 to 2023-09",
+   "start": "2022-10-01",
+   "end": "2023-09-30",
+   "canopy_pct": 9.09,
+   "canopy_pct_low": 2.04,
+   "canopy_pct_high": 17.09,
+   "mean_lst_c": 39.75,
+   "lst_clear_obs_per_pixel": 4.6
+  },
+  {
+   "label": "2023-10 to 2024-09",
+   "start": "2023-10-01",
+   "end": "2024-09-30",
+   "canopy_pct": 10.22,
+   "canopy_pct_low": 3.85,
+   "canopy_pct_high": 17.7,
+   "mean_lst_c": 40.23,
+   "lst_clear_obs_per_pixel": 2.3
+  },
+  {
+   "label": "2024-10 to 2025-09",
+   "start": "2024-10-01",
+   "end": "2025-09-30",
+   "canopy_pct": 7.98,
+   "canopy_pct_low": 0.98,
+   "canopy_pct_high": 16.36,
+   "mean_lst_c": 44.86,
+   "lst_clear_obs_per_pixel": 1.8
+  },
+  {
+   "label": "2025-10 to 2026-09",
+   "start": "2025-10-01",
+   "end": "2026-09-30",
+   "canopy_pct": 13.4,
+   "canopy_pct_low": 5.64,
+   "canopy_pct_high": 21.7,
+   "mean_lst_c": 40.79,
+   "lst_clear_obs_per_pixel": 4.8
+  }
+ ]
+}

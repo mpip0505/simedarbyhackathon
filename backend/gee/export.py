@@ -76,7 +76,8 @@ def main() -> None:
     if not args.no_rasters:
         for key, w in windows.items():
             _download(ndvi_composite(ee, aoi, *w).toFloat(), aoi, NDVI_SCALE_M, RASTER_DIR / f"ndvi_{key}.tif")
-            _download(lst_composite(ee, aoi, *w).toFloat(), aoi, LST_SCALE_M, RASTER_DIR / f"lst_{key}.tif")
+            _download(lst_composite(ee, aoi, *w, fill_gaps=True).toFloat(), aoi, LST_SCALE_M,
+                      RASTER_DIR / f"lst_{key}.tif")
             print(f"saved rasters for {key}")
 
 
