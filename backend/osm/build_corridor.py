@@ -16,7 +16,8 @@ def main() -> None:
     parks = gpd.read_file(OSM_DIR / "parks.geojson")
     if parks.empty:
         raise SystemExit("parks.geojson is empty: run backend.osm.from_pbf (or extract) first")
-    out = build_corridor(parks)
+    out = build_corridor(parks, paths=gpd.read_file(OSM_DIR / "paths.geojson"),
+                         roads=gpd.read_file(OSM_DIR / "roads.geojson"))
     CACHE_DIR.mkdir(parents=True, exist_ok=True)
     (CACHE_DIR / "corridor.geojson").write_text(json.dumps(out["corridor"]), encoding="utf-8")
     (CACHE_DIR / "corridor_spine.geojson").write_text(json.dumps(out["spine"]), encoding="utf-8")

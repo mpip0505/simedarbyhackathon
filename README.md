@@ -43,8 +43,9 @@ records when OSM and satellite data were really built.
 
 ## Honest limits (say these in the pitch)
 - **Simulated sites.** 30 m cells on OSM open land and corridor land, not a real planting list.
-- **Approximate corridor.** Built from OSM parks, about 4.2 km of connecting spine against the stated 5 km.
-  Replace it by dropping the official polygon at `backend/data/input/corridor_official.geojson`.
+- **Approximate corridor.** Built from the 9 largest OSM parks, joined along footpaths/roads where a sensible route
+  exists. Its connecting spine is only about 2 km against the stated 5 km corridor, and one park (north-west) is left
+  unlinked. Replace it by dropping the official polygon at `backend/data/input/corridor_official.geojson`.
 - **Tropical cloud.** Imagery is a multi-date median. Go/no-go result: `backend/data/cache/imagery_check.txt`.
 - **Landsat thermal is coarse** (about 100 m native). Use it to rank sites, not to quote temperatures. About 18%
   of the area has no reliable pixel and is filled from neighbours within 100 m for site scoring.

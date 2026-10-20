@@ -1,7 +1,14 @@
 {
  "approximate": true,
  "n_parks_used": 9,
- "spine_length_m": 4213.2,
+ "spine_length_m": 2013.4,
  "buffer_m": 40,
- "method": "MST of park polygons, buffered"
+ "connectors": {
+  "routed_on_network": 1,
+  "direct_adjacent": 5,
+  "straight_fallback": 1,
+  "unlinked_far": 1
+ },
+ "max_link_m": 1000,
+ "method": "MST of park polygons, joined along footpath/road network, buffered"
 }
