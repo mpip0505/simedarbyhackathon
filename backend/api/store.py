@@ -13,6 +13,7 @@ Parsed files are cached by modification time, and every caller gets its own copy
 import copy
 import json
 import logging
+import os
 from datetime import datetime, timezone
 from pathlib import Path
 from typing import Optional
@@ -30,6 +31,12 @@ _warned: set = set()  # log each distinct problem once, not on every request
 
 class DataUnavailable(Exception):
     """A required data file is missing or unreadable and no earlier good copy exists."""
+
+
+def details_enabled() -> bool:
+    """Public responses carry generic messages only. Set API_EXPOSE_DETAILS=1 (local debugging) to include the
+    detailed reasons; they are always written to the server log either way."""
+    return os.environ.get("API_EXPOSE_DETAILS", "").lower() in ("1", "true", "yes")
 
 
 def _warn_once(key: str, message: str, *args) -> None:
@@ -62,8 +69,10 @@ def read_json(path: Path):
             parsed = json.loads(path.read_text(encoding="utf-8"))
             last = _parsed[path] = (mtime, parsed)
     except (OSError, ValueError) as exc:
+        reason = "missing" if isinstance(exc, FileNotFoundError) else "invalid JSON" if isinstance(exc, ValueError) else "unreadable"
         if last is None:
-            raise DataUnavailable(f"{path.name} is missing or unreadable: {exc}") from exc
+            log.error("cannot read %s (%s): %s", path, reason, exc)      # full path and OS detail stay in the log
+            raise DataUnavailable(f"{path.name} is {reason}") from exc  # the message carries a file name and reason only
         _warn_once(f"stale-{path}-{exc}", "%s is unreadable now (%s): serving the last good copy", path.name, exc)
     return copy.deepcopy(last[1])
 
@@ -99,14 +108,17 @@ def _scores_state(sites: dict) -> tuple:
     try:
         scores = read_json(f)
         errors, _ = validate_scores.validate(scores, sites)
-    except Exception as exc:  # any malformed content, not only well-formed-but-wrong files
-        msg = f"scores.geojson ignored: {exc}"
+    except Exception as exc:  # deliberately broad: ANY malformed file must degrade to placeholders, never a 500
+        detail = f"scores.geojson ignored: could not be read or checked ({type(exc).__name__}: {exc})"
+        public = "scores.geojson could not be read or checked"
     else:
         if not errors:
             return scores, None
-        msg = f"scores.geojson ignored, {len(errors)} problem(s), first: {errors[0]}"
-    _warn_once(f"scores-{msg}", "%s (serving placeholder scores)", msg)
-    return None, msg
+        detail = f"scores.geojson ignored: {len(errors)} problem(s), first: {errors[0]}"
+        public = f"scores.geojson was rejected ({len(errors)} problem(s))"
+    _warn_once(f"scores-{detail}", "%s (serving placeholder scores)", detail)   # full reason: log only
+    public += "; placeholder scores are being served. Run python -m backend.validate_scores for details."
+    return None, detail if details_enabled() else public
 
 
 def load_sites() -> dict:

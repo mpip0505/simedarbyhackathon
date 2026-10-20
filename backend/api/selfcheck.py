@@ -83,6 +83,19 @@ def check() -> dict:
             "warnings": warnings, "checked_at": datetime.now(timezone.utc).isoformat(timespec="seconds")}
 
 
+def public_view(result: dict, details: bool = None) -> dict:
+    """What an HTTP client may see: pass/fail and counts. The problem and warning text (file names, validation
+    messages) is included only when API_EXPOSE_DETAILS is set; it is always in the server log and the CLI output."""
+    details = store.details_enabled() if details is None else details
+    out = {k: result[k] for k in ("ok", "data_mode", "site_count", "checked_at")}
+    out["problem_count"], out["warning_count"] = len(result["problems"]), len(result["warnings"])
+    if details:
+        out["problems"], out["warnings"] = result["problems"], result["warnings"]
+    elif result["problems"] or result["warnings"]:
+        out["detail"] = "Details are in the server log and in: python -m backend.api.selfcheck"
+    return out
+
+
 if __name__ == "__main__":
     result = check()
     print(json.dumps(result, indent=1))

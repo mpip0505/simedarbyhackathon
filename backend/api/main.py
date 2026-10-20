@@ -60,7 +60,8 @@ async def request_context(request: Request, call_next):
 async def data_unavailable(request: Request, exc: store.DataUnavailable):
     rid = getattr(request.state, "request_id", None)
     log.error("data unavailable [%s]: %s", rid, exc)
-    return JSONResponse({"error": "data_unavailable", "detail": str(exc), "request_id": rid}, status_code=503)
+    detail = str(exc) if store.details_enabled() else "Required data is not available right now."
+    return JSONResponse({"error": "data_unavailable", "detail": detail, "request_id": rid}, status_code=503)
 
 
 def _ranked_features(data: dict, weights: Optional[dict] = None) -> list[dict]:
@@ -77,9 +78,14 @@ def health() -> dict:
 
 @app.get("/health/deep")
 def health_deep() -> JSONResponse:
-    """Checks every data file against the contract. 200 when sound, 503 with the problems listed otherwise."""
+    """Checks every data file against the contract. 200 when sound, 503 otherwise. Clients get pass/fail and counts;
+    the detail is in the server log (and in the response only when API_EXPOSE_DETAILS=1)."""
     result = selfcheck.check()
-    return JSONResponse(result, status_code=200 if result["ok"] else 503)
+    for p in result["problems"]:
+        log.error("health/deep PROBLEM: %s", p)
+    for w in result["warnings"]:
+        log.warning("health/deep warning: %s", w)
+    return JSONResponse(selfcheck.public_view(result), status_code=200 if result["ok"] else 503)
 
 
 @app.get("/meta", response_model=Meta)

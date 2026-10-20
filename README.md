@@ -73,7 +73,7 @@ All endpoints are `GET`. Errors are small JSON bodies with a `request_id` (also 
 | `/layers/overlays` and `/layers/overlays/{name}.png` | Before/after NDVI and temperature images with map bounds and a shared colour range |
 | `/weights` | Default weights the sliders should start from |
 | `/meta` | Data mode, `score_source` (`ml`, `placeholder`, `mock`), `scores_stale`, `scores_error`, data version, build times, attribution, caveats |
-| `/health` and `/health/deep` | Liveness; and a full data check (200 sound, 503 with the problems listed) |
+| `/health` and `/health/deep` | Liveness; and a full data check (200 sound, 503 otherwise; counts only, details in the server log) |
 
 Field-by-field contract: [docs/data-contract.md](docs/data-contract.md).
 
@@ -119,13 +119,24 @@ write_scores(df_scores)  # validates, stamps the data version, writes backend/da
   file. (Verified: plain writes produced corrupt reads in a race test; the atomic version produced none.)
 - **Graceful degradation.** A bad ML file is ignored; an unreadable file after a good read keeps serving the last good
   copy; an incomplete cache falls back to mock data loudly; unexpected errors return small JSON, not stack traces.
-- **Self-check.** The API checks every data file against the contract at startup and on `/health/deep`.
+- **Self-check.** The API checks every data file against the contract at startup (logged) and on `/health/deep`
+  (pass/fail and counts; reasons in the log).
 - **Logging.** One line per request and per fallback decision (`LOG_LEVEL` sets the level).
 - **Stale-score detection.** Scores carry the data version they were computed on; `/meta.scores_stale` flags a mismatch.
 
+## Security notes
+- **Read-only.** Every endpoint is `GET`. The API serves data derived from public sources; no secrets live in the repo
+  (the Earth Engine project ID is an environment variable, `GEE_PROJECT`).
+- **Generic public errors.** Responses never contain file paths, exception text or validation details. Clients see
+  messages such as "Required data is not available right now" and counts from `/health/deep`; the full reason goes to the
+  server log. For local debugging only, set `API_EXPOSE_DETAILS=1` to include the reasons in responses. Never set it on a
+  shared or hosted deployment. Treat logs as internal: they contain local file paths.
+- **No authentication, CORS open to all origins.** That is deliberate for a localhost demo. If this were ever hosted:
+  put it behind authentication, restrict CORS origins, add rate limiting and keep `/health/deep` internal.
+
 ## Testing and CI
 ```bash
-python -m pytest backend/tests -q          # 138 tests, no Earth Engine or network needed
+python -m pytest backend/tests -q          # 164 tests, no Earth Engine or network needed
 python -m backend.api.selfcheck            # deep check of the committed data
 python -m backend.scripts.qa_plot          # draws docs/qa-map.png: sites, corridor, parks, paths, buildings
 ```
@@ -146,7 +157,7 @@ they are exercised by `python -m backend.build_cache` with your login.
 | `backend/data/cache/` | Generated files the API serves (committed so the demo works offline) |
 | `backend/data/mock/` | Invented placeholder data for development |
 | `backend/tests/` | Test suite |
-| `docs/` | Data contract, data dictionary, team handoff, ML prompt, pilot-readiness, QA map |
+| `docs/` | Data contract, data dictionary, team handoff, ML prompt, pitch fact-check, judge Q&A, pilot-readiness, QA map |
 
 ## Limitations (read this before quoting any number)
 - **Simulated sites.** 30 m cells on OSM open land, not a real planting list. OSM tags little undeveloped land in the
@@ -167,6 +178,8 @@ they are exercised by `python -m backend.build_cache` with your login.
 - **No ground truth.** No tree inventory, LiDAR or field plots exist for this project.
 - **Scores.** Until ML delivers `scores.geojson` the API serves a labelled placeholder.
 - **Not disclosure-grade.** What a real pilot would need: [docs/pilot-readiness.md](docs/pilot-readiness.md).
+- **Outside facts in the pitch.** Checked in [docs/pitch-fact-check.md](docs/pitch-fact-check.md); several need softer wording
+  (the "5% planted" figure is contradicted by the same source). Hard questions with honest answers: [docs/judge-qa.md](docs/judge-qa.md).
 
 ## Data credits
 Map data (c) OpenStreetMap contributors (ODbL). Contains modified Copernicus Sentinel-2 data (European Space Agency).

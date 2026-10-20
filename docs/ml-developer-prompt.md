@@ -17,7 +17,7 @@ CONTEXT
 - The team has three roles: Backend (done, below), ML (you), Frontend (builds the map against the same API).
 - Repository: this repo. Python 3.12. Run `pip install -r backend/requirements.txt`.
 
-WHAT THE BACKEND ALREADY DOES (all tested: 138 tests pass; a full rebuild from scratch reproduces the data exactly)
+WHAT THE BACKEND ALREADY DOES (all tested: 164 tests pass; a full rebuild from scratch reproduces the data exactly)
 - Builds cloud-masked Sentinel-2 NDVI and Landsat 8/9 surface-temperature composites over Elmina in Google Earth Engine
   (two-year median windows: baseline 2021-10 to 2023-09, latest 2024-10 to 2026-09).
 - Pulls paths, roads, parks, open land and buildings from OpenStreetMap, and builds an **approximate** corridor.
@@ -66,7 +66,9 @@ write_scores(df_scores)   # validates, stamps the data version, writes backend/d
   `docs/scores.example.geojson`.
 - The API merges your file by `site_id` and flips `score_source` from `"placeholder"` to `"ml"`. Confirm with
   `GET /meta` after writing: `score_source` should be `ml`, `scores_error` null and `scores_stale` false.
-- A bad file never breaks the API; it is ignored and reported in `/meta.scores_error`. Always check `/meta`.
+- A bad file never breaks the API; it is ignored and reported in `/meta.scores_error`. Always check `/meta`. The message is
+  deliberately generic: for the reasons run `python -m backend.validate_scores backend/data/cache/scores.geojson`
+  (or read the server log, or set `API_EXPOSE_DETAILS=1` locally to see them in `/meta`).
 - If the backend rebuilds with different data, `/meta.scores_stale` turns true: re-score.
 
 SMALLEST VERSION THAT WORKS FIRST (suggestion, your call)

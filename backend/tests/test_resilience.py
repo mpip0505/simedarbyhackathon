@@ -266,14 +266,16 @@ def test_selfcheck_reports_contract_violations_and_missing_files(cache):
     assert any("duplicate site_id" in p for p in result["problems"])
     (cache / "corridor.geojson").unlink()
     store._parsed.clear()
+    assert any("corridor.geojson" in p for p in selfcheck.check()["problems"])     # full detail exists for the log and CLI
     r = client.get("/health/deep")
-    assert r.status_code == 503 and any("corridor.geojson" in p for p in r.json()["problems"])
+    assert r.status_code == 503 and r.json()["problem_count"] >= 1
+    assert "problems" not in r.json() and "corridor.geojson" not in r.text         # clients get counts, not text
 
 
 def test_selfcheck_warns_about_bad_scores_without_failing(cache):
     (cache / "scores.geojson").write_text("garbage")
     result = selfcheck.check()
-    assert result["ok"] and any("scores.geojson ignored" in w for w in result["warnings"])
+    assert result["ok"] and any("scores.geojson" in w and "placeholder" in w for w in result["warnings"])
 
 
 def test_startup_logs_what_is_being_served(cache, caplog):
@@ -288,3 +290,96 @@ def test_real_cache_passes_the_deep_check():
     store._parsed.clear()
     result = selfcheck.check()
     assert result["ok"], result["problems"]
+
+
+# ---------- no internal detail in public responses (security review) ----------
+
+LEAKY = ("Errno", "Expecting value", "Traceback", "JSONDecodeError", "KeyError", "TypeError", "DataUnavailable",
+         "Users", "AppData", "pytest-of")
+
+
+def assert_no_leak(text, cache):
+    for token in (*LEAKY, str(cache), cache.name):
+        assert token not in text, f"{token!r} leaked into a public response"
+
+
+def test_503_for_unreadable_data_leaks_no_path_or_os_error(cache):
+    (cache / "sites.geojson").write_text("not json")
+    r = client.get("/sites")
+    assert r.status_code == 503 and r.json()["detail"] == "Required data is not available right now."
+    assert_no_leak(r.text, cache)
+
+
+def test_503_for_missing_data_leaks_no_path_or_os_error(cache):
+    (cache / "sites.geojson").unlink()
+    r = client.get("/meta")
+    assert r.status_code == 503
+    assert_no_leak(r.text, cache)
+
+
+def test_full_detail_still_reaches_the_server_log(cache, caplog):
+    (cache / "sites.geojson").write_text("not json")
+    with caplog.at_level(logging.ERROR, logger="backend"):
+        client.get("/sites")
+    assert str(cache) in caplog.text and "invalid JSON" in caplog.text          # operators can still debug
+
+
+def test_opt_in_details_show_file_name_and_reason_but_never_the_path(cache, monkeypatch):
+    monkeypatch.setenv("API_EXPOSE_DETAILS", "1")
+    (cache / "sites.geojson").write_text("not json")
+    r = client.get("/sites")
+    assert r.json()["detail"] == "sites.geojson is invalid JSON"
+    assert str(cache) not in r.text and "Errno" not in r.text
+
+
+@pytest.mark.parametrize("name", list(BAD_SCORES))
+def test_scores_error_is_generic_by_default(cache, name):
+    (cache / "scores.geojson").write_text(BAD_SCORES[name], encoding="utf-8")
+    err = client.get("/meta").json()["scores_error"]
+    assert err and "placeholder scores are being served" in err and "validate_scores" in err
+    assert_no_leak(err, cache)
+    for value in ("high", "250", "NOPE", "S1"):      # no echo of the offending values or site ids
+        assert value not in err
+
+
+def test_scores_error_detail_is_opt_in(cache, monkeypatch):
+    (cache / "scores.geojson").write_text(BAD_SCORES["string score"], encoding="utf-8")
+    monkeypatch.setenv("API_EXPOSE_DETAILS", "1")
+    err = client.get("/meta").json()["scores_error"]
+    assert "S1" in err and "finite number" in err
+
+
+def test_health_deep_public_view_for_a_sound_cache(cache):
+    body = client.get("/health/deep").json()
+    assert {"ok", "data_mode", "site_count", "checked_at", "problem_count", "warning_count"} <= set(body)
+    assert "problems" not in body and "warnings" not in body          # counts only, never the text
+    assert body["ok"] and body["problem_count"] == 0
+    assert body["warning_count"] == 2 and "server log" in body["detail"]  # this tiny cache has no series/overlay files
+    assert "series.json" not in json.dumps(body)
+
+
+def test_health_deep_detail_is_opt_in(cache, monkeypatch):
+    (cache / "corridor.geojson").unlink()
+    store._parsed.clear()
+    monkeypatch.setenv("API_EXPOSE_DETAILS", "true")
+    body = client.get("/health/deep").json()
+    assert any("corridor.geojson" in p for p in body["problems"]) and str(cache) not in json.dumps(body)
+
+
+@pytest.mark.parametrize("value, expected", [("1", True), ("true", True), ("YES", True), ("", False), ("0", False),
+                                              ("no", False), ("false", False)])
+def test_details_flag_parsing(monkeypatch, value, expected):
+    monkeypatch.setenv("API_EXPOSE_DETAILS", value)
+    assert store.details_enabled() is expected
+
+
+def test_details_are_off_when_the_variable_is_unset(monkeypatch):
+    monkeypatch.delenv("API_EXPOSE_DETAILS", raising=False)
+    assert store.details_enabled() is False
+
+
+def test_unexpected_error_page_is_generic_and_has_no_path(cache, monkeypatch):
+    monkeypatch.setattr(store, "load_corridor", lambda: (_ for _ in ()).throw(OSError(2, "No such file", str(cache))))
+    r = client.get("/layers/corridor")
+    assert r.status_code == 500 and r.json()["detail"] == "Something went wrong on the server."
+    assert_no_leak(r.text, cache)

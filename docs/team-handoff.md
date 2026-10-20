@@ -2,7 +2,7 @@
 
 Status: the backend runs end to end on real Elmina data. Everything below is from the cached files in
 `backend/data/cache/`, rebuilt by `python -m backend.build_cache` (a full rebuild from a fresh download takes about
-4 minutes and reproduced the committed data exactly). 138 tests pass.
+4 minutes and reproduced the committed data exactly). 164 tests pass.
 
 ## 1. Imagery go/no-go: GO
 Enough clear Sentinel-2 and Landsat 8/9 observations exist over City of Elmina for both periods, **using multi-date
@@ -46,7 +46,9 @@ write_scores(df_scores)   # validates, stamps the data version, writes backend/d
   start from your default.
 - Until you deliver, the API serves a simple placeholder score (`score_source: "placeholder"`). It is not your model.
 - A bad or half-written scores file never breaks the API: it is ignored, logged, and shown in `/meta.scores_error`
-  (so check `/meta` after you write). `write_scores` refuses to write a file the validator rejects.
+  (so check `/meta` after you write). `write_scores` refuses to write a file the validator rejects. The `/meta`
+  message is generic by design; get the reasons from `python -m backend.validate_scores <file>` or the server log.
+  For local debugging only, `API_EXPOSE_DETAILS=1` puts the reasons in the response.
 - **Split by `block_id`** (e.g. `GroupKFold`). Neighbouring 30 m cells are correlated, so random splits flatter stability.
 - Cautions that affect your work:
   - There are **no real labels**. Validation can only check consistency, not that the ranking is right.
