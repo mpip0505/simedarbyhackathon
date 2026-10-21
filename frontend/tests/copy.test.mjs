@@ -28,13 +28,13 @@ test("index.html carries the honesty content a redesign must keep", () => {
     assert.match(html, new RegExp(`id="${id}"[^>]*data-required="honesty"|data-required="honesty"[^>]*id="${id}"`), `#${id} must be marked`);
   }
   assert.match(html, /simulated/i);
-  assert.match(html, /ML model is connected/);
+  assert.match(html, /scoring model is connected/);
   assert.match(html, /not a tree count/i);
 });
 
 test("the scripts keep the placeholder and simulated labels, and the temperature and canopy cautions", () => {
   const all = shipped.map(([, t]) => t).join("\n");
-  assert.match(all, /ML model not connected yet/);
+  assert.match(all, /scoring model not connected yet/);
   assert.match(all, /Preview score/);
   assert.match(all, /Example site|simulated/i);
   assert.match(all, /Indicative only/);

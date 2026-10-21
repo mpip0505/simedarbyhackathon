@@ -52,7 +52,7 @@ export function renderScenario(card, scenario) {
 
   clear(card).append(
     el("div", { class: "card-head" }, el("h3", {}, `If the top ${scenario.k} sites are planted`),
-      el("p", { class: "card-sub" }, "Average tree cover across those sites (greenness 0.6 or above), from the ML team's scenario tool")),
+      el("p", { class: "card-sub" }, "Average tree cover across those sites (greenness 0.6 or above), from the team's scenario tool")),
     el("div", { class: "card-chips" }, el("span", { class: "chip chip-warn" }, "Scenario, not a forecast"),
       scenario.stale ? el("span", { class: "chip chip-bad" }, "Computed on older data") : null),
     el("p", { class: "card-lead" }, headline),

@@ -49,21 +49,21 @@ function showStatus(meta) {
   const mock = meta.data_mode === "mock";
   setChip("#chip-mode", mock ? "Data: MOCK (invented)" : "Data: cached real data", mock ? "bad" : "quiet");
   const scores = {
-    ml: ["Scores: ML model", "ok"],
-    placeholder: ["Preview scores: ML model not connected yet", "warn"],
+    ml: ["Scores: scoring model", "ok"],
+    placeholder: ["Preview scores: scoring model not connected yet", "warn"],
     mock: ["Scores: mock data", "bad"],
   };
   setChip("#chip-scores", ...(scores[meta.score_source] ?? ["Scores: unknown", "warn"]));
   $("#preview-note").hidden = meta.score_source === "ml" || meta.score_source === "mock";   // the mock case has its own, louder notice below
   $("#honesty-text").textContent = meta.score_source === "ml"
     ? "Example sites, not Sime Darby Property's list."
-    : "Example sites, not Sime Darby Property's list. Scores are previews until the ML model is connected.";
+    : "Example sites, not Sime Darby Property's list. Scores are previews until the scoring model is connected.";
 
   const notices = clear($("#notices"));
   const add = (text, bad) => notices.append(el("div", { class: bad ? "notice notice-bad" : "notice" }, text));
   if (mock) add("This is invented MOCK data for development. Do not present it as Elmina results.", true);
   if (meta.scores_error) add(meta.scores_error, true);
-  if (meta.scores_stale) add("The ML scores were computed on older data. Ask the ML developer to re-score.", true);
+  if (meta.scores_stale) add("The scores were computed on older data. Ask the team to re-score.", true);
 
   clear($("#caveats")).append(...meta.caveats.map((c) => el("li", {}, c)));
   $("#attribution").textContent = (meta.attribution ?? []).join("  ·  ");
@@ -168,7 +168,7 @@ async function boot() {
   const hasShortlist = !placeholder && shortlist?.diversified_sites?.length > 0;
   $("#list-mode").hidden = !hasShortlist;
   if (!placeholder && (uncertainty?.stale || shortlist?.stale)) {
-    $("#notices").append(el("div", { class: "notice" }, "The ML rank ranges or shortlist were worked out on older data. Ask the ML developer to re-run them."));
+    $("#notices").append(el("div", { class: "notice" }, "The rank ranges or shortlist were worked out on older data. Ask the team to re-run them."));
   }
   renderImpact($("#card-impact"), placeholder ? null : impact);   // describes the ML ranking, so it waits for ML scores
   const defaults = Object.fromEntries(KEYS.map((k) => [k, Math.round(weightsResponse.default[k] * 100)]));

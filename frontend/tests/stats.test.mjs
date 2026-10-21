@@ -16,7 +16,7 @@ test("the strip counts sites, the top score, corridor-gap sites and sites with m
 
 test("the labels say where the top score comes from", () => {
   assert.equal(plantStats(ranked, { placeholder: false, usingServer: true })[1].label, "Top score");
-  assert.equal(plantStats(ranked, { placeholder: false, usingServer: true })[1].note, "ML model");
+  assert.equal(plantStats(ranked, { placeholder: false, usingServer: true })[1].note, "scoring model");
   assert.equal(plantStats(ranked, { placeholder: true, usingServer: false })[1].note, "your weights");
 });
 

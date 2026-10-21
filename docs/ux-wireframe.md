@@ -50,7 +50,7 @@ The headline and card verdicts come from the data (`frontend/js/report-logic.js`
 | Corridor gap | Gap in the green corridor |
 | Canopy proxy | Tree-cover estimate |
 | Gap-filled | Estimated from nearby pixels |
-| Placeholder scores | Preview scores: ML model not connected yet |
+| Placeholder scores | Preview scores: scoring model not connected yet |
 | Simulated sites | Example sites (simulated). Keep the word **simulated** visible somewhere |
 
 Never say: reportable, defensible, accurate, "canopy increased". Never show the 10,266 or "5% planted" figure
@@ -62,7 +62,7 @@ Never say: reportable, defensible, accurate, "canopy increased". Never show the 
 - **No sites match:** "No sites match these filters." with a Clear filters button, never a blank list.
 - **Data service unreachable:** says what happened, gives the start command, offers Retry. No jargon, no apology.
 - **Example data in use:** an unmissable banner that this is invented sample data.
-- **Preview scores / score file problem:** an amber note until the ML model is connected; a clear notice if its file is rejected
+- **Preview scores / score file problem:** an amber note until the scoring model is connected; a clear notice if its file is rejected
   or out of date. The ranking keeps working.
 - **Small screens:** (target) panels become sheets. In the built app the sidebar becomes a strip along the top and the panels stack under the map.
 
@@ -80,7 +80,7 @@ Mostly presentation, plus small logic that reuses the tested modules. No backend
 4. The plain-language renames above.
 5. A short note after each slider move saying how many of the top 10 changed.
 6. A first-visit hint, a loading state and a no-match state.
-7. `frontend/tests/copy.test.mjs` now checks the new wording ("ML model not connected yet", "Preview score") and still requires
+7. `frontend/tests/copy.test.mjs` now checks the new wording ("scoring model not connected yet", "Preview score") and still requires
    the simulated and preview-score labels, the honesty bar and the banned-phrase scan.
 
 ## Open questions for the team

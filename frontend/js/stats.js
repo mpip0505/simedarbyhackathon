@@ -18,7 +18,7 @@ export function plantStats(ranked, { placeholder, usingServer }) {
       label: placeholder ? "Top preview score" : "Top score",
       value: scores.length ? fmt(Math.max(...scores)) : fmt(null),
       unit: "",
-      note: !usingServer ? "your weights" : placeholder ? "placeholder weights" : "ML model",
+      note: !usingServer ? "your weights" : placeholder ? "placeholder weights" : "scoring model",
     },
     { label: "Near a corridor gap", value: String(nearGap), unit: "sites", note: "within 50 m" },   // the API flags sites within 50 m of a gap
     { label: "Reliable ground heat", value: String(reliable), unit: `of ${n}`, note: `${n - reliable} are estimated` },

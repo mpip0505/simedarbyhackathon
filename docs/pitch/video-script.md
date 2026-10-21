@@ -6,7 +6,7 @@ Timings add up to 5:00. **Say what we did, say what we did not, say what it woul
 ## Before you record (10 minutes)
 1. Start the app: `uvicorn backend.api.main:app --port 8000` and open http://localhost:8000/ (or the hosted link; open it first, a free tier can take about a minute to wake).
 2. Screen 1440x900, browser zoom 100%, close other tabs and notifications; use a clean browser profile.
-3. Check the chips show "Example sites (simulated)" and "Scores: ML model". If it says "Preview scores", stop: the ML scores are not loaded.
+3. Check the chips show "Example sites (simulated)" and "Scores: scoring model". If it says "Preview scores", stop: the scores are not loaded.
 4. Rehearse once with a timer.
 5. Keep `docs/pitch/screens/` open as a fallback if the live app fails mid-recording.
 
@@ -14,7 +14,7 @@ Timings add up to 5:00. **Say what we did, say what we did not, say what it woul
 | Time | On screen | Say (plain words) |
 |---|---|---|
 | 0:00 to 0:25 | the Plant first screen | "Sime Darby Property plans to plant a great deal in its townships, for example a 5 km biodiversity corridor in City of Elmina. Each season someone has to decide where the next trees go first. We built a tool that helps answer that, from free satellite and map data. This is a screening tool, not a tree count or a carbon figure." |
-| 0:25 to 0:55 | point at the chips and the honesty bar | "Everything here is labelled. The 564 sites are simulated example locations, not Sime Darby Property's list, and the scores come from our ML model. We say that on every screen because we do not have ground truth." |
+| 0:25 to 0:55 | point at the chips and the honesty bar | "Everything here is labelled. The 564 sites are simulated example locations, not Sime Darby Property's list, and the scores come from our scoring model. We say that on every screen because we do not have ground truth." |
 | 0:55 to 1:40 | click the rank-1 badge or the first site in the list; the site card opens | "The map shows the top five sites. Click one and you get a one-sentence reason: hot and bare around it, a footpath with no shade, next to a gap in the corridor. Then the three scores, and how steady the rank is: across 2,000 plausible weightings it stayed number one every time. That matters because other prioritising tools often agree on the area but disagree on the exact site." |
 | 1:40 to 2:20 | drag the Heat relief slider to 100 and back; point at the note saying how many of the top 10 changed | "The planner decides what matters. Move a slider and the list and the map re-rank at once, in the browser, using the same formula as the server. The note says how many of the top ten changed." |
 | 2:20 to 2:50 | switch the list to Spread out | "Spread out picks a first round that covers more areas, so one season is not all in one corner." |

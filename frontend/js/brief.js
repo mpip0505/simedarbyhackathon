@@ -15,9 +15,9 @@ export function renderBrief(root, ranked, { ctx, steadyOf, meta, weights, custom
   const sum = Object.values(weights).reduce((a, b) => a + b, 0) || 1;
   const share = (k) => `${Math.round((100 * (weights[k] ?? 0)) / sum)}%`;     // slider values as a share of the total
   root.append(
-    el("h1", {}, "Planting brief: where to plant first in City of Elmina"),
+    el("h1", {}, "Planting brief: where to plant first (pilot township: City of Elmina)"),
     el("p", { class: "brief-flag" }, "Example sites (simulated), not Sime Darby Property's list."
-      + (preview ? " Preview scores: the ML model is not connected yet." : "")),
+      + (preview ? " Preview scores: the scoring model is not connected yet." : "")),
     el("p", {}, "A screening tool: sites ranked by heat relief, green links and shade for walkers. Not a tree count or a carbon figure."),
     el("p", {}, `What mattered: heat relief ${share("cooling")}, links green areas ${share("connectivity")}, shade for walkers ${share("shade")}`
       + (custom ? " (set by the person who printed this)." : " (the defaults).")),

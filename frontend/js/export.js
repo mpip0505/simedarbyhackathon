@@ -12,7 +12,7 @@ export function toGeoJson(features, { scoreSource = "unknown", dataVersion = nul
     type: "FeatureCollection",
     name: "elmina-ranked-sites",
     note: "Example planting sites (simulated), not Sime Darby Property's list. A screening tool, not a tree count or a carbon figure."
-      + (scoreSource === "ml" ? "" : " Scores are previews until the ML model is connected."),
+      + (scoreSource === "ml" ? "" : " Scores are previews until the scoring model is connected."),
     score_source: scoreSource,
     data_version: dataVersion,
     features: features.map((f) => ({

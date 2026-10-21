@@ -81,7 +81,7 @@ Co-benefit for People: shade where people walk, near homes. *Screen:* `screens/0
 
 ## Slide 9: Visual Concept (Enabler)
 Four screenshots: the map with the numbered top five and sliders (`01`), a site card with its reason and steadiness (`02`), the reach card (`05`), and before and after with the honest verdict (`03`).
-Caption each: "Example sites (simulated). Scores from the ML model."
+Caption each: "Example sites (simulated). Scores from the scoring model."
 
 ## Slide 10: Why your team should win (98 words)
 Triple T built a working, honest screening tool, not a mock-up. From free satellite and OpenStreetMap data, it ranks 564 candidate planting sites in City of Elmina by heat relief, green-corridor links and shade for walkers, explains every rank in plain words, and lets planners change the weights live. We tested our canopy estimate against two independent maps, found they disagree by a factor of several, and say so on screen. Every number is reproducible with one command, so it can re-run each season. Give us the real site list and it becomes Sime Darby Property's planting prioritiser.

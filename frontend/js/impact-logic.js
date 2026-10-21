@@ -41,4 +41,4 @@ export function impactTiles(report, n) {
 }
 
 export const IMPACT_CAPTION = "This counts what lies near the sites. It does not show that planting there would cool anything, improve health or survive. "
-  + "The sites are simulated, and the ranking is the ML default, not your slider settings. Homes are the ones OpenStreetMap maps, so the count is a lower bound.";
+  + "The sites are simulated, and the ranking uses the default weights, not your slider settings. Homes are the ones OpenStreetMap maps, so the count is a lower bound.";

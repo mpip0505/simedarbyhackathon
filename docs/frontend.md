@@ -88,7 +88,7 @@ even digit (72.25 becomes 72.2), and naive JavaScript rounding disagreed with th
 `backend/scripts/make_frontend_fixture.py` records what the backend returns, `tests/weights.test.mjs` replays it, and
 `backend/tests/test_frontend_fixture.py` fails if the backend and the fixture drift apart.
 
-Until a slider moves, the table shows the API's own ranking (the ML model's, once merged). Only after a slider moves does
+Until a slider moves, the table shows the API's own ranking (the scoring model's, once merged). Only after a slider moves does
 the browser re-rank, and the page says so.
 
 ## Test it

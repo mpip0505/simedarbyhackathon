@@ -9,7 +9,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Where to plant first in City of Elmina</title>
+  <title>Where to plant first: Canopy Prioritiser</title>
   <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='7' fill='%23FF4D00'/%3E%3Cg transform='translate(4.5 4.5) scale(.625)'%3E%3Ccircle cx='12' cy='9.5' r='6' fill='%23fff'/%3E%3Crect x='11' y='14' width='2' height='7' rx='1' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
   <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
   <link rel="stylesheet" href="css/app.css">
@@ -40,7 +40,7 @@
         <span class="chip">Screening</span>
       </div>
       <p class="side-label">Project</p>
-      <p class="side-project">City of Elmina</p>
+      <p class="side-project">City of Elmina (pilot)</p>
       <nav id="view-tabs" class="side-nav" aria-label="Views">
         <button type="button" class="nav-item" data-view="prioritise" aria-current="page"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-map"></use></svg><span>Plant first</span></button>
         <button type="button" class="nav-item" data-view="report"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-columns"></use></svg><span>Before and after</span></button>
@@ -71,7 +71,7 @@
       <!-- ========== top bar ========== -->
       <header id="topbar" class="topbar">
         <nav class="crumbs" aria-label="Breadcrumb">
-          <span>City of Elmina</span><span class="crumb-sep" aria-hidden="true">/</span><span id="crumb-view" aria-current="page">Plant first</span>
+          <span>Pilot: City of Elmina</span><span class="crumb-sep" aria-hidden="true">/</span><span id="crumb-view" aria-current="page">Plant first</span>
         </nav>
         <button type="button" class="btn btn-secondary btn-sm" data-action="download"><svg class="ic" width="14" height="14" aria-hidden="true"><use href="#i-download"></use></svg>Download list</button>
       </header>
@@ -91,17 +91,18 @@
           <!-- ========== Plant first ========== -->
           <section id="view-prioritise" class="page" aria-label="Plant first">
             <p id="preview-note" class="notice" role="note" data-required="honesty" hidden>
-              Preview scores: the ML model is not connected yet. Sites are examples (simulated), not Sime Darby Property's list.
+              Preview scores: the scoring model is not connected yet. Sites are examples (simulated), not Sime Darby Property's list.
             </p>
 
             <div class="page-head">
               <div class="page-title">
-                <h1>Where to plant first in City of Elmina</h1>
+                <h1>Where to plant first</h1>
                 <p id="screening-note" data-required="honesty">
                   A screening tool: sites ranked by heat relief, green links and shade for walkers. Not a tree count or a carbon figure.
                 </p>
               </div>
               <ul id="status" class="chips" aria-label="Data status">
+                <li id="chip-pilot" class="chip">Pilot township: City of Elmina</li>
                 <li id="chip-simulated" class="chip chip-warn" data-required="honesty">Example sites (simulated)</li>
                 <li id="chip-scores" class="chip" data-required="honesty">Scores: loading</li>
                 <li id="chip-mode" class="chip chip-quiet">Data: loading</li>
@@ -199,7 +200,7 @@
                   <div class="sheet-body" id="top-body">
                     <div id="list-mode" class="seg seg-sm" role="group" aria-label="Which list" hidden>
                       <label class="pill" title="Strict order by score"><input type="radio" name="list-mode" value="ranked" checked><span>Ranked</span></label>
-                      <label class="pill" title="The ML team's top 20, capped per 250 m block so a first round covers more areas"><input type="radio" name="list-mode" value="shortlist"><span>Spread out</span></label>
+                      <label class="pill" title="A spread-out top 20, capped per 250 m block so a first round covers more areas"><input type="radio" name="list-mode" value="shortlist"><span>Spread out</span></label>
                     </div>
                     <div id="filters" class="seg seg-sm" role="group" aria-label="Filter sites">
                       <label class="pill"><input type="radio" name="origin" value="all" checked><span>All</span></label>
@@ -303,7 +304,7 @@
 
       <footer id="honesty-bar" class="honesty">
         <p id="honesty-text" class="honesty-text" data-required="honesty">
-          Example sites, not Sime Darby Property's list. Scores are previews until the ML model is connected.
+          Example sites, not Sime Darby Property's list. Scores are previews until the scoring model is connected.
         </p>
         <button type="button" id="open-limits" class="link-button" data-action="limits">Limits of this data</button>
         <button type="button" id="open-credits" class="link-button" data-action="credits">Data credits</button>

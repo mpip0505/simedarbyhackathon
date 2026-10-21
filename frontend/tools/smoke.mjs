@@ -136,10 +136,11 @@ try {
     const r = await rows();
     initialTop = r[0];
     assert.equal(r.length, 5, `expected the top 5, got ${r.length}`);
-    assert.equal(await evaluate(`document.querySelector('h1').textContent`), "Where to plant first in City of Elmina");
+    assert.equal(await evaluate(`document.querySelector('h1').textContent`), "Where to plant first");
+    assert.match(await evaluate(`document.querySelector('#chip-pilot').textContent`), /Pilot township: City of Elmina/);
     assert.match(await evaluate(`document.querySelector('#count').textContent`), /^\d+ in total$/);
     assert.match(await evaluate(`document.querySelector('#chip-simulated').textContent`), /simulated/i);
-    assert.match(await evaluate(`document.querySelector('#chip-scores').textContent`), /Preview scores|ML model|mock/i);
+    assert.match(await evaluate(`document.querySelector('#chip-scores').textContent`), /Preview scores|scoring model|mock/i);
     assert.match(await evaluate(`document.querySelector('#honesty-text').textContent`), /not Sime Darby Property's list/);
     assert.ok(r.every((row) => row[2].length > 3), "every row gives a short reason");
     assert.equal(await evaluate(`document.querySelectorAll('#stats-plant .stat').length`), 4, "four figures above the map");
@@ -239,7 +240,7 @@ try {
     assert.equal((await rows()).length, 5);
   });
   await check("ML evidence: steady marks, rank range on the site card, and the spread-out shortlist", async () => {
-    if (!(await evaluate(`document.querySelector('#chip-scores').textContent.includes('ML model')`))) return;   // previews carry no ML evidence
+    if (!(await evaluate(`document.querySelector('#chip-scores').textContent.includes('scoring model')`))) return;   // previews carry no ML evidence
     await evaluate(`document.querySelector('#weights-reset').click()`);
     await waitFor(`document.querySelectorAll('#top-list .steady-mark').length > 0`, "steady marks in the list");
     assert.match(await evaluate(`document.querySelector('#list-note').textContent`), /of the top 20 stay there/);
@@ -361,7 +362,7 @@ try {
   });
   await shot("3-before-after-greenness");
   await check("Before and after: the ML planting scenario is labelled as a scenario, with four lines and its numbers", async () => {
-    if (!(await evaluate(`document.querySelector('#chip-scores').textContent.includes('ML model')`))) return;
+    if (!(await evaluate(`document.querySelector('#chip-scores').textContent.includes('scoring model')`))) return;
     assert.equal(await evaluate(`document.querySelector('#card-scenario').hidden`), false);
     const text = await evaluate(`document.querySelector('#card-scenario').textContent`);
     assert.match(text, /Scenario, not a forecast/);
