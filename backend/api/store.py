@@ -318,3 +318,8 @@ def load_scenario() -> Optional[dict]:
 def load_impact() -> Optional[dict]:
     """What the top N sites reach (unshaded footpath, mapped homes, corridor gaps), de-duplicated. Reach, not outcome."""
     return _ml_report("impact_reach.json")
+
+
+def load_tradeoff() -> Optional[dict]:
+    """The first 20 and 50 sites chosen five ways, with what each reaches. A trade-off, not a league table."""
+    return _ml_report("tradeoff.json")

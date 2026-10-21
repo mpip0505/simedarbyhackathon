@@ -90,4 +90,5 @@ export const api = {
   shortlist: () => getOptional("/ml/shortlist"),
   scenario: () => getOptional("/ml/scenario"),
   impact: () => getOptional("/ml/impact"),
+  tradeoff: () => getOptional("/ml/tradeoff"),
 };

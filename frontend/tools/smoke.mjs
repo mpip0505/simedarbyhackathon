@@ -399,6 +399,19 @@ try {
     await evaluate(`${card}.querySelector('button[aria-pressed="false"]').click()`);
     assert.doesNotMatch(await evaluate(`${card}.innerText`), /first 50 sites/, "the toggle should change the numbers");
   });
+  await check("the trade-off card compares five ways of choosing, as a trade-off with no winner", async () => {
+    const card = `document.querySelector('#card-tradeoff')`;
+    assert.equal(await evaluate(`${card}.hidden`), false, "the card should show with scores from the scoring model");
+    const text = await evaluate(`${card}.innerText`);
+    assert.match(text, /Compare ways to choose the first sites/);
+    assert.match(text, /Trade-off, not a league table/);
+    assert.match(text, /not proof that it is better/);
+    assert.equal(await evaluate(`${card}.querySelectorAll('tbody tr').length`), 5);
+    assert.equal(await evaluate(`${card}.querySelectorAll('tr.is-ours').length`), 1);
+    const before = await evaluate(`${card}.querySelector('tbody tr:nth-child(4)').innerText`);
+    await evaluate(`${card}.querySelector('button[aria-pressed="false"]').click()`);
+    assert.notEqual(await evaluate(`${card}.querySelector('tbody tr:nth-child(4)').innerText`), before, "the toggle should change the numbers");
+  });
   await check("the planting brief fills with the top sites, the simulated label and the limits, and asks the browser to print", async () => {
     await evaluate(`window.__printed = 0; window.print = () => { window.__printed++; }`);
     await evaluate(`document.querySelector('[data-action="brief"]').click()`);

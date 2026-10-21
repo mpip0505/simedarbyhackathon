@@ -21,6 +21,7 @@ import { plantStats } from "./stats.js";
 import { renderStrip } from "./strip.js";
 import { renderScenario } from "./scenario.js";
 import { renderImpact } from "./impact.js";
+import { renderTradeoff } from "./tradeoff.js";
 import { steadiness, steadySummary, shortlistRows, shortlistNote } from "./ml-logic.js";
 
 const OSM_NAMES = ["open_land", "parks", "buildings", "roads", "paths"];
@@ -154,9 +155,9 @@ async function boot() {
       "The ?api= address in the link was ignored: only a localhost address or this site's own address is accepted."));
   }
 
-  const optional = await Promise.all([api.spine(), api.overlays(), api.uncertainty(), api.shortlist(), api.impact(), ...OSM_NAMES.map((n) => api.osm(n))]
+  const optional = await Promise.all([api.spine(), api.overlays(), api.uncertainty(), api.shortlist(), api.impact(), api.tradeoff(), ...OSM_NAMES.map((n) => api.osm(n))]
     .map((p) => p.catch(() => null)));
-  const [spine, overlays, uncertainty, shortlist, impact, ...osmList] = optional;
+  const [spine, overlays, uncertainty, shortlist, impact, tradeoff, ...osmList] = optional;
   const osm = Object.fromEntries(OSM_NAMES.map((n, i) => [n, osmList[i]]));
   if (!osmList.some(Boolean)) $("#notices").append(el("div", { class: "notice" }, "No OpenStreetMap basemap in this data set; showing the sites only."));
 
@@ -170,6 +171,7 @@ async function boot() {
   if (!placeholder && (uncertainty?.stale || shortlist?.stale)) {
     $("#notices").append(el("div", { class: "notice" }, "The rank ranges or shortlist were worked out on older data. Ask the team to re-run them."));
   }
+  renderTradeoff($("#card-tradeoff"), placeholder ? null : tradeoff);
   renderImpact($("#card-impact"), placeholder ? null : impact);   // describes the ML ranking, so it waits for ML scores
   const defaults = Object.fromEntries(KEYS.map((k) => [k, Math.round(weightsResponse.default[k] * 100)]));
   store.set({ served: features, weights: defaults });

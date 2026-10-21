@@ -607,3 +607,19 @@ dialog form[method="dialog"] { display: flex; justify-content: flex-end; margin:
 #card-impact { display: flex; flex-direction: column; gap: 12px; }
 #card-impact .caption { font-size: 12px; line-height: 16px; color: var(--text-muted); }
 #card-impact .seg { align-self: flex-start; }
+
+/* ---------- "Compare ways to choose the first sites" card ---------- */
+#card-tradeoff { display: flex; flex-direction: column; gap: 12px; }
+#card-tradeoff .caption { font-size: 12px; line-height: 16px; color: var(--text-muted); }
+#card-tradeoff .seg { align-self: flex-start; }
+.tradeoff-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.tradeoff-table th, .tradeoff-table td { padding: 8px 10px; text-align: left; vertical-align: top; border-bottom: 1px solid var(--border); }
+.tradeoff-table thead th { font-weight: 500; color: var(--text-muted); font-size: 12px; }
+.tradeoff-table tbody th { font-weight: 400; min-width: 170px; }
+.tradeoff-table .num { text-align: right; font-variant-numeric: tabular-nums; }
+.tradeoff-table tr.is-ours th, .tradeoff-table tr.is-ours td { background: var(--accent-tint); font-weight: 500; }
+.tr-val { font-variant-numeric: tabular-nums; }
+.tr-pct { color: var(--text-muted); font-size: 12px; }
+.tr-bar { display: block; height: 6px; margin-top: 4px; background: var(--hover); border-radius: 3px; overflow: hidden; }
+.tr-bar > span { display: block; height: 100%; background: var(--accent); }
+@media (forced-colors: active) { .tr-bar { border: 1px solid CanvasText; } .tr-bar > span { background: Highlight; forced-color-adjust: none; } }

@@ -1,0 +1,162 @@
+{
+ "data_version": "f12bc98c3fbd",
+ "methods": {
+  "canopy_gap_only": "Canopy gap only: least green 250 m surroundings first (the canopy-gap half of Tree Equity Score)",
+  "equal_three": "Our three scores with equal weights (a user who leaves every slider at the same value)",
+  "heat_and_gap": "Heat and canopy gap, equal weight (a Tree Equity Score or Boston style blend, without the social layer we do not have)",
+  "heat_only": "Heat only: hottest 250 m surroundings first (the idea behind a land-surface-temperature ranking such as Boston's)",
+  "ours": "Ours: heat 45%, connectivity 30%, shade 25% (the default weights)",
+  "spread_out": "Spread out: our default ranking with at most 3 sites per 250 m block, so a first round covers more areas"
+ },
+ "n_sites": 564,
+ "note": "A trade-off, not a league table: our default weights favour footpath and corridor by design, and a heat-only list picks the hottest surroundings. Reach is not benefit, the sites are simulated, and the heat-only, canopy-gap and combined lists are simplified stand-ins for published approaches.",
+ "ours": "ours",
+ "results": {
+  "20": {
+   "canopy_gap_only": {
+    "areas": 6,
+    "gap_m": 90,
+    "gap_pct": 5.5,
+    "homes": 0,
+    "homes_pct": 0.0,
+    "hotter_than_pct": 61.0,
+    "n": 20,
+    "unshaded_path_m": 610,
+    "unshaded_path_pct": 0.9
+   },
+   "equal_three": {
+    "areas": 6,
+    "gap_m": 540,
+    "gap_pct": 32.7,
+    "homes": 243,
+    "homes_pct": 25.1,
+    "hotter_than_pct": 67.0,
+    "n": 20,
+    "unshaded_path_m": 2880,
+    "unshaded_path_pct": 4.4
+   },
+   "heat_and_gap": {
+    "areas": 7,
+    "gap_m": 0,
+    "gap_pct": 0.0,
+    "homes": 71,
+    "homes_pct": 7.3,
+    "hotter_than_pct": 96.0,
+    "n": 20,
+    "unshaded_path_m": 540,
+    "unshaded_path_pct": 0.8
+   },
+   "heat_only": {
+    "areas": 9,
+    "gap_m": 200,
+    "gap_pct": 12.1,
+    "homes": 78,
+    "homes_pct": 8.1,
+    "hotter_than_pct": 98.0,
+    "n": 20,
+    "unshaded_path_m": 580,
+    "unshaded_path_pct": 0.9
+   },
+   "ours": {
+    "areas": 6,
+    "gap_m": 480,
+    "gap_pct": 29.1,
+    "homes": 243,
+    "homes_pct": 25.1,
+    "hotter_than_pct": 68.0,
+    "n": 20,
+    "unshaded_path_m": 2860,
+    "unshaded_path_pct": 4.3
+   },
+   "spread_out": {
+    "areas": 10,
+    "gap_m": 660,
+    "gap_pct": 40.0,
+    "homes": 301,
+    "homes_pct": 31.1,
+    "hotter_than_pct": 66.0,
+    "n": 20,
+    "unshaded_path_m": 3650,
+    "unshaded_path_pct": 5.5
+   }
+  },
+  "50": {
+   "canopy_gap_only": {
+    "areas": 13,
+    "gap_m": 90,
+    "gap_pct": 5.5,
+    "homes": 36,
+    "homes_pct": 3.7,
+    "hotter_than_pct": 72.0,
+    "n": 50,
+    "unshaded_path_m": 1130,
+    "unshaded_path_pct": 1.7
+   },
+   "equal_three": {
+    "areas": 11,
+    "gap_m": 1080,
+    "gap_pct": 65.5,
+    "homes": 248,
+    "homes_pct": 25.6,
+    "hotter_than_pct": 60.0,
+    "n": 50,
+    "unshaded_path_m": 5110,
+    "unshaded_path_pct": 7.8
+   },
+   "heat_and_gap": {
+    "areas": 11,
+    "gap_m": 0,
+    "gap_pct": 0.0,
+    "homes": 109,
+    "homes_pct": 11.3,
+    "hotter_than_pct": 92.0,
+    "n": 50,
+    "unshaded_path_m": 1280,
+    "unshaded_path_pct": 1.9
+   },
+   "heat_only": {
+    "areas": 14,
+    "gap_m": 310,
+    "gap_pct": 18.8,
+    "homes": 344,
+    "homes_pct": 35.5,
+    "hotter_than_pct": 96.0,
+    "n": 50,
+    "unshaded_path_m": 2060,
+    "unshaded_path_pct": 3.1
+   },
+   "ours": {
+    "areas": 14,
+    "gap_m": 1150,
+    "gap_pct": 69.7,
+    "homes": 349,
+    "homes_pct": 36.1,
+    "hotter_than_pct": 64.0,
+    "n": 50,
+    "unshaded_path_m": 5400,
+    "unshaded_path_pct": 8.2
+   },
+   "spread_out": {
+    "areas": 25,
+    "gap_m": 960,
+    "gap_pct": 58.2,
+    "homes": 387,
+    "homes_pct": 40.0,
+    "hotter_than_pct": 75.0,
+    "n": 50,
+    "unshaded_path_m": 6320,
+    "unshaded_path_pct": 9.6
+   }
+  }
+ },
+ "spread": "spread_out",
+ "steps": [
+  20,
+  50
+ ],
+ "totals": {
+  "gap_m": 1650,
+  "homes": 968,
+  "unshaded_path_m": 65860
+ }
+}

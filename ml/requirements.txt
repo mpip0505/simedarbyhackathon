@@ -1,6 +1,8 @@
-pandas>=2.2
-numpy>=2.0
-scipy>=1.13
-scikit-learn>=1.5
-rasterio>=1.5
-geopandas>=1.2
+# Pinned to the versions the ML tests were run with (the shared ones match backend/requirements.txt, so both files install together in one resolution).
+# Install:  pip install -r backend/requirements.txt -r ml/requirements.txt
+pandas==2.2.3
+numpy==2.2.6
+scipy==1.15.1
+scikit-learn==1.5.0
+rasterio==1.5.2
+geopandas==1.2.0

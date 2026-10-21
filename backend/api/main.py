@@ -241,6 +241,12 @@ def ml_impact() -> dict:
     return _ml_or_404(store.load_impact(), "impact")
 
 
+@app.get("/ml/tradeoff")
+def ml_tradeoff() -> dict:
+    """What the first 20 and 50 sites reach when chosen by heat only, canopy gap only, both, our default weights, or spread out."""
+    return _ml_or_404(store.load_tradeoff(), "tradeoff")
+
+
 # ---- the bundled barebones web app (frontend/), served from the same process ----
 FRONTEND_DIR = Path(__file__).resolve().parents[2] / "frontend"
 
