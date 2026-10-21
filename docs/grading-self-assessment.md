@@ -51,3 +51,7 @@ No ground truth (tree inventory, LiDAR or field plots) and no real Sime Darby si
 - 22 Oct 2026, after Batches 4 and 5 (theme fit and pitch package): Fit moves from about 12 up to about **13 to 14 of 15** (`docs/theme-fit.md`: Planet track, attributed developer priorities, the People angle said carefully).
   The deck outline, video script and submission checklist are written (`docs/pitch/`), but **the deck and the video themselves are not made and the live link is not deployed**, so Pitch Quality and Feasibility only gain once those exist.
   Estimated total now about **68 to 75**, rising to about 72 to 78 once the deck, video and live link are done.
+- 22 Oct 2026, after the audit-fix batches (pilot reframing, trade-off view, footpath greenness layer) and the Figma deck revision: Pitch quality and Innovation edge up (the deck is now written and reframed
+  as a pilot with expansion intent; the trade-off card answers "why these weights?"; the greenness layer makes the People angle visible). Estimated total about **70 to 76**; still capped by no ground truth, no real site list,
+  no live URL yet and an unrecorded video. Honest corrections made on the way: the app and deck say "scoring model" (no fitted parameters) instead of "ML model"; the footpath figure says "little tree cover (satellite)"
+  because about 95% of footpath samples fall below the threshold at 10 m.

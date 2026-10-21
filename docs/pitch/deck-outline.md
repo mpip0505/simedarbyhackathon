@@ -4,6 +4,8 @@ Written for: the team member building the slides in the official template (10 ma
 two-part pitch, **Mechanism** (the solution, how it works, who benefits, why it creates value for the township) and **Enabler** (how technology enables it, the user experience, implementation at township scale).
 Every number is from the repository (source in brackets). Screenshots are in `docs/pitch/screens/`. Words to avoid are listed at the end. Team and contact details are yours to fill in.
 
+**The live deck** is in Figma Slides (https://www.figma.com/slides/LySZlNsfHqvMU1nNwuGpjZ). On 22 October 2026 it was revised in place to match this outline and reframed as a **pilot**: the problem is stated at township scale (Sime Darby Property's townships, with City of Elmina as the pilot), the product is called Canopy Prioritiser, the kicker says Planet (one track only), outdated test counts and the word "defensible" are gone, the Impact slide shows reach instead of an unsourced time-saving claim, the Feasibility slide states the Earth Engine licence and that hosting is not yet verified, and the three screenshot placeholders hold current screenshots. Still to do by the team: the team-information placeholders (leader, members, emails, phone). The deck has 12 main slides plus an appendix, above the 10-main-slide limit in the template; that was left unchanged on request.
+
 **One thread through every slide:** *"Where should the next tree go first?"*
 
 | # | Template slide | Part | Official criterion it earns marks on |
