@@ -2,7 +2,12 @@
 
 Status: the backend runs end to end on real Elmina data. Everything below is from the cached files in
 `backend/data/cache/`, rebuilt by `python -m backend.build_cache` (a full rebuild from a fresh download takes about
-4 minutes and reproduced the committed data exactly). 164 tests pass.
+4 minutes and reproduced the committed data exactly). 164 backend tests pass.
+
+**ML has delivered** (`score_source: "ml"` in `/meta`). Section 4 below is the original brief, kept for reference;
+what was actually built, validated and written up is in [`ml/README.md`](../ml/README.md) and
+[ml-model.md](ml-model.md) (34 more tests: `python -m pytest ml/tests -q`). Nothing in section 3 changes for Frontend
+as a result — same fields, same shape, see the note there.
 
 ## 1. Imagery go/no-go: GO
 Enough clear Sentinel-2 and Landsat 8/9 observations exist over City of Elmina for both periods, **using multi-date
@@ -30,8 +35,11 @@ Works with no internet and no Earth Engine. Field list: `docs/data-contract.md`.
 - **Always show:** a "simulated sites" label, the `caveats` and `attribution` from `GET /meta`, and a badge when
   `score_source` is not `ml`.
 - Overlays, series and the corridor come from the cache folder. They do not exist in mock mode (404).
+- **Now that ML has delivered:** nothing above changes. `score_source` reads `ml` (so the non-`ml` badge should
+  already be hiding itself); `GET /weights` now returns 0.45 / 0.30 / 0.25 instead of the backend's 0.40 / 0.35 / 0.25
+  placeholder default, so sliders will visibly start one notch differently — that is correct, not a bug to chase.
 
-## 4. For ML
+## 4. For ML (original brief — see `ml/README.md` for what was actually delivered)
 Start with [data-dictionary.md](data-dictionary.md). It lists every feature with units, ranges and cautions.
 ```python
 from backend.ml_io import load_sites_df, write_scores

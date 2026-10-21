@@ -1,8 +1,9 @@
 # Judge Q&A: hard questions with honest answers
 
 Written for: whoever presents (and anyone covering Q&A). Every answer uses only what the repository can back up. Where
-a number is quoted, it comes from the committed data (`backend/data/cache/`) or [pitch-fact-check.md](pitch-fact-check.md).
-Answers marked **[ML to fill]** depend on the scoring model, which was not delivered when this was written.
+a number is quoted, it comes from the committed data (`backend/data/cache/`) or [pitch-fact-check.md](pitch-fact-check.md)
+or the ML validation reports (`ml/reports/`, explained in [ml-model.md](ml-model.md)). The scoring model has now been
+delivered (`score_source: "ml"` in `/meta`); the questions below that depended on it are filled in.
 
 **Style rule: say what we did, say what we did not, say what it would take.** Judges mark down overclaiming far more
 than modest honesty, and a confident wrong number is the worst outcome.
@@ -28,9 +29,14 @@ plausible, but we call it indicative.
 
 **4. Where is your ground truth? How did you validate it?**
 We have none: no tree inventory, LiDAR or field plots. What we did: an imagery go/no-go check, a threshold sensitivity
-run, an independent cross-check against two land-cover products, and stability tests on the ranking
-**[ML to fill: weight-stability results]**. These show consistency, not correctness. A pilot would need field plots, and
-that is the first thing we would ask Sime Darby Property for.
+run, an independent cross-check against two land-cover products, and stability tests on the ranking. Nudging the
+weight sliders around our defaults barely moves it (rank correlation 0.99, 18 of the top 20 unchanged); letting them
+swing anywhere, including switching a whole benefit off, moves it more (median 0.92, worst case only 1 of 20 survives).
+Refitting on 4/5 of the township's neighbourhoods and scoring the rest against that gives 0.997. A 2000-draw Monte
+Carlo over every judgement call at once finds 13 of today's top 20 robust (in the top 20 at least 80% of the time) and
+is explicit about which of the other 7 are closer calls, and why. All of this shows the ranking is *consistent* and
+*stable*, not that it is *correct* - we say both halves of that sentence every time. A pilot would need field plots,
+and that is the first thing we would ask Sime Darby Property for.
 
 **5. Why NDVI 0.6?**
 Across the thresholds we tried, 0.6 agreed best with the two independent maps on average (F1 0.51, against 0.47 at 0.5
@@ -104,9 +110,15 @@ quoting any percentage.
 
 ## About the technology
 
-**18. How does the scoring work?** **[ML to fill]**
-Plain-language explanation from the ML developer: the three scores, the default weights and why, and what the stability
-analysis shows. The weights are adjustable live in the app.
+**18. How does the scoring work?**
+Three scores out of 100 - cooling benefit, habitat connectivity, shade on walking routes - each a plain weighted
+average of a handful of satellite and map measurements of a site's surroundings, blended into one total that sorts
+the map. No model is trained: there are no labels to train one on, and a fitted model would invent confidence we
+cannot back. Default weights are cooling 0.45, connectivity 0.30, shade 0.25 - heat is the best-measured of the
+three, connectivity is weighted down because the corridor it depends on is approximate. The weights are adjustable
+live in the app (`/weights`, re-ranks via `?w_cooling=`), and the pitch deck's shortlist spreads the same top sites
+across 10 neighbourhoods instead of one corridor-edge strip, for one point of average score. Full write-up:
+[ml-model.md](ml-model.md).
 
 **19. What happens if the demo breaks?**
 The demo runs offline from committed data, with no live Earth Engine or internet call. The API checks its own data at
@@ -117,9 +129,13 @@ in about four minutes and reproduced the committed data exactly.
 The data is derived from public sources (satellite imagery and OpenStreetMap); there is no personal data. The API is
 read-only and, as a localhost demo, has no login. A hosted version would need authentication and restricted access.
 
-**21. Is the model explainable?** **[ML to fill]**
-Aim for: every score is a transparent combination of named measurements, and the detail panel shows what drives each site's
-rank.
+**21. Is the model explainable?**
+Yes, deliberately so, and that was a design choice over a more complex model: every score is a transparent weighted
+average of eight named measurements (how hot the surroundings are, how close to a corridor gap, how much nearby
+footpath has no shade, and so on), with one of two simple rules deciding how each is turned into a 0-100 input - a
+percentile rank for things that only mean something relative to other sites, a decay curve for things with physical
+distance meaning. No hidden layers, nothing fitted to data we do not have. The detail panel can show exactly which
+of those eight pushed a site's rank up or down, in one step back from the number on the map.
 
 ## Curveballs
 
