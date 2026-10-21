@@ -33,7 +33,7 @@ run, an independent cross-check against two land-cover products, and stability t
 weight sliders around our defaults barely moves it (rank correlation 0.99, 18 of the top 20 unchanged); letting them
 swing anywhere, including switching a whole benefit off, moves it more (median 0.92, worst case only 1 of 20 survives).
 Refitting on 4/5 of the township's neighbourhoods and scoring the rest against that gives 0.997. A 2000-draw Monte
-Carlo over every judgement call at once finds 13 of today's top 20 robust (in the top 20 at least 80% of the time) and
+Carlo over every judgement call at once finds 14 of today's top 20 robust (in the top 20 at least 80% of the time) and
 is explicit about which of the other 7 are closer calls, and why. All of this shows the ranking is *consistent* and
 *stable*, not that it is *correct* - we say both halves of that sentence every time. A pilot would need field plots,
 and that is the first thing we would ask Sime Darby Property for.

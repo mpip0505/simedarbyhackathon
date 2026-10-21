@@ -1,7 +1,7 @@
 {
  "k": 20,
  "max_per_block": 3,
- "data_version": "482cd831d34a",
+ "data_version": "f12bc98c3fbd",
  "raw_top_k": {
   "n": 20,
   "distinct_blocks": 6,
@@ -12,7 +12,7 @@
   "n": 20,
   "distinct_blocks": 10,
   "largest_block_share": 0.15,
-  "mean_rank": 15.1
+  "mean_rank": 15.0
  },
  "score_given_up": 1.0,
  "sites_swapped_in": [
@@ -252,11 +252,11 @@
    "lat": 3.185537,
    "block_id": "B452-1411",
    "origin": "corridor_edge",
-   "rank": 31,
-   "score_total": 80.1,
+   "rank": 29,
+   "score_total": 80.3,
    "score_cooling": 87.3,
    "score_connectivity": 91.9,
-   "score_shade": 52.8
+   "score_shade": 53.8
   },
   {
    "site_id": "ELM-3726-11724",

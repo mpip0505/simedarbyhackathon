@@ -1,6 +1,6 @@
 {
- "generated_utc": "2026-10-21 02:53:52",
- "data_version": "482cd831d34a",
+ "generated_utc": "2026-10-21 03:53:53",
+ "data_version": "f12bc98c3fbd",
  "sites": 564,
  "weights": {
   "cooling": 0.45,
@@ -30,12 +30,12 @@
   },
   "score_shade": {
    "count": 564.0,
-   "mean": 28.3,
-   "std": 34.1,
+   "mean": 28.2,
+   "std": 34.0,
    "min": 0.3,
    "25%": 6.3,
    "50%": 11.4,
-   "75%": 42.9,
+   "75%": 41.8,
    "max": 100.0
   },
   "score_total": {
@@ -45,7 +45,7 @@
    "min": 14.6,
    "25%": 22.0,
    "50%": 29.4,
-   "75%": 53.0,
+   "75%": 52.5,
    "max": 92.5
   }
  },
@@ -76,7 +76,7 @@
   },
   "unshaded": {
    "median": 0.0,
-   "share_below_5": 0.715
+   "share_below_5": 0.72
   },
   "near": {
    "median": 38.3,
@@ -88,42 +88,42 @@
   "features": [
    {
     "feature": "lst_mean_250m",
-    "top_decile_mean": 42.44,
+    "top_decile_mean": 42.438,
     "bottom_decile_mean": 39.221
    },
    {
     "feature": "ndvi_mean_250m",
-    "top_decile_mean": 0.309,
+    "top_decile_mean": 0.312,
     "bottom_decile_mean": 0.441
    },
    {
     "feature": "built_up_frac_250m",
-    "top_decile_mean": 0.151,
+    "top_decile_mean": 0.147,
     "bottom_decile_mean": 0.0
    },
    {
     "feature": "residential_buildings_within_250m",
-    "top_decile_mean": 26.071,
+    "top_decile_mean": 25.375,
     "bottom_decile_mean": 0.0
    },
    {
     "feature": "corridor_gap_dist_m",
-    "top_decile_mean": 60.646,
+    "top_decile_mean": 48.83,
     "bottom_decile_mean": 1277.204
    },
    {
     "feature": "dist_to_nearest_park_m",
-    "top_decile_mean": 97.759,
+    "top_decile_mean": 101.054,
     "bottom_decile_mean": 421.223
    },
    {
     "feature": "uncovered_path_length_50m",
-    "top_decile_mean": 342.143,
+    "top_decile_mean": 328.579,
     "bottom_decile_mean": 0.0
    },
    {
     "feature": "dist_to_path_m",
-    "top_decile_mean": 13.029,
+    "top_decile_mean": 12.391,
     "bottom_decile_mean": 274.021
    },
    {
@@ -161,7 +161,7 @@
      "max": 518
     },
     "sites_always_in_top_50": 3,
-    "sites_never_in_top_50": 438
+    "sites_never_in_top_50": 440
    },
    {
     "sampler": "sliders nudged: Dirichlet(20 x default)",
@@ -178,9 +178,9 @@
      "max": 20
     },
     "rank_spread_per_site": {
-     "median": 139,
+     "median": 140,
      "p90": 292,
-     "max": 338
+     "max": 337
     },
     "sites_always_in_top_50": 18,
     "sites_never_in_top_50": 473
@@ -191,49 +191,49 @@
  "leave_input_out": [
   {
    "variant": "without hot",
-   "spearman_vs_default": 0.9483,
+   "spearman_vs_default": 0.9482,
    "top20_shared": 16,
-   "median_rank_shift": 33,
+   "median_rank_shift": 32,
    "score": "cooling"
   },
   {
    "variant": "without bare",
    "spearman_vs_default": 0.9582,
    "top20_shared": 16,
-   "median_rank_shift": 23,
+   "median_rank_shift": 24,
    "score": "cooling"
   },
   {
    "variant": "without unshaded",
-   "spearman_vs_default": 0.9747,
+   "spearman_vs_default": 0.9748,
    "top20_shared": 17,
    "median_rank_shift": 22,
    "score": "shade"
   },
   {
    "variant": "without built",
-   "spearman_vs_default": 0.9812,
-   "top20_shared": 15,
+   "spearman_vs_default": 0.9813,
+   "top20_shared": 16,
    "median_rank_shift": 17,
    "score": "cooling"
   },
   {
    "variant": "without gap",
-   "spearman_vs_default": 0.9855,
+   "spearman_vs_default": 0.9854,
    "top20_shared": 18,
-   "median_rank_shift": 10,
+   "median_rank_shift": 11,
    "score": "connectivity"
   },
   {
    "variant": "without park",
-   "spearman_vs_default": 0.9891,
+   "spearman_vs_default": 0.989,
    "top20_shared": 18,
    "median_rank_shift": 13,
    "score": "connectivity"
   },
   {
    "variant": "without near",
-   "spearman_vs_default": 0.9935,
+   "spearman_vs_default": 0.9934,
    "top20_shared": 19,
    "median_rank_shift": 10,
    "score": "shade"
@@ -249,7 +249,7 @@
  "scale_sensitivity": [
   {
    "variant": "shrink_gapfilled=False",
-   "spearman_vs_default": 0.9861,
+   "spearman_vs_default": 0.986,
    "top20_shared": 20,
    "median_rank_shift": 2
   },
@@ -272,16 +272,16 @@
    "median_rank_shift": 4
   },
   {
-   "variant": "unshaded_cap_m=75.0",
+   "variant": "unshaded_cap_m=300.0",
    "spearman_vs_default": 0.9989,
    "top20_shared": 17,
    "median_rank_shift": 1
   },
   {
-   "variant": "unshaded_cap_m=300.0",
-   "spearman_vs_default": 0.9989,
+   "variant": "unshaded_cap_m=75.0",
+   "spearman_vs_default": 0.9991,
    "top20_shared": 18,
-   "median_rank_shift": 0
+   "median_rank_shift": 1
   },
   {
    "variant": "path_scale_m=300.0",
@@ -293,7 +293,7 @@
  "block_holdout": {
   "folds": 5,
   "blocks": 63,
-  "spearman_vs_default": 0.9966,
+  "spearman_vs_default": 0.9965,
   "top20_shared": 19,
   "median_rank_shift": 5,
   "note": "Only the percentile scales are sample-dependent; the distance decays are absolute, which is why this check moves the ranking so little."
@@ -336,7 +336,7 @@
   {
    "a": "path_length_within_50m",
    "b": "uncovered_path_length_50m",
-   "spearman": 0.9998
+   "spearman": 0.9999
   },
   {
    "a": "corridor_gap_dist_m",

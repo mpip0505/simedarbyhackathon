@@ -1,5 +1,5 @@
 # Planting-impact scenario — NOT a forecast
-Data version `482cd831d34a`. Regenerate with `python -m ml.scenario --k 50 --years 25`.
+Data version `f12bc98c3fbd`. Regenerate with `python -m ml.scenario --k 50 --years 25`.
 
 > **This is a scenario, not a prediction.** It shows what a plausible outcome could look like under a stated growth assumption we did not fit to any field data (none exists for Elmina) - it is not a trend fitted to the yearly series, which the project already says is noisier than its signal. Change the assumption, change the chart. It is also scoped to the *planted set's own average canopy*, not a township-wide figure, and it makes no claim about temperature or carbon - those need relationships this project has not measured.
 

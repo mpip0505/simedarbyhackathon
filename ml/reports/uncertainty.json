@@ -1,6 +1,6 @@
 {
- "generated_utc": "2026-10-21 02:54:11",
- "data_version": "482cd831d34a",
+ "generated_utc": "2026-10-21 03:54:10",
+ "data_version": "f12bc98c3fbd",
  "draws": 2000,
  "k": 20,
  "sampled": {
@@ -14,15 +14,15 @@
  "sites_in_sample": 564,
  "robust_top_k": {
   "threshold": 0.8,
-  "count_overall": 13,
-  "count_within_baseline_top_k": 13
+  "count_overall": 14,
+  "count_within_baseline_top_k": 14
  },
  "boundary_sites": {
   "range": [
    0.2,
    0.8
   ],
-  "count": 14
+  "count": 13
  },
  "rank_agreement": {
   "spearman_baseline_vs_median": 0.9989
@@ -32,8 +32,8 @@
   "baseline_rank": 13,
   "rank_p05": 12,
   "rank_p95": 49,
-  "topk_frequency": 0.422,
-  "why": "On the fence: uncovered_path_length_50m=170m is inside the sampled unshaded_cap_m range (75.0, 300.0)."
+  "topk_frequency": 0.39,
+  "why": "On the fence: uncovered_path_length_50m=162.7m is inside the sampled unshaded_cap_m range (75.0, 300.0)."
  },
  "baseline_top_k": [
   {
@@ -57,7 +57,7 @@
    "score_p95": 90.7,
    "rank_median": 3,
    "rank_p05": 2,
-   "rank_p95": 9,
+   "rank_p95": 8,
    "topk_frequency": 0.996
   },
   {
@@ -69,7 +69,7 @@
    "score_p95": 90.3,
    "rank_median": 4,
    "rank_p05": 3,
-   "rank_p95": 8,
+   "rank_p95": 7,
    "topk_frequency": 0.998
   },
   {
@@ -94,19 +94,19 @@
    "rank_median": 4,
    "rank_p05": 2,
    "rank_p95": 14,
-   "topk_frequency": 0.981
+   "topk_frequency": 0.982
   },
   {
    "site_id": "ELM-3731-11726",
    "baseline_rank": 6,
    "baseline_score": 85.5,
-   "score_median": 85.4,
-   "score_p05": 81.5,
-   "score_p95": 89.3,
+   "score_median": 85.2,
+   "score_p05": 81.1,
+   "score_p95": 89.2,
    "rank_median": 8,
    "rank_p05": 4,
-   "rank_p95": 14,
-   "topk_frequency": 0.984
+   "rank_p95": 19,
+   "topk_frequency": 0.961
   },
   {
    "site_id": "ELM-3720-11715",
@@ -118,7 +118,7 @@
    "rank_median": 7,
    "rank_p05": 6,
    "rank_p95": 14,
-   "topk_frequency": 0.993
+   "topk_frequency": 0.994
   },
   {
    "site_id": "ELM-3719-11716",
@@ -129,7 +129,7 @@
    "score_p95": 89.6,
    "rank_median": 8,
    "rank_p05": 5,
-   "rank_p95": 15,
+   "rank_p95": 14,
    "topk_frequency": 0.978
   },
   {
@@ -141,7 +141,7 @@
    "score_p95": 89.0,
    "rank_median": 10,
    "rank_p05": 7,
-   "rank_p95": 19,
+   "rank_p95": 18,
    "topk_frequency": 0.962
   },
   {
@@ -154,7 +154,7 @@
    "rank_median": 11,
    "rank_p05": 3,
    "rank_p95": 23,
-   "topk_frequency": 0.933
+   "topk_frequency": 0.931
   },
   {
    "site_id": "ELM-3720-11716",
@@ -163,10 +163,10 @@
    "score_median": 84.1,
    "score_p05": 79.9,
    "score_p95": 88.3,
-   "rank_median": 12,
+   "rank_median": 11,
    "rank_p05": 9,
    "rank_p95": 22,
-   "topk_frequency": 0.933
+   "topk_frequency": 0.935
   },
   {
    "site_id": "ELM-3719-11717",
@@ -175,22 +175,22 @@
    "score_median": 83.6,
    "score_p05": 78.7,
    "score_p95": 88.5,
-   "rank_median": 13,
+   "rank_median": 12,
    "rank_p05": 10,
    "rank_p95": 23,
-   "topk_frequency": 0.935
+   "topk_frequency": 0.934
   },
   {
    "site_id": "ELM-3718-11717",
    "baseline_rank": 13,
    "baseline_score": 83.3,
-   "score_median": 80.8,
-   "score_p05": 74.4,
-   "score_p95": 87.3,
-   "rank_median": 26,
+   "score_median": 80.4,
+   "score_p05": 73.9,
+   "score_p95": 87.2,
+   "rank_median": 27,
    "rank_p05": 12,
    "rank_p95": 49,
-   "topk_frequency": 0.422
+   "topk_frequency": 0.39
   },
   {
    "site_id": "ELM-3736-11743",
@@ -199,10 +199,10 @@
    "score_median": 82.9,
    "score_p05": 77.1,
    "score_p95": 88.6,
-   "rank_median": 16,
+   "rank_median": 15,
    "rank_p05": 8,
    "rank_p95": 33,
-   "topk_frequency": 0.816
+   "topk_frequency": 0.828
   },
   {
    "site_id": "ELM-3715-11715",
@@ -214,7 +214,7 @@
    "rank_median": 17,
    "rank_p05": 14,
    "rank_p95": 29,
-   "topk_frequency": 0.79
+   "topk_frequency": 0.8
   },
   {
    "site_id": "ELM-3730-11726",
@@ -226,7 +226,7 @@
    "rank_median": 18,
    "rank_p05": 13,
    "rank_p95": 29,
-   "topk_frequency": 0.654
+   "topk_frequency": 0.658
   },
   {
    "site_id": "ELM-3720-11717",
@@ -235,10 +235,10 @@
    "score_median": 82.5,
    "score_p05": 77.8,
    "score_p95": 87.2,
-   "rank_median": 19,
+   "rank_median": 18,
    "rank_p05": 14,
-   "rank_p95": 29,
-   "topk_frequency": 0.618
+   "rank_p95": 28,
+   "topk_frequency": 0.638
   },
   {
    "site_id": "ELM-3714-11715",
@@ -250,7 +250,7 @@
    "rank_median": 19,
    "rank_p05": 14,
    "rank_p95": 32,
-   "topk_frequency": 0.643
+   "topk_frequency": 0.668
   },
   {
    "site_id": "ELM-3737-11743",
@@ -261,20 +261,20 @@
    "score_p95": 88.1,
    "rank_median": 21,
    "rank_p05": 12,
-   "rank_p95": 41,
-   "topk_frequency": 0.448
+   "rank_p95": 40,
+   "topk_frequency": 0.461
   },
   {
    "site_id": "ELM-3715-11716",
    "baseline_rank": 20,
    "baseline_score": 82.2,
-   "score_median": 82.1,
-   "score_p05": 76.5,
+   "score_median": 82.0,
+   "score_p05": 76.3,
    "score_p95": 87.7,
    "rank_median": 21,
    "rank_p05": 14,
    "rank_p95": 37,
-   "topk_frequency": 0.466
+   "topk_frequency": 0.44
   }
  ],
  "full_table_csv_note": "full per-site table is in uncertainty_sites.csv next to this report"

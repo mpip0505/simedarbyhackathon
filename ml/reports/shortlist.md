@@ -1,5 +1,5 @@
 # Diversified shortlist (k=20, max 3 per 250 m block)
-Data version `482cd831d34a`. Regenerate with `python -m ml.shortlist`.
+Data version `f12bc98c3fbd`. Regenerate with `python -m ml.shortlist`.
 
 This does **not** change `scores.geojson` or the live map ranking - see the module docstring in `ml/shortlist.py` for why rank can't be reordered this way inside the scored file. This is a presentation artifact: which sites to put on a slide as "start here", spread across the township instead of one strip.
 
@@ -7,9 +7,9 @@ This does **not** change `scores.geojson` or the live map ranking - see the modu
 | version | n | distinct_blocks | largest_block_share | mean_rank |
 |---|---|---|---|---|
 | raw top 20 | 20 | 6 | 0.35 | 10.5 |
-| diversified | 20 | 10 | 0.15 | 15.1 |
+| diversified | 20 | 10 | 0.15 | 15.0 |
 
-Trade-off: the diversified set's average `score_total` is **1.0 points lower** than the raw top 20 (mean rank moves from 10.5 to 15.1). That's the price of spread - every swapped-in site is still a genuinely good candidate, just not quite top-tier, and it was not already represented nearby.
+Trade-off: the diversified set's average `score_total` is **1.0 points lower** than the raw top 20 (mean rank moves from 10.5 to 15.0). That's the price of spread - every swapped-in site is still a genuinely good candidate, just not quite top-tier, and it was not already represented nearby.
 
 **Swapped in** (5): ELM-3726-11724, ELM-3729-11726, ELM-3736-11741, ELM-3767-11758, ELM-3769-11778
 
@@ -36,5 +36,5 @@ Trade-off: the diversified set's average `score_total` is **1.0 points lower** t
 | 22 | ELM-3729-11726 | 101.508939 | 3.176833 | B447-1407 | corridor_edge | 82.0 | 66.2 | 90.7 | 99.9 |
 | 27 | ELM-3769-11778 | 101.519673 | 3.190957 | B452-1413 | open_land | 80.7 | 95.1 | 46.7 | 95.6 |
 | 28 | ELM-3736-11741 | 101.510812 | 3.180903 | B448-1408 | corridor_edge | 80.6 | 64.4 | 94.5 | 92.9 |
-| 31 | ELM-3767-11758 | 101.519152 | 3.185537 | B452-1411 | corridor_edge | 80.1 | 87.3 | 91.9 | 52.8 |
+| 29 | ELM-3767-11758 | 101.519152 | 3.185537 | B452-1411 | corridor_edge | 80.3 | 87.3 | 91.9 | 53.8 |
 | 35 | ELM-3726-11724 | 101.508133 | 3.176289 | B447-1406 | corridor_edge | 79.4 | 63.1 | 88.1 | 98.5 |

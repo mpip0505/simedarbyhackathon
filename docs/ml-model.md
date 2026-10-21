@@ -88,7 +88,7 @@ Full report: [`ml/reports/validation.md`](../ml/reports/validation.md).
 | Does any single input carry it? | Dropping each of the eight inputs in turn: worst case **0.95** (surrounding temperature), everything else ≥ 0.96. |
 | Do the judgement constants matter? | Re-running with decay scales, caps and the gap-fill discount changed: **≥ 0.986** in every case. |
 | Does unreliable temperature reach the top? | **0 of the top 20** sites have mostly gap-filled temperature. |
-| How much does the *whole* ranking depend on our judgement calls at once? | 2000 Monte Carlo draws over the weights and all four distance/length constants together: median-rank agreement with the single default ranking is **Spearman 0.999**, the #1 site is in the top 20 in 100% of draws, but only **13 of the default top 20** clear an 80%-of-draws "robust" bar. The rest are plausible, not guaranteed — `ml/reports/uncertainty.md` lists which, and why (see below). |
+| How much does the *whole* ranking depend on our judgement calls at once? | 2000 Monte Carlo draws over the weights and all four distance/length constants together: median-rank agreement with the single default ranking is **Spearman 0.999**, the #1 site is in the top 20 in 100% of draws, but only **14 of the default top 20** clear an 80%-of-draws "robust" bar. The rest are plausible, not guaranteed — `ml/reports/uncertainty.md` lists which, and why (see below). |
 
 The honest headline: **the shortlist is robust to how we weigh the three benefits, but it is not
 robust to deciding that only one of them matters.** If a planner cares purely about habitat
@@ -98,7 +98,7 @@ choice is visible instead of hidden inside the model.
 A second, specific thing the uncertainty run caught: the sites ranked 15–20 are mostly "boundary"
 cases (in the top 20 well under half the time) rather than nearly as solid as ranks 1–9. One of
 them, ranked 13 by default, turned out to be fragile for an identifiable reason — its one nearby
-unshaded footpath (170 m) happens to sit almost exactly on the length we treat as "enough to earn
+unshaded footpath (163 m) happens to sit almost exactly on the length we treat as "enough to earn
 full marks," so a slightly different cutoff flips it between rank 12 and rank 49. Its two
 neighbours in the list have unshaded paths long enough that no reasonable cutoff would change their
 score. That's the kind of thing a single deterministic number hides and a distribution catches.

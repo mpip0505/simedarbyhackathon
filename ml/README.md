@@ -59,7 +59,7 @@ Draws many plausible weight sets *and* distance/length constants at once (not on
 `ml.validation`'s sensitivity section), rescoring every site under each, then reports per site: a
 score range, a rank range, and the share of draws it stays in the top 20. Current headline: the
 single default ranking's median across 2000 draws agrees at **Spearman 0.999**, rank 1 is in the
-top 20 100% of the time, but **13 of the default top 20** clear the "robust" bar (>= 80% of draws) -
+top 20 100% of the time, but **14 of the default top 20** clear the "robust" bar (>= 80% of draws) -
 the rest are plausible, not guaranteed, and the report says which ones and why (one site's good
 shade score turns out to hinge entirely on where `unshaded_cap_m` happens to land). Use this for the
 "how sure are we" slide; use `ml.validation` for the one-at-a-time sensitivity breakdown.
