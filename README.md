@@ -8,9 +8,16 @@ This repository is the **backend**: satellite and map data in, a small tested AP
 `frontend/` that proves the API end to end. The scoring model (ML) and the final interface design are built by teammates
 against the API and data contract described here.
 
-> **Status: working prototype, screening-grade.** It ranks where to look first. It is **not** a tree count, a carbon
-> figure or disclosure-grade evidence. The candidate sites are **simulated** (we do not have Sime Darby Property's
-> real planting list). Read [Limitations](#limitations-read-this-before-quoting-any-number) before quoting any number.
+**ML status: delivered.** `score_source` in `/meta` is `ml`. The scoring code, validation and the plain-language
+write-up live in [`ml/`](ml/) and [docs/ml-model.md](docs/ml-model.md) — see [For the ML teammate](#for-the-ml-teammate)
+below for the rest of the trail.
+
+> **Status: pilot of the method on real Elmina data** — not yet a pilot of real planting. The pipeline, corridor and
+> scoring run end to end on real satellite and map data for a real township; that is what has been piloted. It ranks
+> where to look first. It is **not** a tree count, a carbon figure or disclosure-grade evidence. The candidate sites
+> are **simulated** (we do not have Sime Darby Property's real planting list) — piloting *real planting* needs that
+> list plus field plots, both scoped in [pilot-readiness.md](docs/pilot-readiness.md). Read
+> [Limitations](#limitations-read-this-before-quoting-any-number) before quoting any number.
 
 ## Contents
 [Quick start](#quick-start) · [How it works](#how-it-works) · [API](#api) · [Rebuilding the data](#rebuilding-the-data) ·
@@ -58,8 +65,8 @@ curl localhost:8000/health/deep                                       # checks e
 4. **Candidate sites.** 30 m grid cells on open land and non-park corridor land, minus buildings and roads, labelled
    `simulated` (564 sites). Each carries about 30 measured features (see the [data dictionary](docs/data-dictionary.md)):
    temperature, vegetation, surroundings, unshaded nearby walking routes, corridor distances, a reliability flag.
-5. **Scores.** The ML teammate delivers `scores.geojson`. Until then the API serves a clearly labelled **placeholder**
-   score so the map is usable; it is not the model.
+5. **Scores.** The ML teammate delivers `scores.geojson` (**done** — `score_source: "ml"`). Before delivery, and for
+   any site ML did not score, the API serves a clearly labelled **placeholder** instead; it is never presented as the model.
 6. **API.** Ranked sites, one site's detail, a before/after summary, yearly series, map overlays, health checks.
 
 ## API
@@ -97,15 +104,32 @@ Builds are deterministic: a full rebuild from a fresh download reproduced the co
 `backend/data/cache/build_info.json` records when OSM and satellite data were really fetched.
 
 ## For the ML teammate
-Start here: [docs/data-dictionary.md](docs/data-dictionary.md) and [docs/ml-developer-prompt.md](docs/ml-developer-prompt.md).
-```python
-from backend.ml_io import load_sites_df, write_scores
-df = load_sites_df()     # one row per site: surroundings, shade, corridor, reliability, block_id, ...
-# compute score_cooling, score_connectivity, score_shade, score_total (0-100) and rank (1 = plant first)
-write_scores(df_scores)  # validates, stamps the data version, writes backend/data/cache/scores.geojson
-```
-- Check a file by hand: `python -m backend.validate_scores file.geojson`. Format example: `docs/scores.example.geojson`.
-- A bad scores file can never break the API: it is ignored, logged, and reported in `/meta.scores_error`.
+**Status: delivered.** The brief was [docs/data-dictionary.md](docs/data-dictionary.md) and
+[docs/ml-developer-prompt.md](docs/ml-developer-prompt.md); the delivered model, validation and write-up live in
+[`ml/`](ml/) — start there (`ml/README.md`) to rerun or extend it. Summary:
+
+- **Scoring code:** [`ml/scoring_model.py`](ml/scoring_model.py) — three 0-100 scores (cooling, connectivity, shade)
+  from eight named, transparent inputs; no fitted parameters (there are no labels to fit to).
+- **Delivery:** `python -m ml.run_scoring` writes `weights.json` then `scores.geojson` via the interface below;
+  `python -m backend.validate_scores backend/data/cache/scores.geojson` confirms it.
+  ```python
+  from backend.ml_io import load_sites_df, write_scores
+  df = load_sites_df()     # one row per site: surroundings, shade, corridor, reliability, block_id, ...
+  # compute score_cooling, score_connectivity, score_shade, score_total (0-100) and rank (1 = plant first)
+  write_scores(df_scores)  # validates, stamps the data version, writes backend/data/cache/scores.geojson
+  ```
+- **Validation (no ground truth, so "consistent and stable", never "correct"):** `python -m ml.validation` —
+  direction check, weight-stability under random and slider-realistic draws, leave-one-input-out, spatial block
+  hold-out, reliability of gap-filled temperature, shortlist concentration, redundant-feature check.
+  `python -m ml.uncertainty` goes further: a 2000-draw Monte Carlo over the weights *and* the model's judgement
+  constants at once, reporting a score and rank range per site, not one deterministic number. Reports:
+  [`ml/reports/`](ml/reports/).
+- **Pitch tools:** `python -m ml.shortlist` produces a spread-out top-20 (capped per 250 m block) for a slide that
+  reads as "a few priority areas", separate from the live-ranked map. `python -m ml.scenario` produces a labelled
+  planting-impact **scenario** (explicitly not a forecast — the yearly series is too thin and noisy to fit a trend
+  through honestly), anchored to canopy measured today inside Elmina's own parks. Plain-language write-up for
+  judges/slides: [docs/ml-model.md](docs/ml-model.md).
+- 45 tests: `python -m pytest ml/tests -q`.
 - Split train/test by `block_id` (neighbouring cells are correlated). Site IDs are stable across rebuilds.
 - **There are no ground-truth labels.** Validation can only check consistency, not that the ranking is right.
 
@@ -123,6 +147,11 @@ Canopy dashboard system in `css/app.css`, and it can be replaced without touchin
 - Reuse `frontend/js/weights.js`, `drivers.js`, `scale.js`, `report-logic.js` and `csv.js` unchanged; they are tested, and
   `weights.js` is checked against the Python backend so slider re-ranking always matches the API.
 - Always show the "simulated sites" label, the caveats and attribution from `/meta`, and a badge when `score_source` is not `ml`.
+
+**Nothing to change now that ML has delivered** — the API contract is identical whether `score_source` is
+`placeholder` or `ml` (same fields, same types, always pre-sorted by `rank`); only the values and `score_source`
+change. The one visible difference: `/weights` now returns the ML default (0.45 / 0.30 / 0.25) instead of the
+backend's config placeholder (0.40 / 0.35 / 0.25), so sliders should start from a slightly different position.
 
 ## Reliability
 - **Offline by design.** The demo needs only the committed cache. The API never imports Earth Engine or OSM libraries
@@ -170,7 +199,7 @@ they are exercised by `python -m backend.build_cache` with your login.
 | `backend/ml_io.py`, `backend/validate_scores.py` | ML hand-off: feature table in, validated scores out |
 | `backend/build_cache.py` | One-command rebuild |
 | `backend/atomic.py`, `retry.py`, `logging_config.py` | Atomic writes, transient-failure retries, logging |
-| `backend/data/cache/` | Generated files the API serves (committed so the demo works offline) |
+| `backend/data/cache/` | Generated files the API serves (committed so the demo works offline), including ML's `scores.geojson`, `weights.json` |
 | `backend/data/mock/` | Invented placeholder data for development |
 | `frontend/` | Web app (sidebar dashboard: map, top sites, sliders, site card, before/after), design-system style guide, Leaflet and fonts bundled, unit tests and a browser smoke test |
 | `backend/tests/` | Test suite |
@@ -193,7 +222,9 @@ they are exercised by `python -m backend.build_cache` with your login.
   average agreement of the three thresholds tried (F1 0.51, against 0.47 at 0.5 and 0.32 at 0.7). Both references are
   satellite-derived, not field truth. Details: `backend/data/cache/crosscheck.json`.
 - **No ground truth.** No tree inventory, LiDAR or field plots exist for this project.
-- **Scores.** Until ML delivers `scores.geojson` the API serves a labelled placeholder.
+- **Scores.** Delivered (`score_source: "ml"`); the ranking is validated for consistency and stability, not
+  correctness — there is no ground truth, see [docs/ml-model.md](docs/ml-model.md). Any site ML did not score keeps
+  the labelled placeholder.
 - **Not disclosure-grade.** What a real pilot would need: [docs/pilot-readiness.md](docs/pilot-readiness.md).
 - **Outside facts in the pitch.** Checked in [docs/pitch-fact-check.md](docs/pitch-fact-check.md); several need softer wording
   (the "5% planted" figure is contradicted by the same source). Hard questions with honest answers: [docs/judge-qa.md](docs/judge-qa.md).

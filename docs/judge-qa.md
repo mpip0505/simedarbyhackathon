@@ -1,8 +1,9 @@
 # Judge Q&A: hard questions with honest answers
 
 Written for: whoever presents (and anyone covering Q&A). Every answer uses only what the repository can back up. Where
-a number is quoted, it comes from the committed data (`backend/data/cache/`) or [pitch-fact-check.md](pitch-fact-check.md).
-Answers marked **[ML to fill]** depend on the scoring model, which was not delivered when this was written.
+a number is quoted, it comes from the committed data (`backend/data/cache/`) or [pitch-fact-check.md](pitch-fact-check.md)
+or the ML validation reports (`ml/reports/`, explained in [ml-model.md](ml-model.md)). The scoring model has now been
+delivered (`score_source: "ml"` in `/meta`); the questions below that depended on it are filled in.
 
 **Style rule: say what we did, say what we did not, say what it would take.** Judges mark down overclaiming far more
 than modest honesty, and a confident wrong number is the worst outcome.
@@ -28,9 +29,14 @@ plausible, but we call it indicative.
 
 **4. Where is your ground truth? How did you validate it?**
 We have none: no tree inventory, LiDAR or field plots. What we did: an imagery go/no-go check, a threshold sensitivity
-run, an independent cross-check against two land-cover products, and stability tests on the ranking
-**[ML to fill: weight-stability results]**. These show consistency, not correctness. A pilot would need field plots, and
-that is the first thing we would ask Sime Darby Property for.
+run, an independent cross-check against two land-cover products, and stability tests on the ranking. Nudging the
+weight sliders around our defaults barely moves it (rank correlation 0.99, 18 of the top 20 unchanged); letting them
+swing anywhere, including switching a whole benefit off, moves it more (median 0.92, worst case only 1 of 20 survives).
+Refitting on 4/5 of the township's neighbourhoods and scoring the rest against that gives 0.997. A 2000-draw Monte
+Carlo over every judgement call at once finds 14 of today's top 20 robust (in the top 20 at least 80% of the time) and
+is explicit about which of the other 7 are closer calls, and why. All of this shows the ranking is *consistent* and
+*stable*, not that it is *correct* - we say both halves of that sentence every time. A pilot would need field plots,
+and that is the first thing we would ask Sime Darby Property for.
 
 **5. Why NDVI 0.6?**
 Across the thresholds we tried, 0.6 agreed best with the two independent maps on average (F1 0.51, against 0.47 at 0.5
@@ -97,6 +103,13 @@ site needs its own validation, and commercial use changes the Earth Engine licen
 Sime Darby Property's real site list, one set of field plots or a LiDAR/drone sample to calibrate the canopy proxy, the
 official corridor polygon, and a scheduled seasonal re-run. Details in [pilot-readiness.md](pilot-readiness.md).
 
+**16a. Wait — is this itself a pilot, or not?**
+Both answers are true, for two different things. We **did** pilot the method: the pipeline, corridor model and
+scoring ran end to end on real satellite imagery and real OpenStreetMap data for a real township, City of Elmina —
+not a toy example. We have **not** piloted real planting: the 564 candidate sites are simulated, not Sime Darby
+Property's list, so nothing has been planted or tested against their own records yet. *Do not say* "we piloted tree
+planting in Elmina" — say "we piloted the method in Elmina; piloting real planting is the next, concrete step."
+
 **17. You say 5% of the trees are planted. Is that right?**
 We do not use that figure. The developer's own pages conflict: one infographic says 10,266 trees planted (from a 2022
 survey) while text on the same page says over 41,000. We would ask Sime Darby Property for the current count before
@@ -104,9 +117,26 @@ quoting any percentage.
 
 ## About the technology
 
-**18. How does the scoring work?** **[ML to fill]**
-Plain-language explanation from the ML developer: the three scores, the default weights and why, and what the stability
-analysis shows. The weights are adjustable live in the app.
+**18. How does the scoring work?**
+Three scores out of 100 - cooling benefit, habitat connectivity, shade on walking routes - each a plain weighted
+average of a handful of satellite and map measurements of a site's surroundings, blended into one total that sorts
+the map. No model is trained: there are no labels to train one on, and a fitted model would invent confidence we
+cannot back. Default weights are cooling 0.45, connectivity 0.30, shade 0.25 - heat is the best-measured of the
+three, connectivity is weighted down because the corridor it depends on is approximate. The weights are adjustable
+live in the app (`/weights`, re-ranks via `?w_cooling=`), and the pitch deck's shortlist spreads the same top sites
+across 10 neighbourhoods instead of one corridor-edge strip, for one point of average score. Full write-up:
+[ml-model.md](ml-model.md).
+
+**18a. Do you predict future canopy or temperature?**
+No, deliberately. Our yearly series is five historical points with more year-to-year noise than
+signal (one year's canopy band alone spans 6.6% to 21.9%), so fitting a trend through it and calling
+it a forecast would be a worse version of the overclaiming we refuse to do elsewhere. What we show
+instead is a labelled **scenario**: if the top-ranked sites are planted, a plausible canopy
+trajectory for *that planted set* under a named, swappable growth-speed assumption (not fitted, not
+cited) — anchored to one real measurement, what canopy already looks like inside Elmina's existing
+parks today (about 15%, using the same NDVI definition as everywhere else). It does not translate
+into a temperature or carbon number; we have no calibrated relationship to do that honestly. See
+`ml/reports/scenario.md`. *Do not say:* "we predict X% canopy by 2030."
 
 **19. What happens if the demo breaks?**
 The demo runs offline from committed data, with no live Earth Engine or internet call. The API checks its own data at
@@ -117,9 +147,13 @@ in about four minutes and reproduced the committed data exactly.
 The data is derived from public sources (satellite imagery and OpenStreetMap); there is no personal data. The API is
 read-only and, as a localhost demo, has no login. A hosted version would need authentication and restricted access.
 
-**21. Is the model explainable?** **[ML to fill]**
-Aim for: every score is a transparent combination of named measurements, and the detail panel shows what drives each site's
-rank.
+**21. Is the model explainable?**
+Yes, deliberately so, and that was a design choice over a more complex model: every score is a transparent weighted
+average of eight named measurements (how hot the surroundings are, how close to a corridor gap, how much nearby
+footpath has no shade, and so on), with one of two simple rules deciding how each is turned into a 0-100 input - a
+percentile rank for things that only mean something relative to other sites, a decay curve for things with physical
+distance meaning. No hidden layers, nothing fitted to data we do not have. The detail panel can show exactly which
+of those eight pushed a site's rank up or down, in one step back from the number on the map.
 
 ## Curveballs
 
@@ -138,4 +172,5 @@ number was less certain than we first thought, which we then put on the screen.
 
 ## Phrases to avoid
 "Accurate", "validated" (without saying against what), "defensible", "reportable evidence", "our recommended sites",
-"canopy increased", "10,266 trees planted (5%)", "KL's heat islands doubled", "carbon sequestered".
+"canopy increased", "10,266 trees planted (5%)", "KL's heat islands doubled", "carbon sequestered",
+"we predict/forecast X% canopy by [year]" (say "scenario", not "forecast" — see Q18a).

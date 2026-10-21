@@ -1,0 +1,281 @@
+{
+ "generated_utc": "2026-10-21 03:54:10",
+ "data_version": "f12bc98c3fbd",
+ "draws": 2000,
+ "k": 20,
+ "sampled": {
+  "weights": "Dirichlet(20 x default), sliders-nudged",
+  "gap_scale_m": "Uniform(200.0, 800.0)",
+  "park_scale_m": "Uniform(200.0, 800.0)",
+  "path_scale_m": "Uniform(75.0, 300.0)",
+  "unshaded_cap_m": "Uniform(75.0, 300.0)",
+  "shrink_gapfilled": "on in 80% of draws"
+ },
+ "sites_in_sample": 564,
+ "robust_top_k": {
+  "threshold": 0.8,
+  "count_overall": 14,
+  "count_within_baseline_top_k": 14
+ },
+ "boundary_sites": {
+  "range": [
+   0.2,
+   0.8
+  ],
+  "count": 13
+ },
+ "rank_agreement": {
+  "spearman_baseline_vs_median": 0.9989
+ },
+ "widest_swing_in_baseline_top_k": {
+  "site_id": "ELM-3718-11717",
+  "baseline_rank": 13,
+  "rank_p05": 12,
+  "rank_p95": 49,
+  "topk_frequency": 0.39,
+  "why": "On the fence: uncovered_path_length_50m=162.7m is inside the sampled unshaded_cap_m range (75.0, 300.0)."
+ },
+ "baseline_top_k": [
+  {
+   "site_id": "ELM-3734-11725",
+   "baseline_rank": 1,
+   "baseline_score": 92.5,
+   "score_median": 92.6,
+   "score_p05": 90.6,
+   "score_p95": 94.4,
+   "rank_median": 1,
+   "rank_p05": 1,
+   "rank_p95": 1,
+   "topk_frequency": 1.0
+  },
+  {
+   "site_id": "ELM-3719-11715",
+   "baseline_rank": 2,
+   "baseline_score": 86.6,
+   "score_median": 86.6,
+   "score_p05": 82.5,
+   "score_p95": 90.7,
+   "rank_median": 3,
+   "rank_p05": 2,
+   "rank_p95": 8,
+   "topk_frequency": 0.996
+  },
+  {
+   "site_id": "ELM-3717-11714",
+   "baseline_rank": 3,
+   "baseline_score": 86.3,
+   "score_median": 86.4,
+   "score_p05": 82.6,
+   "score_p95": 90.3,
+   "rank_median": 4,
+   "rank_p05": 3,
+   "rank_p95": 7,
+   "topk_frequency": 0.998
+  },
+  {
+   "site_id": "ELM-3719-11714",
+   "baseline_rank": 4,
+   "baseline_score": 86.1,
+   "score_median": 86.4,
+   "score_p05": 83.3,
+   "score_p95": 89.5,
+   "rank_median": 4,
+   "rank_p05": 3,
+   "rank_p95": 10,
+   "topk_frequency": 0.996
+  },
+  {
+   "site_id": "ELM-3720-11714",
+   "baseline_rank": 5,
+   "baseline_score": 86.1,
+   "score_median": 86.4,
+   "score_p05": 83.4,
+   "score_p95": 89.6,
+   "rank_median": 4,
+   "rank_p05": 2,
+   "rank_p95": 14,
+   "topk_frequency": 0.982
+  },
+  {
+   "site_id": "ELM-3731-11726",
+   "baseline_rank": 6,
+   "baseline_score": 85.5,
+   "score_median": 85.2,
+   "score_p05": 81.1,
+   "score_p95": 89.2,
+   "rank_median": 8,
+   "rank_p05": 4,
+   "rank_p95": 19,
+   "topk_frequency": 0.961
+  },
+  {
+   "site_id": "ELM-3720-11715",
+   "baseline_rank": 7,
+   "baseline_score": 85.4,
+   "score_median": 85.6,
+   "score_p05": 82.1,
+   "score_p95": 89.2,
+   "rank_median": 7,
+   "rank_p05": 6,
+   "rank_p95": 14,
+   "topk_frequency": 0.994
+  },
+  {
+   "site_id": "ELM-3719-11716",
+   "baseline_rank": 8,
+   "baseline_score": 85.1,
+   "score_median": 85.1,
+   "score_p05": 80.7,
+   "score_p95": 89.6,
+   "rank_median": 8,
+   "rank_p05": 5,
+   "rank_p95": 14,
+   "topk_frequency": 0.978
+  },
+  {
+   "site_id": "ELM-3716-11715",
+   "baseline_rank": 9,
+   "baseline_score": 84.4,
+   "score_median": 84.5,
+   "score_p05": 79.9,
+   "score_p95": 89.0,
+   "rank_median": 10,
+   "rank_p05": 7,
+   "rank_p95": 18,
+   "topk_frequency": 0.962
+  },
+  {
+   "site_id": "ELM-3735-11742",
+   "baseline_rank": 10,
+   "baseline_score": 84.4,
+   "score_median": 84.3,
+   "score_p05": 78.8,
+   "score_p95": 89.7,
+   "rank_median": 11,
+   "rank_p05": 3,
+   "rank_p95": 23,
+   "topk_frequency": 0.931
+  },
+  {
+   "site_id": "ELM-3720-11716",
+   "baseline_rank": 11,
+   "baseline_score": 83.9,
+   "score_median": 84.1,
+   "score_p05": 79.9,
+   "score_p95": 88.3,
+   "rank_median": 11,
+   "rank_p05": 9,
+   "rank_p95": 22,
+   "topk_frequency": 0.935
+  },
+  {
+   "site_id": "ELM-3719-11717",
+   "baseline_rank": 12,
+   "baseline_score": 83.6,
+   "score_median": 83.6,
+   "score_p05": 78.7,
+   "score_p95": 88.5,
+   "rank_median": 12,
+   "rank_p05": 10,
+   "rank_p95": 23,
+   "topk_frequency": 0.934
+  },
+  {
+   "site_id": "ELM-3718-11717",
+   "baseline_rank": 13,
+   "baseline_score": 83.3,
+   "score_median": 80.4,
+   "score_p05": 73.9,
+   "score_p95": 87.2,
+   "rank_median": 27,
+   "rank_p05": 12,
+   "rank_p95": 49,
+   "topk_frequency": 0.39
+  },
+  {
+   "site_id": "ELM-3736-11743",
+   "baseline_rank": 14,
+   "baseline_score": 83.0,
+   "score_median": 82.9,
+   "score_p05": 77.1,
+   "score_p95": 88.6,
+   "rank_median": 15,
+   "rank_p05": 8,
+   "rank_p95": 33,
+   "topk_frequency": 0.828
+  },
+  {
+   "site_id": "ELM-3715-11715",
+   "baseline_rank": 15,
+   "baseline_score": 82.5,
+   "score_median": 82.6,
+   "score_p05": 77.9,
+   "score_p95": 87.4,
+   "rank_median": 17,
+   "rank_p05": 14,
+   "rank_p95": 29,
+   "topk_frequency": 0.8
+  },
+  {
+   "site_id": "ELM-3730-11726",
+   "baseline_rank": 16,
+   "baseline_score": 82.5,
+   "score_median": 82.5,
+   "score_p05": 77.8,
+   "score_p95": 87.1,
+   "rank_median": 18,
+   "rank_p05": 13,
+   "rank_p95": 29,
+   "topk_frequency": 0.658
+  },
+  {
+   "site_id": "ELM-3720-11717",
+   "baseline_rank": 17,
+   "baseline_score": 82.4,
+   "score_median": 82.5,
+   "score_p05": 77.8,
+   "score_p95": 87.2,
+   "rank_median": 18,
+   "rank_p05": 14,
+   "rank_p95": 28,
+   "topk_frequency": 0.638
+  },
+  {
+   "site_id": "ELM-3714-11715",
+   "baseline_rank": 18,
+   "baseline_score": 82.3,
+   "score_median": 82.4,
+   "score_p05": 77.0,
+   "score_p95": 87.7,
+   "rank_median": 19,
+   "rank_p05": 14,
+   "rank_p95": 32,
+   "topk_frequency": 0.668
+  },
+  {
+   "site_id": "ELM-3737-11743",
+   "baseline_rank": 19,
+   "baseline_score": 82.3,
+   "score_median": 82.2,
+   "score_p05": 76.2,
+   "score_p95": 88.1,
+   "rank_median": 21,
+   "rank_p05": 12,
+   "rank_p95": 40,
+   "topk_frequency": 0.461
+  },
+  {
+   "site_id": "ELM-3715-11716",
+   "baseline_rank": 20,
+   "baseline_score": 82.2,
+   "score_median": 82.0,
+   "score_p05": 76.3,
+   "score_p95": 87.7,
+   "rank_median": 21,
+   "rank_p05": 14,
+   "rank_p95": 37,
+   "topk_frequency": 0.44
+  }
+ ],
+ "full_table_csv_note": "full per-site table is in uncertainty_sites.csv next to this report"
+}

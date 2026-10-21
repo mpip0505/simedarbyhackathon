@@ -1,0 +1,509 @@
+{
+ "generated_utc": "2026-10-21 03:53:53",
+ "data_version": "f12bc98c3fbd",
+ "sites": 564,
+ "weights": {
+  "cooling": 0.45,
+  "connectivity": 0.3,
+  "shade": 0.25
+ },
+ "score_summary": {
+  "score_cooling": {
+   "count": 564.0,
+   "mean": 50.2,
+   "std": 21.2,
+   "min": 7.5,
+   "25%": 33.5,
+   "50%": 54.9,
+   "75%": 64.3,
+   "max": 96.1
+  },
+  "score_connectivity": {
+   "count": 564.0,
+   "mean": 29.1,
+   "std": 30.1,
+   "min": 0.4,
+   "25%": 4.6,
+   "50%": 19.5,
+   "75%": 35.8,
+   "max": 98.5
+  },
+  "score_shade": {
+   "count": 564.0,
+   "mean": 28.2,
+   "std": 34.0,
+   "min": 0.3,
+   "25%": 6.3,
+   "50%": 11.4,
+   "75%": 41.8,
+   "max": 100.0
+  },
+  "score_total": {
+   "count": 564.0,
+   "mean": 38.4,
+   "std": 20.6,
+   "min": 14.6,
+   "25%": 22.0,
+   "50%": 29.4,
+   "75%": 52.5,
+   "max": 92.5
+  }
+ },
+ "component_summary": {
+  "hot": {
+   "median": 50.0,
+   "share_below_5": 0.05
+  },
+  "bare": {
+   "median": 50.0,
+   "share_below_5": 0.051
+  },
+  "built": {
+   "median": 51.7,
+   "share_below_5": 0.0
+  },
+  "gap": {
+   "median": 15.1,
+   "share_below_5": 0.429
+  },
+  "park": {
+   "median": 37.5,
+   "share_below_5": 0.161
+  },
+  "inside": {
+   "median": 0.0,
+   "share_below_5": 0.826
+  },
+  "unshaded": {
+   "median": 0.0,
+   "share_below_5": 0.72
+  },
+  "near": {
+   "median": 38.3,
+   "share_below_5": 0.083
+  }
+ },
+ "direction": {
+  "decile_size": 56,
+  "features": [
+   {
+    "feature": "lst_mean_250m",
+    "top_decile_mean": 42.438,
+    "bottom_decile_mean": 39.221
+   },
+   {
+    "feature": "ndvi_mean_250m",
+    "top_decile_mean": 0.312,
+    "bottom_decile_mean": 0.441
+   },
+   {
+    "feature": "built_up_frac_250m",
+    "top_decile_mean": 0.147,
+    "bottom_decile_mean": 0.0
+   },
+   {
+    "feature": "residential_buildings_within_250m",
+    "top_decile_mean": 25.375,
+    "bottom_decile_mean": 0.0
+   },
+   {
+    "feature": "corridor_gap_dist_m",
+    "top_decile_mean": 48.83,
+    "bottom_decile_mean": 1277.204
+   },
+   {
+    "feature": "dist_to_nearest_park_m",
+    "top_decile_mean": 101.054,
+    "bottom_decile_mean": 421.223
+   },
+   {
+    "feature": "uncovered_path_length_50m",
+    "top_decile_mean": 328.579,
+    "bottom_decile_mean": 0.0
+   },
+   {
+    "feature": "dist_to_path_m",
+    "top_decile_mean": 12.391,
+    "bottom_decile_mean": 274.021
+   },
+   {
+    "feature": "canopy_pct_baseline",
+    "top_decile_mean": 3.625,
+    "bottom_decile_mean": 10.709
+   },
+   {
+    "feature": "lst_valid_frac",
+    "top_decile_mean": 0.916,
+    "bottom_decile_mean": 0.999
+   }
+  ],
+  "note": "Partly true by construction: the scores are built from these features. This checks the wiring and the sign of every term, not that the ranking is right."
+ },
+ "weight_stability": {
+  "samplers": [
+   {
+    "sampler": "any weights: Dirichlet(1,1,1)",
+    "draws": 2000,
+    "spearman_vs_default": {
+     "min": 0.41,
+     "p05": 0.546,
+     "median": 0.916,
+     "max": 1.0
+    },
+    "top20_shared_with_default": {
+     "min": 1,
+     "median": 14,
+     "max": 20
+    },
+    "rank_spread_per_site": {
+     "median": 211,
+     "p90": 396,
+     "max": 518
+    },
+    "sites_always_in_top_50": 3,
+    "sites_never_in_top_50": 440
+   },
+   {
+    "sampler": "sliders nudged: Dirichlet(20 x default)",
+    "draws": 2000,
+    "spearman_vs_default": {
+     "min": 0.673,
+     "p05": 0.866,
+     "median": 0.991,
+     "max": 1.0
+    },
+    "top20_shared_with_default": {
+     "min": 3,
+     "median": 18,
+     "max": 20
+    },
+    "rank_spread_per_site": {
+     "median": 140,
+     "p90": 292,
+     "max": 337
+    },
+    "sites_always_in_top_50": 18,
+    "sites_never_in_top_50": 473
+   }
+  ],
+  "note": "Every draw re-totals the same three component scores, so this measures how much the weight choice matters, not whether the components are right."
+ },
+ "leave_input_out": [
+  {
+   "variant": "without hot",
+   "spearman_vs_default": 0.9482,
+   "top20_shared": 16,
+   "median_rank_shift": 32,
+   "score": "cooling"
+  },
+  {
+   "variant": "without bare",
+   "spearman_vs_default": 0.9582,
+   "top20_shared": 16,
+   "median_rank_shift": 24,
+   "score": "cooling"
+  },
+  {
+   "variant": "without unshaded",
+   "spearman_vs_default": 0.9748,
+   "top20_shared": 17,
+   "median_rank_shift": 22,
+   "score": "shade"
+  },
+  {
+   "variant": "without built",
+   "spearman_vs_default": 0.9813,
+   "top20_shared": 16,
+   "median_rank_shift": 17,
+   "score": "cooling"
+  },
+  {
+   "variant": "without gap",
+   "spearman_vs_default": 0.9854,
+   "top20_shared": 18,
+   "median_rank_shift": 11,
+   "score": "connectivity"
+  },
+  {
+   "variant": "without park",
+   "spearman_vs_default": 0.989,
+   "top20_shared": 18,
+   "median_rank_shift": 13,
+   "score": "connectivity"
+  },
+  {
+   "variant": "without near",
+   "spearman_vs_default": 0.9934,
+   "top20_shared": 19,
+   "median_rank_shift": 10,
+   "score": "shade"
+  },
+  {
+   "variant": "without inside",
+   "spearman_vs_default": 0.9966,
+   "top20_shared": 18,
+   "median_rank_shift": 7,
+   "score": "connectivity"
+  }
+ ],
+ "scale_sensitivity": [
+  {
+   "variant": "shrink_gapfilled=False",
+   "spearman_vs_default": 0.986,
+   "top20_shared": 20,
+   "median_rank_shift": 2
+  },
+  {
+   "variant": "gap_scale_m=800.0, park_scale_m=800.0",
+   "spearman_vs_default": 0.9882,
+   "top20_shared": 18,
+   "median_rank_shift": 14
+  },
+  {
+   "variant": "gap_scale_m=200.0, park_scale_m=200.0",
+   "spearman_vs_default": 0.9923,
+   "top20_shared": 18,
+   "median_rank_shift": 9
+  },
+  {
+   "variant": "path_scale_m=75.0",
+   "spearman_vs_default": 0.9985,
+   "top20_shared": 19,
+   "median_rank_shift": 4
+  },
+  {
+   "variant": "unshaded_cap_m=300.0",
+   "spearman_vs_default": 0.9989,
+   "top20_shared": 17,
+   "median_rank_shift": 1
+  },
+  {
+   "variant": "unshaded_cap_m=75.0",
+   "spearman_vs_default": 0.9991,
+   "top20_shared": 18,
+   "median_rank_shift": 1
+  },
+  {
+   "variant": "path_scale_m=300.0",
+   "spearman_vs_default": 0.9994,
+   "top20_shared": 19,
+   "median_rank_shift": 2
+  }
+ ],
+ "block_holdout": {
+  "folds": 5,
+  "blocks": 63,
+  "spearman_vs_default": 0.9965,
+  "top20_shared": 19,
+  "median_rank_shift": 5,
+  "note": "Only the percentile scales are sample-dependent; the distance decays are absolute, which is why this check moves the ranking so little."
+ },
+ "reliability": {
+  "threshold": 0.5,
+  "sites_dropped": 93,
+  "sites_kept": 471,
+  "spearman_among_kept": 0.9994,
+  "low_reliability_in_default_top20": 0,
+  "note": "Dropping sites changes the percentile scales, so a perfect 1.0 is not expected. The last number is what matters: how much of the headline top 20 rests on gap-filled temperature."
+ },
+ "concentration": {
+  "top_20": {
+   "distinct_blocks": 6,
+   "largest_block_share": 0.35,
+   "origin_mix": {
+    "corridor_edge": 20
+   }
+  },
+  "top_50": {
+   "distinct_blocks": 14,
+   "largest_block_share": 0.22,
+   "origin_mix": {
+    "corridor_edge": 48,
+    "open_land": 2
+   }
+  },
+  "top_100": {
+   "distinct_blocks": 26,
+   "largest_block_share": 0.12,
+   "origin_mix": {
+    "corridor_edge": 74,
+    "open_land": 26
+   }
+  },
+  "note": "Not a defect of the scores: corridor-edge cells near unshaded paths genuinely cluster. It is a caveat for the pitch - present the top 20 as a few planting areas, and use the weight sliders or a per-block cap if a spread-out shortlist is wanted."
+ },
+ "redundant_feature_pairs": [
+  {
+   "a": "path_length_within_50m",
+   "b": "uncovered_path_length_50m",
+   "spearman": 0.9999
+  },
+  {
+   "a": "corridor_gap_dist_m",
+   "b": "dist_to_corridor_spine_m",
+   "spearman": 0.9994
+  }
+ ],
+ "top_20": [
+  {
+   "rank": 1,
+   "site_id": "ELM-3734-11725",
+   "score_total": 92.5,
+   "score_cooling": 87.3,
+   "score_connectivity": 94.8,
+   "score_shade": 99.1
+  },
+  {
+   "rank": 2,
+   "site_id": "ELM-3719-11715",
+   "score_total": 86.6,
+   "score_cooling": 74.8,
+   "score_connectivity": 93.0,
+   "score_shade": 100.0
+  },
+  {
+   "rank": 3,
+   "site_id": "ELM-3717-11714",
+   "score_total": 86.3,
+   "score_cooling": 75.4,
+   "score_connectivity": 91.6,
+   "score_shade": 99.6
+  },
+  {
+   "rank": 4,
+   "site_id": "ELM-3719-11714",
+   "score_total": 86.1,
+   "score_cooling": 78.5,
+   "score_connectivity": 88.2,
+   "score_shade": 97.3
+  },
+  {
+   "rank": 5,
+   "site_id": "ELM-3720-11714",
+   "score_total": 86.1,
+   "score_cooling": 79.8,
+   "score_connectivity": 85.6,
+   "score_shade": 98.0
+  },
+  {
+   "rank": 6,
+   "site_id": "ELM-3731-11726",
+   "score_total": 85.5,
+   "score_cooling": 74.2,
+   "score_connectivity": 92.1,
+   "score_shade": 98.0
+  },
+  {
+   "rank": 7,
+   "site_id": "ELM-3720-11715",
+   "score_total": 85.4,
+   "score_cooling": 76.3,
+   "score_connectivity": 88.2,
+   "score_shade": 98.6
+  },
+  {
+   "rank": 8,
+   "site_id": "ELM-3719-11716",
+   "score_total": 85.1,
+   "score_cooling": 71.8,
+   "score_connectivity": 93.2,
+   "score_shade": 99.2
+  },
+  {
+   "rank": 9,
+   "site_id": "ELM-3716-11715",
+   "score_total": 84.4,
+   "score_cooling": 70.5,
+   "score_connectivity": 94.0,
+   "score_shade": 97.9
+  },
+  {
+   "rank": 10,
+   "site_id": "ELM-3735-11742",
+   "score_total": 84.4,
+   "score_cooling": 67.1,
+   "score_connectivity": 98.5,
+   "score_shade": 98.8
+  },
+  {
+   "rank": 11,
+   "site_id": "ELM-3720-11716",
+   "score_total": 83.9,
+   "score_cooling": 72.4,
+   "score_connectivity": 88.8,
+   "score_shade": 98.9
+  },
+  {
+   "rank": 12,
+   "site_id": "ELM-3719-11717",
+   "score_total": 83.6,
+   "score_cooling": 68.4,
+   "score_connectivity": 94.2,
+   "score_shade": 98.1
+  },
+  {
+   "rank": 13,
+   "site_id": "ELM-3718-11717",
+   "score_total": 83.3,
+   "score_cooling": 68.1,
+   "score_connectivity": 95.0,
+   "score_shade": 96.6
+  },
+  {
+   "rank": 14,
+   "site_id": "ELM-3736-11743",
+   "score_total": 83.0,
+   "score_cooling": 64.8,
+   "score_connectivity": 97.3,
+   "score_shade": 98.6
+  },
+  {
+   "rank": 15,
+   "site_id": "ELM-3715-11715",
+   "score_total": 82.5,
+   "score_cooling": 68.0,
+   "score_connectivity": 92.7,
+   "score_shade": 96.4
+  },
+  {
+   "rank": 16,
+   "site_id": "ELM-3730-11726",
+   "score_total": 82.5,
+   "score_cooling": 69.2,
+   "score_connectivity": 88.8,
+   "score_shade": 98.7
+  },
+  {
+   "rank": 17,
+   "site_id": "ELM-3720-11717",
+   "score_total": 82.4,
+   "score_cooling": 68.9,
+   "score_connectivity": 89.3,
+   "score_shade": 98.3
+  },
+  {
+   "rank": 18,
+   "site_id": "ELM-3714-11715",
+   "score_total": 82.3,
+   "score_cooling": 66.0,
+   "score_connectivity": 93.3,
+   "score_shade": 98.6
+  },
+  {
+   "rank": 19,
+   "site_id": "ELM-3737-11743",
+   "score_total": 82.3,
+   "score_cooling": 63.6,
+   "score_connectivity": 95.8,
+   "score_shade": 99.8
+  },
+  {
+   "rank": 20,
+   "site_id": "ELM-3715-11716",
+   "score_total": 82.2,
+   "score_cooling": 64.6,
+   "score_connectivity": 95.4,
+   "score_shade": 98.0
+  }
+ ]
+}
