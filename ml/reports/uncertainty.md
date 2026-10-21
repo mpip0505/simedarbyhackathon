@@ -1,5 +1,5 @@
 # Score uncertainty (Monte Carlo over the modelling judgement calls)
-Generated 2026-10-21 02:45:42 UTC on data_version `482cd831d34a`, 2000 draws. Regenerate with `python -m ml.uncertainty`.
+Generated 2026-10-21 02:54:11 UTC on data_version `482cd831d34a`, 2000 draws. Regenerate with `python -m ml.uncertainty`.
 
 > This is **not** a confidence interval on the true best planting site - there is no ground truth to be confident about. It is a measure of how much the ranking depends on judgement calls (the weights, and four distance constants inside the scores) that were chosen, not fitted. A site whose rank barely moves across plausible choices is a safer pitch claim than one near the cutoff.
 

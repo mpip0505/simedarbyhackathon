@@ -5,8 +5,6 @@ import pytest
 
 from backend.ml_io import load_sites_df
 
-from ml.run_scoring import DEFAULT_WEIGHTS
-from ml.scoring_model import score_sites
 from ml.uncertainty import SCALE_RANGES, _diagnose_swing, monte_carlo, summarise
 
 

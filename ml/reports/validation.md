@@ -1,5 +1,5 @@
 # Score validation report
-Generated 2026-10-21 02:20:17 UTC on data_version `482cd831d34a`, 564 sites, weights {"cooling": 0.45, "connectivity": 0.3, "shade": 0.25}. Regenerate with `python -m ml.validation`.
+Generated 2026-10-21 02:53:52 UTC on data_version `482cd831d34a`, 564 sites, weights {"cooling": 0.45, "connectivity": 0.3, "shade": 0.25}. Regenerate with `python -m ml.validation`.
 > **There are no ground-truth labels for this problem** - no tree inventory, LiDAR or field plots. Nothing below shows the ranking is correct. It shows the ranking is *consistent* with the features it is built from and *stable* under the choices we had to make. Read it that way, and say so in the pitch.
 ## Scores at a glance
 | score | min | 25% | 50% | 75% | max |

@@ -35,7 +35,7 @@ from backend.ml_io import current_data_version, load_sites_df
 
 from ml.run_scoring import DEFAULT_WEIGHTS
 from ml.scoring_model import (COMPONENT_COLUMNS, CONNECTIVITY_WEIGHTS, COOLING_WEIGHTS,
-                              SHADE_WEIGHTS, components, pct_rank, score_sites)
+                              SHADE_WEIGHTS, components, score_sites)
 
 REPORT_DIR = __import__("pathlib").Path(__file__).resolve().parent / "reports"
 TOP_K = 20

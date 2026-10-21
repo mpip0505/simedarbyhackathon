@@ -156,6 +156,15 @@ def test_zero_weights_are_refused(df):
         score_sites(df, {"cooling": 0, "connectivity": 0, "shade": 0})
 
 
+def test_score_sites_preserves_input_row_order(df):
+    """ml/uncertainty.py's Monte Carlo reads score_mat/rank_mat positionally (no site_id join, for
+    speed over many draws), so it depends on this holding. If a future refactor of add_ranks ever
+    returns rows sorted by rank instead of restoring df's row order, that dependency breaks silently
+    - this is the regression guard for it."""
+    scores = score_sites(df, DEFAULT_WEIGHTS)
+    assert list(scores["site_id"]) == list(df["site_id"])
+
+
 def test_scoring_is_deterministic(df):
     a, b = score_sites(df, DEFAULT_WEIGHTS), score_sites(df, DEFAULT_WEIGHTS)
     pd.testing.assert_frame_equal(a, b)
