@@ -69,10 +69,12 @@ Say plainly: this counts what lies near the sites. It does not show cooling, hea
 Co-benefit for People: shade where people walk, near homes. *Screen:* `screens/05-reach.png`.
 
 ## Slide 7: Feasibility (Enabler)
-- **Built and running**: 284 backend and ML tests, 110 frontend tests, a 37-check browser test including an accessibility scan and a hostile-data security test.
+- **Built and running**: 284 backend and ML tests, 121 frontend tests, a 38-check browser test including an accessibility scan and a hostile-data security test.
 - **Free data**; hosting on a free tier works for a demo (`render.yaml`); exports for the planning team: ranked CSV, GIS map file and a printable brief (`screens/06-brief.png`).
 - **What we need from Sime Darby Property:** the real site list, the official corridor outline, the current tree count, and a few hours of fieldwork.
 - **Honest risks:** simulated sites; no ground truth; OpenStreetMap under-maps some areas; the Earth Engine registration is noncommercial, so a paid pilot needs a commercial plan or an open-data pipeline ([commercial-case.md](../commercial-case.md)).
+
+**User flow for a slide (see [user-flow.md](user-flow.md)):** Explore, Understand, Prioritise, Evaluate, Plan, Export, Field-verify, Implement. The first six are in the app; the last two are the pilot.
 
 ## Slide 8: Implementation (Enabler)
 1. **Now:** working prototype on simulated sites.

@@ -468,6 +468,49 @@ try {
     assert.match(said, /an example site, simulated\. Ranked \d+ of \d+\./);
     assert.match(said, /heat relief \d+, links green areas \d+, shade for walkers \d+/);
   });
+  await check("the planting plan: add from the site card, set a status and a note, see it counted, downloaded, and remembered after a reload", async () => {
+    const planCard = `document.querySelector('#card-plan')`;
+    await evaluate(`window.__blobs = []; const make = URL.createObjectURL.bind(URL); URL.createObjectURL = (b) => { window.__blobs.push(b); return make(b); };`);
+    const textOf = (i) => evaluate(`window.__blobs[${i}].text()`);
+    assert.match(await evaluate(`${planCard}.innerText`), /No sites yet/);
+    assert.match(await evaluate(`${planCard}.innerText`), /Your notes, not verified/);
+    await evaluate(`document.querySelector('${ROWS}').click()`);
+    await sleep(300);
+    const id = await evaluate(`document.querySelector('#card-body .card-title strong').textContent.trim()`);
+    await evaluate(`[...document.querySelectorAll('#card-body .plan-controls button')].find(b => b.textContent === 'Add to planting plan').click()`);
+    assert.equal(await evaluate(`document.querySelectorAll('#card-body .plan-controls select').length`), 1, "a status choice should appear");
+    await evaluate(`(() => { const s = document.querySelector('#card-body .plan-controls select'); s.value = 'needs-inspection'; s.dispatchEvent(new Event('change', { bubbles: true })); })()`);
+    const tiles = await evaluate(`${planCard}.querySelector('.stats').innerText`);
+    assert.match(tiles, /IN THE PLAN[\s\S]*1[\s\S]*NEEDS INSPECTION[\s\S]*1/i, `tiles read: ${JSON.stringify(tiles)}`);
+    assert.equal(await evaluate(`${planCard}.querySelectorAll('tbody tr').length`), 1);
+    assert.match(await evaluate(`document.querySelector('${ROWS} .site-name').innerText`), /In plan/);
+    await evaluate(`(() => { const i = ${planCard}.querySelector('tbody input'); i.value = '=2+2 check access'; i.dispatchEvent(new Event('change', { bubbles: true })); })()`);
+    await evaluate(`[...${planCard}.querySelectorAll('button')].find(b => b.textContent === 'Download plan (CSV)').click()`);
+    const planCsv = await textOf(0);
+    assert.ok(planCsv.includes(`${id},Needs inspection,'=2+2 check access`), `plan csv read: ${JSON.stringify(planCsv.slice(0, 400))}`);
+    assert.match(planCsv, /not inspected or verified/);
+    await evaluate(`[...${planCard}.querySelectorAll('button')].find(b => b.textContent === 'Download field sheet (CSV)').click()`);
+    const sheet = await textOf(1);
+    assert.match(sheet, /^site_id,lat,lon,shade_on_path,canopy_class,path_in_use,photo_id,notes,observer,date/);
+    assert.match(sheet, new RegExp(id));
+    assert.doesNotMatch(sheet, /rank|score/i);
+    await evaluate(`window.print = () => {}; document.querySelector('[data-action="brief"]').click()`);
+    assert.match(await evaluate(`document.querySelector('#print-brief').innerText || document.querySelector('#print-brief').textContent`), /Planting plan \(the planner's own entries, not verified\)/);
+    await send("Page.navigate", { url: "about:blank" });
+    await send("Page.navigate", { url: `${BASE}/app/` });
+    await waitFor(`document.querySelectorAll('${ROWS}').length > 0 && document.querySelector('#loading').hidden`, "the page to reload");
+    await sleep(500);
+    assert.equal(await evaluate(`${planCard}.querySelectorAll('tbody tr').length`), 1, "the plan should be remembered");
+    assert.match(await evaluate(`${planCard}.querySelector('tbody input').value`), /check access/);
+    assert.equal(await evaluate(`${planCard}.querySelector('tbody select').value`), "needs-inspection");
+    await evaluate(`[...${planCard}.querySelectorAll('button')].find(b => b.textContent === 'Add the first five in the list').click()`);
+    assert.equal(await evaluate(`${planCard}.querySelectorAll('tbody tr').length`), 5, "the first five join the one already there");
+    const clear = `[...${planCard}.querySelectorAll('button')].find(b => /^Clear the plan|^Click again/.test(b.textContent))`;
+    await evaluate(`${clear}.click()`);
+    assert.match(await evaluate(`${clear}.textContent`), /Click again to clear/);
+    await evaluate(`${clear}.click()`);
+    assert.match(await evaluate(`${planCard}.innerText`), /No sites yet/);
+  });
   await check("the trade-off card compares five ways of choosing, as a trade-off with no winner", async () => {
     const card = `document.querySelector('#card-tradeoff')`;
     assert.equal(await evaluate(`${card}.hidden`), false, "the card should show with scores from the scoring model");
@@ -488,7 +531,7 @@ try {
     const text = await evaluate(`document.querySelector('#print-brief').innerText || document.querySelector('#print-brief').textContent`);
     assert.match(text, /Example sites \(simulated\)/);
     assert.match(text, /Limits of this data/);
-    assert.equal(await evaluate(`document.querySelectorAll('#print-brief tbody tr').length`), 10);
+    assert.equal(await evaluate(`document.querySelectorAll('#print-brief table')[0].querySelectorAll('tbody tr').length`), 10);
     assert.equal(await evaluate(`getComputedStyle(document.querySelector('#print-brief')).display`), "none", "the brief must not show on screen");
   });
   await check("the skip link is the first thing Tab reaches and it moves focus to the main content", async () => {

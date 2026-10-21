@@ -55,3 +55,6 @@ No ground truth (tree inventory, LiDAR or field plots) and no real Sime Darby si
   as a pilot with expansion intent; the trade-off card answers "why these weights?"; the greenness layer makes the People angle visible). Estimated total about **70 to 76**; still capped by no ground truth, no real site list,
   no live URL yet and an unrecorded video. Honest corrections made on the way: the app and deck say "scoring model" (no fitted parameters) instead of "ML model"; the footpath figure says "little tree cover (satellite)"
   because about 95% of footpath samples fall below the threshold at 10 m.
+- 22 Oct 2026, after the planting plan (the step after export): closes the "recommendation with no next step" gap (see docs/pitch/user-flow.md). Feasibility and Commercial each gain a little (a decision-to-action loop and a
+  field-sheet hand-off), and Impact's credibility improves because the pilot path is now concrete. It is the planner's own record saved in the browser; there are no logins, no shared records and no inspection, and the docs say so.
+  Estimated total about **71 to 77**, still capped by no ground truth, no real site list, no live URL and an unrecorded video.

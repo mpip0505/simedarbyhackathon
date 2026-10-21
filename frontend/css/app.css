@@ -656,3 +656,24 @@ dialog form[method="dialog"] { display: flex; justify-content: flex-end; margin:
 :root[data-contrast="high"] .chip { border-color: #000; }
 :root[data-contrast="high"] :focus-visible { outline-width: 3px; }
 .card-speak { align-self: flex-start; }
+
+/* ---------- planting plan: the card block, the panel, the "In plan" mark ---------- */
+.input { width: 100%; height: var(--ctl); padding: 0 10px; border: 1px solid var(--border-input); border-radius: var(--r-2); background: #fff; font-size: 13px; }
+.plan-controls { display: flex; flex-direction: column; gap: 8px; padding-top: 12px; border-top: 1px solid var(--border); }
+.plan-controls h3 { margin: 0; font-size: 13px; line-height: 20px; font-weight: 600; }
+.plan-controls .btn { align-self: flex-start; }
+.plan-field { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--text-muted); }
+.plan-field .select, .plan-field .input { width: 100%; font-size: 13px; color: var(--text); }
+#card-plan { display: flex; flex-direction: column; gap: 12px; }
+#card-plan .caption, .plan-say { margin: 0; font-size: 12px; line-height: 16px; color: var(--text-muted); }
+.plan-empty { margin: 0; font-size: 13px; color: var(--text-2); }
+.plan-actions { display: flex; flex-wrap: wrap; gap: 8px; }
+.plan-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+.plan-table th, .plan-table td { padding: 6px 8px; text-align: left; vertical-align: middle; border-bottom: 1px solid var(--border); }
+.plan-table thead th { font-weight: 500; color: var(--text-muted); font-size: 12px; }
+.plan-table tbody th { font-weight: 500; font-family: var(--font-mono); font-size: 12px; white-space: nowrap; }
+.plan-table .num { text-align: right; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.plan-table .select { width: 100%; min-width: 150px; }
+.plan-table .input { min-width: 180px; }
+.plan-mark { margin-left: 6px; padding: 0 6px; font: 500 11px/16px var(--font-sans); border: 1px solid var(--border-strong); border-radius: 999px; background: var(--accent-tint); color: var(--text-2); }
+.brief-table + h2 { margin-top: 14pt; }

@@ -88,6 +88,9 @@ and a Stanford review calls the causal evidence for heat-health benefits weak. W
 link: roughly 6 to 7% of street trees die each year in the first five years. So we claim decision support for where to plant first,
 not measured cooling, and our implementation plan puts field checks and post-planting care first. See [prior-art.md](prior-art.md).
 
+**10d. What happens after the planner exports the shortlist?**
+The app has a lightweight **planting plan**: the planner adds sites, marks which need inspection, and keeps notes, then downloads the plan or a blind field sheet (place only, no rank or score). Statuses are the planner's own entries, kept in the browser on that device; the tool does not inspect, verify or track real planting, and there are no logins or shared records yet. The real-world steps after that (field checks, permissions and suitability, species, approval, planting and monitoring) are the pilot: [pilot-readiness.md](pilot-readiness.md). A shared, auditable version for a team is the obvious next feature, not something we claim today.
+
 **11. How does the ranking handle biodiversity and endangered species?**
 It does not model species. Biodiversity enters through connectivity along the corridor and through vegetation context.
 Species choice, ERT planting lists and soil suitability would need Sime Darby Property's landscape data. We say so rather

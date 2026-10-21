@@ -13,7 +13,7 @@ import { renderBrief } from "./brief.js";
 import {
   createMap, createBasemap, createCorridor, createPathShade, createOverlay, createStreetTiles, createSitesLayer, createBadges,
 } from "./map.js";
-import { renderTopList, highlightRow } from "./list.js";
+import { renderTopList, highlightRow, markPlan } from "./list.js";
 import { renderCard } from "./panel.js";
 import { setupSliders } from "./sliders.js";
 import { setupReport } from "./report.js";
@@ -24,6 +24,8 @@ import { renderImpact } from "./impact.js";
 import { renderTradeoff } from "./tradeoff.js";
 import { buildHash, parseHash } from "./hash.js";
 import { startTour } from "./tour.js";
+import { createPlan, planRows } from "./plan.js";
+import { renderPlanPanel } from "./plan-ui.js";
 import { steadiness, steadySummary, shortlistRows, shortlistNote } from "./ml-logic.js";
 
 const OSM_NAMES = ["open_land", "parks", "buildings", "roads", "paths"];
@@ -271,7 +273,7 @@ async function boot() {
     const feature = selectedId ? byId.get(selectedId) : null;
     $("#sheet-card").hidden = !feature;
     $(".map-box").classList.toggle("has-card", Boolean(feature));
-    if (feature) renderCard($("#card-body"), feature, { weights, ctx, total: byId.size, placeholder, steady: steadyOf(selectedId), custom: !store.get().usingServer });
+    if (feature) renderCard($("#card-body"), feature, { weights, ctx, total: byId.size, placeholder, steady: steadyOf(selectedId), custom: !store.get().usingServer, plan });
   }
 
   /** The part of the map the card leaves free, in map pixels: to its right as a side panel, above it when it spans the map (phones). */
@@ -297,6 +299,12 @@ async function boot() {
     $("#sheet-card").scrollIntoView({ block: "nearest", behavior: scrollBehavior() });
   }
 
+  // The planting plan: the planner's own shortlist, kept in this browser only (see plan.js)
+  let storage = null;
+  try { storage = window.localStorage; } catch { /* blocked storage: the plan still works for this visit */ }
+  const plan = createPlan(storage);
+  let planPanel = null;
+
   const syncHash = () => {
     try {
       const s = store.get();
@@ -315,7 +323,7 @@ async function boot() {
     badges.update(rows.slice(0, BADGES), (id) => sitesLayer.center(id), s.selectedId);
 
     const expanded = s.expanded || (s.selectedId && rows.findIndex((f) => f.properties.site_id === s.selectedId) >= LIST_LIMIT);
-    renderTopList(list, rows, { selectedId: s.selectedId, onSelect: (id) => select(id, "list"), weights: s.weights, ctx, limit: expanded ? rows.length : LIST_LIMIT, steadyOf });
+    renderTopList(list, rows, { selectedId: s.selectedId, onSelect: (id) => select(id, "list"), weights: s.weights, ctx, limit: expanded ? rows.length : LIST_LIMIT, steadyOf, inPlan: plan.ids() });
     const spread = s.listMode === "shortlist" && hasShortlist;
     $("#list-note").hidden = !spread && placeholder;
     $("#list-note").textContent = spread
@@ -338,6 +346,7 @@ async function boot() {
     }
     lastRanked = ranked;
     syncHash();
+    planPanel?.redraw();
   }
 
   function select(id, source) {
@@ -380,10 +389,10 @@ async function boot() {
   $("#see-all").addEventListener("click", () => { store.set({ expanded: !store.get().expanded }); refresh(); });
   actions.download = () => download("elmina-ranked-sites.csv", toCsv(rankedRows(currentRanked())));
   actions.geojson = () => download("elmina-ranked-sites.geojson",
-    JSON.stringify(toGeoJson(currentRanked(), { scoreSource: meta.score_source, dataVersion: meta.data_version ?? null })), "application/geo+json");
+    JSON.stringify(toGeoJson(currentRanked(), { scoreSource: meta.score_source, dataVersion: meta.data_version ?? null, plan })), "application/geo+json");
   actions.brief = () => {
     const s = store.get();
-    renderBrief($("#print-brief"), currentRanked(), { ctx, steadyOf, meta, weights: s.weights, custom: !s.usingServer });
+    renderBrief($("#print-brief"), currentRanked(), { ctx, steadyOf, meta, weights: s.weights, custom: !s.usingServer, planRows: planRows(plan.list(), byId) });
     window.print();
   };
   $("#coach-dismiss").addEventListener("click", () => { $("#coach").hidden = true; });
@@ -396,6 +405,11 @@ async function boot() {
     else if (!$("#sheet-card").hidden) closeCard();
   });
 
+  planPanel = renderPlanPanel($("#card-plan"), plan, {
+    byId: () => byId, onSelect: (id) => select(id, "list"),
+    topIds: () => visibleRows(currentRanked()).slice(0, 5).map((f) => f.properties.site_id), download,
+  });
+  plan.subscribe(() => markPlan(list, plan.ids()));
   const start = parseHash(location.hash);              // a shared link: weights and site in the address
   if (start.weights) {
     sliders.set(start.weights);

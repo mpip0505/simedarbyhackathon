@@ -7,7 +7,7 @@ import { siteHeadline } from "./drivers.js";
 const KEEP = ["rank", "site_id", "score_total", "score_cooling", "score_connectivity", "score_shade", "origin", "area_m2", "source", "score_source"];
 
 /** The ranked sites as a GeoJSON FeatureCollection with a plain-language note at the top. */
-export function toGeoJson(features, { scoreSource = "unknown", dataVersion = null } = {}) {
+export function toGeoJson(features, { scoreSource = "unknown", dataVersion = null, plan = null } = {}) {
   return {
     type: "FeatureCollection",
     name: "elmina-ranked-sites",
@@ -18,7 +18,10 @@ export function toGeoJson(features, { scoreSource = "unknown", dataVersion = nul
     features: features.map((f) => ({
       type: "Feature",
       geometry: f.geometry,
-      properties: Object.fromEntries(KEEP.filter((k) => k in f.properties).map((k) => [k, f.properties[k]])),
+      properties: {
+        ...Object.fromEntries(KEEP.filter((k) => k in f.properties).map((k) => [k, f.properties[k]])),
+        ...(plan?.get(f.properties.site_id) ? { plan_status: plan.get(f.properties.site_id).status, plan_note: plan.get(f.properties.site_id).note } : {}),
+      },
     })),
   };
 }
