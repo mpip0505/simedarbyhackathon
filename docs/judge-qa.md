@@ -73,6 +73,21 @@ walking routes. Our contribution is the repeatable pipeline from free data to a 
 weights and honest uncertainty. We are not claiming a new satellite method. The cross-check also shows why a single
 canopy map should not be trusted blindly.
 
+**10b. Tree Equity Score and i-Tree already prioritise where to plant. Why another one?**
+They rank US census areas using canopy gap, heat and social vulnerability, built on US data; none of them picks individual 30 m
+cells, none has a habitat-corridor goal, and they are not built for cloudy tropical imagery. A 2025 comparison of five such tools in
+Austin found they agree on the broad area but differ on the specific top sites, so one list is not "the answer". That is why we
+show a rank-steadiness result and adjustable weights. What they have that we lack: a social-vulnerability layer, planting
+feasibility and species (Boston), and an outcome evaluation. We are not claiming to beat them. See [prior-art.md](prior-art.md).
+*Do not say:* "better than Tree Equity Score". Our `ml/method_agreement.py` compares simplified stand-ins on our own data;
+agreement is not accuracy.
+
+**10c. Does prioritising where to plant actually work?**
+Honestly, it is largely unevaluated. Cooling and health benefits of more tree cover are mostly modelled (for example a London study),
+and a Stanford review calls the causal evidence for heat-health benefits weak. What is well documented is that survival is the weak
+link: roughly 6 to 7% of street trees die each year in the first five years. So we claim decision support for where to plant first,
+not measured cooling, and our implementation plan puts field checks and post-planting care first. See [prior-art.md](prior-art.md).
+
 **11. How does the ranking handle biodiversity and endangered species?**
 It does not model species. Biodiversity enters through connectivity along the corridor and through vegetation context.
 Species choice, ERT planting lists and soil suitability would need Sime Darby Property's landscape data. We say so rather

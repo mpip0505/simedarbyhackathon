@@ -160,6 +160,17 @@ Canopy dashboard system in `css/app.css`, and it can be replaced without touchin
 change. The one visible difference: `/weights` now returns the ML default (0.45 / 0.30 / 0.25) instead of the
 backend's config placeholder (0.40 / 0.35 / 0.25), so sliders should start from a slightly different position.
 
+### For the planning team: exports, print and accessibility
+- **Download ranked list** (CSV), **Map file for GIS** (GeoJSON, opens in QGIS, ArcGIS or geojson.io) and **Print planting brief** (top 10 sites with
+  a one-sentence reason, score steadiness, location, the limits and credits; print or save as PDF). Every export keeps the "simulated" label and the score source.
+- **Accessibility:** skip link, keyboard-operable map list and site card, visible focus, high-contrast (forced-colors) support, reduced motion respected,
+  colour-blind-safe ramp. The smoke test runs **axe-core (WCAG 2.2 A and AA rules)** on both views and finds no violations. That is an automated scan,
+  which catches only part of the problems: say "axe-clean, keyboard-tested", not "WCAG compliant", until someone has also tested with a screen reader.
+- **Hosting a live demo:** `Dockerfile` and `render.yaml` serve the app and API from the committed data using only `backend/requirements-serve.txt`
+  (FastAPI, Uvicorn, Pydantic). Locally: `docker build -t elmina-canopy .` then `docker run --rm -p 8000:8000 elmina-canopy`. On Render: New, Blueprint, pick this repo.
+  The free plan sleeps when idle (first load can take about a minute), so open the link before presenting and keep the recorded video as a fallback.
+  The serve-only dependency set was checked in a clean virtual environment; the Docker image itself has not been built here (Docker is not installed on this machine).
+
 ## Reliability
 - **Offline by design.** The demo needs only the committed cache. The API never imports Earth Engine or OSM libraries
   (a test enforces it).
@@ -187,8 +198,9 @@ backend's config placeholder (0.40 / 0.35 / 0.25), so sliders should start from 
 ## Testing and CI
 ```bash
 python -m pytest backend/tests -q          # 201 tests, no Earth Engine or network needed
-node --test "frontend/tests/*.test.mjs"    # 94 frontend unit tests (Node 22, no dependencies)
-node frontend/tools/smoke.mjs              # real Chrome/Edge drives the web app (API must be running)
+node --test "frontend/tests/*.test.mjs"    # 97 frontend unit tests (Node 22, no dependencies)
+node frontend/tools/smoke.mjs              # real Chrome/Edge drives the web app, 29 checks (API must be running)
+(cd frontend && npm install)                # once, to switch on the axe-core accessibility scan inside the smoke test
 python -m backend.api.selfcheck            # deep check of the committed data
 python -m backend.scripts.qa_plot          # draws docs/qa-map.png: sites, corridor, parks, paths, buildings
 ```
@@ -235,6 +247,7 @@ they are exercised by `python -m backend.build_cache` with your login.
 - **Not disclosure-grade.** What a real pilot would need: [docs/pilot-readiness.md](docs/pilot-readiness.md).
 - **Outside facts in the pitch.** Checked in [docs/pitch-fact-check.md](docs/pitch-fact-check.md); several need softer wording
   (the "5% planted" figure is contradicted by the same source). Hard questions with honest answers: [docs/judge-qa.md](docs/judge-qa.md).
+- **Other canopy prioritisers.** What Tree Equity Score, i-Tree Landscape, Boston's Right Place Right Tree and others do, what is and is not proven, and where this project fits: [docs/prior-art.md](docs/prior-art.md). `python -m ml.method_agreement` compares our ranking with simplified stand-ins of those approaches (report in `ml/reports/method_agreement.md`).
 
 ## Data credits
 Map data (c) OpenStreetMap contributors (ODbL). Contains modified Copernicus Sentinel-2 data (European Space Agency).

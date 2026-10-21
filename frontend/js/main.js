@@ -8,6 +8,8 @@ import { KEYS, retotal, topChange } from "./weights.js";
 import { buildContext } from "./drivers.js";
 import { extent, fmt, legendBins } from "./scale.js";
 import { toCsv, rankedRows } from "./csv.js";
+import { toGeoJson } from "./export.js";
+import { renderBrief } from "./brief.js";
 import {
   createMap, createBasemap, createCorridor, createOverlay, createStreetTiles, createSitesLayer, createBadges,
 } from "./map.js";
@@ -83,8 +85,8 @@ function showFatal(error) {
   $("#loading").hidden = true;
 }
 
-function download(filename, text) {
-  const url = URL.createObjectURL(new Blob([text], { type: "text/csv" }));
+function download(filename, text, type = "text/csv") {
+  const url = URL.createObjectURL(new Blob([text], { type }));
   const a = el("a", { href: url, download: filename });
   document.body.append(a);
   a.click();
@@ -122,7 +124,9 @@ function setupLayersMenu() {
 const actions = {
   limits: () => openDialog("#dlg-limits"),
   credits: () => openDialog("#dlg-credits"),
-  download: () => {},                       // these three need the loaded data, so boot() fills them in
+  geojson: () => {},
+  brief: () => {},
+  download: () => {},                       // these need the loaded data, so boot() fills them in
   sites: () => {},
   layers: () => {},
 };
@@ -339,6 +343,13 @@ async function boot() {
   });
   $("#see-all").addEventListener("click", () => { store.set({ expanded: !store.get().expanded }); refresh(); });
   actions.download = () => download("elmina-ranked-sites.csv", toCsv(rankedRows(currentRanked())));
+  actions.geojson = () => download("elmina-ranked-sites.geojson",
+    JSON.stringify(toGeoJson(currentRanked(), { scoreSource: meta.score_source, dataVersion: meta.data_version ?? null })), "application/geo+json");
+  actions.brief = () => {
+    const s = store.get();
+    renderBrief($("#print-brief"), currentRanked(), { ctx, steadyOf, meta, weights: s.weights, custom: !s.usingServer });
+    window.print();
+  };
   $("#coach-dismiss").addEventListener("click", () => { $("#coach").hidden = true; });
   $("#card-close").addEventListener("click", closeCard);
   setupSheets();

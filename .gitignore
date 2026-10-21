@@ -8,3 +8,4 @@ backend/data/input/
 !backend/data/cache/rasters/*.tif
 backend/data/raw_osm/
 /cache/
+node_modules/

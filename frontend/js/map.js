@@ -153,7 +153,7 @@ export function createBadges(onSelect, map) {
     for (const { marker, base, w } of placed) {
       const home = map.latLngToLayerPoint(base);
       let at = home;
-      for (let step = 1; step <= 12 && taken.some((q) => q.point.distanceTo(at) < badgeSpacing(q.w, w)); step++) {
+      for (let step = 1; step <= 12 && taken.some((q) => Math.abs(q.point.x - at.x) < badgeSpacing(q.w, w) && Math.abs(q.point.y - at.y) < BADGE_HEIGHT + 2); step++) {
         const angle = step * (Math.PI / 4);                     // spiral outwards around the true position
         const radius = badgeSpacing(w, w) * (1 + Math.floor((step - 1) / 8) * 0.8);
         at = home.add(L.point(Math.cos(angle) * radius, Math.sin(angle) * radius));

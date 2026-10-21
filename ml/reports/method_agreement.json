@@ -1,0 +1,213 @@
+{
+ "areas_in_top": {
+  "canopy_gap_only": 6,
+  "equal_three": 6,
+  "heat_and_gap": 7,
+  "heat_only": 9,
+  "ours": 6
+ },
+ "data_version": "f12bc98c3fbd",
+ "methods": {
+  "canopy_gap_only": "Canopy gap only: least green 250 m surroundings first (the canopy-gap half of Tree Equity Score)",
+  "equal_three": "Our three scores with equal weights (a user who leaves every slider at the same value)",
+  "heat_and_gap": "Heat and canopy gap, equal weight (a Tree Equity Score or Boston style blend, without the social layer we do not have)",
+  "heat_only": "Heat only: hottest 250 m surroundings first (the idea behind a land-surface-temperature ranking such as Boston's)",
+  "ours": "Ours: heat 45%, connectivity 30%, shade 25% (the default weights)"
+ },
+ "n_sites": 564,
+ "n_steady": 14,
+ "ours_steady_picks_in_each_top": {
+  "canopy_gap_only": 2,
+  "equal_three": 14,
+  "heat_and_gap": 0,
+  "heat_only": 0,
+  "ours": 14
+ },
+ "spearman": {
+  "canopy_gap_only": {
+   "canopy_gap_only": 1.0,
+   "equal_three": 0.214,
+   "heat_and_gap": 0.789,
+   "heat_only": 0.306,
+   "ours": 0.332
+  },
+  "equal_three": {
+   "canopy_gap_only": 0.214,
+   "equal_three": 1.0,
+   "heat_and_gap": 0.603,
+   "heat_only": 0.721,
+   "ours": 0.975
+  },
+  "heat_and_gap": {
+   "canopy_gap_only": 0.789,
+   "equal_three": 0.603,
+   "heat_and_gap": 1.0,
+   "heat_only": 0.785,
+   "ours": 0.694
+  },
+  "heat_only": {
+   "canopy_gap_only": 0.306,
+   "equal_three": 0.721,
+   "heat_and_gap": 0.785,
+   "heat_only": 1.0,
+   "ours": 0.775
+  },
+  "ours": {
+   "canopy_gap_only": 0.332,
+   "equal_three": 0.975,
+   "heat_and_gap": 0.694,
+   "heat_only": 0.775,
+   "ours": 1.0
+  }
+ },
+ "top_k": 20,
+ "top_overlap": {
+  "canopy_gap_only": {
+   "canopy_gap_only": 20,
+   "equal_three": 3,
+   "heat_and_gap": 4,
+   "heat_only": 1,
+   "ours": 3
+  },
+  "equal_three": {
+   "canopy_gap_only": 3,
+   "equal_three": 20,
+   "heat_and_gap": 0,
+   "heat_only": 0,
+   "ours": 18
+  },
+  "heat_and_gap": {
+   "canopy_gap_only": 4,
+   "equal_three": 0,
+   "heat_and_gap": 20,
+   "heat_only": 10,
+   "ours": 0
+  },
+  "heat_only": {
+   "canopy_gap_only": 1,
+   "equal_three": 0,
+   "heat_and_gap": 10,
+   "heat_only": 20,
+   "ours": 0
+  },
+  "ours": {
+   "canopy_gap_only": 3,
+   "equal_three": 18,
+   "heat_and_gap": 0,
+   "heat_only": 0,
+   "ours": 20
+  }
+ },
+ "top_sites": {
+  "canopy_gap_only": [
+   "ELM-3736-11743",
+   "ELM-3737-11743",
+   "ELM-3787-11700",
+   "ELM-3735-11742",
+   "ELM-3787-11701",
+   "ELM-3736-11742",
+   "ELM-3737-11742",
+   "ELM-3788-11699",
+   "ELM-3736-11741",
+   "ELM-3788-11701",
+   "ELM-3788-11702",
+   "ELM-3789-11699",
+   "ELM-3788-11703",
+   "ELM-3683-11822",
+   "ELM-3717-11838",
+   "ELM-3717-11839",
+   "ELM-3685-11823",
+   "ELM-3789-11702",
+   "ELM-3683-11823",
+   "ELM-3684-11823"
+  ],
+  "equal_three": [
+   "ELM-3734-11725",
+   "ELM-3719-11715",
+   "ELM-3717-11714",
+   "ELM-3719-11716",
+   "ELM-3731-11726",
+   "ELM-3735-11742",
+   "ELM-3719-11714",
+   "ELM-3720-11714",
+   "ELM-3720-11715",
+   "ELM-3716-11715",
+   "ELM-3719-11717",
+   "ELM-3736-11743",
+   "ELM-3720-11716",
+   "ELM-3718-11717",
+   "ELM-3737-11743",
+   "ELM-3714-11715",
+   "ELM-3715-11716",
+   "ELM-3715-11715",
+   "ELM-3719-11718",
+   "ELM-3719-11719"
+  ],
+  "heat_and_gap": [
+   "ELM-3683-11822",
+   "ELM-3676-11827",
+   "ELM-3675-11827",
+   "ELM-3676-11826",
+   "ELM-3683-11823",
+   "ELM-3674-11827",
+   "ELM-3675-11826",
+   "ELM-3674-11826",
+   "ELM-3673-11827",
+   "ELM-3684-11823",
+   "ELM-3673-11826",
+   "ELM-3685-11823",
+   "ELM-3748-11774",
+   "ELM-3683-11824",
+   "ELM-3682-11826",
+   "ELM-3770-11777",
+   "ELM-3796-11757",
+   "ELM-3748-11775",
+   "ELM-3796-11756",
+   "ELM-3682-11827"
+  ],
+  "heat_only": [
+   "ELM-3769-11778",
+   "ELM-3770-11777",
+   "ELM-3777-11781",
+   "ELM-3673-11827",
+   "ELM-3673-11826",
+   "ELM-3674-11827",
+   "ELM-3674-11826",
+   "ELM-3675-11827",
+   "ELM-3675-11826",
+   "ELM-3676-11827",
+   "ELM-3676-11826",
+   "ELM-3766-11758",
+   "ELM-3767-11758",
+   "ELM-3764-11757",
+   "ELM-3777-11772",
+   "ELM-3765-11756",
+   "ELM-3766-11756",
+   "ELM-3683-11822",
+   "ELM-3778-11772",
+   "ELM-3764-11755"
+  ],
+  "ours": [
+   "ELM-3734-11725",
+   "ELM-3719-11715",
+   "ELM-3717-11714",
+   "ELM-3719-11714",
+   "ELM-3720-11714",
+   "ELM-3731-11726",
+   "ELM-3720-11715",
+   "ELM-3719-11716",
+   "ELM-3716-11715",
+   "ELM-3735-11742",
+   "ELM-3720-11716",
+   "ELM-3719-11717",
+   "ELM-3718-11717",
+   "ELM-3736-11743",
+   "ELM-3715-11715",
+   "ELM-3730-11726",
+   "ELM-3720-11717",
+   "ELM-3714-11715",
+   "ELM-3737-11743",
+   "ELM-3715-11716"
+  ]
+ }
+}

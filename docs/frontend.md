@@ -93,10 +93,11 @@ the browser re-rank, and the page says so.
 
 ## Test it
 ```bash
-node --test "frontend/tests/*.test.mjs"   # 88 unit tests, no dependencies (Node 22; quote the pattern)
+node --test "frontend/tests/*.test.mjs"   # 97 unit tests, no dependencies (Node 22; quote the pattern)
 # or:  cd frontend && npm test
 python -m pytest backend/tests -q       # includes the static-serving and endpoint tests
-node frontend/tools/smoke.mjs           # real Chrome or Edge drives the app; needs the API running on port 8000
+node frontend/tools/smoke.mjs           # real Chrome or Edge drives the app (29 checks); needs the API running on port 8000
+# once:  cd frontend && npm install   (adds axe-core, so the smoke test also scans both views for WCAG 2.2 A/AA problems)
 ```
 The smoke test loads the page, clicks a row, drags the sliders, filters (both filters stay in step), searches, opens the layers
 panel, toggles layers, switches views and temperature/vegetation, checks the unreachable-API message and a narrow screen

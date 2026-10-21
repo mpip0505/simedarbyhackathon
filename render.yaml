@@ -1,0 +1,9 @@
+# One-click deploy on Render (free plan): New + > Blueprint > pick this repo. Serves the web app and API from the committed cache.
+# The free plan sleeps when idle, so the first visit can take about a minute: open the link before presenting, and keep the recorded video as a fallback.
+services:
+  - type: web
+    name: elmina-canopy-prioritiser
+    runtime: docker
+    plan: free
+    healthCheckPath: /health
+    autoDeploy: true

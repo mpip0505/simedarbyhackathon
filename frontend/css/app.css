@@ -574,3 +574,31 @@ dialog form[method="dialog"] { display: flex; justify-content: flex-end; margin:
   .popover { width: min(256px, calc(100vw - 48px)); }
 }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; animation: none !important; } }
+
+/* ---------- accessibility: skip link, outlines that survive high-contrast modes, the programmatic focus target ---------- */
+.skip-link { position: absolute; left: 8px; top: -48px; z-index: 1000; padding: 8px 12px; border-radius: var(--r-2); background: var(--ink); color: #fff; font-weight: 500; }
+.skip-link:focus { top: 8px; }
+#main:focus { outline: none; }
+@media (forced-colors: active) {
+  :focus-visible { outline: 2px solid Highlight; }
+  .chip, .btn, .pill span, .rank-badge, .card-rank { border: 1px solid CanvasText; }
+  .meter { border: 1px solid CanvasText; }
+  .meter > span, .hbar-fill { background: Highlight; forced-color-adjust: none; }
+}
+
+/* ---------- printing: only the planting brief ("Print planting brief") ---------- */
+#print-brief { display: none; }
+@media print {
+  @page { size: A4; margin: 14mm; }
+  html, body { height: auto; background: #fff; }
+  body > :not(#print-brief) { display: none !important; }
+  #print-brief { display: block; color: #000; font: 11pt/1.4 var(--font-sans); }
+  #print-brief h1 { font-size: 17pt; margin: 0 0 6pt; }
+  #print-brief h2 { font-size: 12pt; margin: 14pt 0 4pt; }
+  #print-brief .brief-flag { font-weight: 700; padding: 4pt 6pt; border: 1.5pt solid #000; }
+  #print-brief .brief-sub { color: #333; font-size: 9pt; }
+  #print-brief table { width: 100%; border-collapse: collapse; margin: 8pt 0; }
+  #print-brief th, #print-brief td { text-align: left; vertical-align: top; padding: 4pt 5pt; border-bottom: 0.5pt solid #777; font-size: 9.5pt; }
+  #print-brief tr { break-inside: avoid; }
+  #print-brief ul { margin: 0; padding-left: 14pt; font-size: 9.5pt; }
+}

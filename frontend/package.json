@@ -6,5 +6,8 @@
   "scripts": {
     "test": "node --test",
     "smoke": "node tools/smoke.mjs"
+  },
+  "devDependencies": {
+    "axe-core": "^4.10.2"
   }
 }

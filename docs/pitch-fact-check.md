@@ -44,10 +44,29 @@ Status key: **Confirmed**, **Confirmed with caveat**, **Conflicting** (sources d
   (2024-10 to 2026-09) windows cannot be tied to a specific planting milestone. Do not imply the before/after view
   measures the effect of planting.
 
+## Later findings (search summaries, not full pages): newer figures that conflict with the table above
+Re-checked with a second search. These come from the developer's own marketing and press pages, so attribute them and re-read the source before use.
+- **Trees planted:** a 2026 advertorial says "over 140,000 trees" planted and "four ecological corridors spanning 18.4 kilometres"; an older release
+  says over 120,000 trees planted since 2011 across its townships (not only Elmina); a 2020 company publication lists 102,167 trees from 2011 to mid-2020.
+  So there is still no single trustworthy "percent of 210,000 planted" number. **Do not state one.**
+- **Endangered trees:** the stated target is **50,000 IUCN Red-Listed trees by 2030**; an older release says over 21,000 planted "as of last year" (undated in the
+  results). Safe wording: "a stated target of 50,000 endangered trees by 2030".
+- **Nursery and centre:** the Elmina Living Collection Nursery is described as holding 187 species with more than 35,000 seeds sown and 10,000 saplings in the
+  holding area (stock, not trees surviving in the field). The Elmina Rainforest Knowledge Centre runs education and research.
+- **Corridor and parks:** the 5 km Urban Biodiversity Corridor linking six parks (and Bukit Cerakah Forest Reserve) and the 121 ha (about 300 acre) Central Park are
+  repeated across sources. Elmina also has a 90 km walking and cycling track in developer-sourced press.
+- **Not found:** any post-planting survival or maintenance figures, any heat or shade measurements for the township, and any resident volunteer planting drives.
+  Do not imply the tool measures survival or that residents already take part.
+- **The hackathon itself** (The Star, 20 and 30 September 2026; EdgeProp): themes People (health, wellbeing, safety, community connections) and Planet
+  (sustainable living, environmental regeneration); ideas should use technology, data or AI, be scalable and combine community-based approaches with technology.
+  RM14,000 prize pool (champion RM6,000); grand finale 14 November 2026; top five pitch at Innovation Day in December; selected ideas may be taken to proof of
+  concept. The press pages do not give the scoring, but the **official hackathon page does**: Impact and Sustainability Value 25%, Innovation and Differentiation 20%, Feasibility and Deliverability 20%, Strategic Fit and Theme Relevance 15%, Commercial and Value Multiplication 10%, Team, Evidence and Pitch Quality 10% ([official page](https://www.simedarbyproperty.com/universityhackathon/)). The pitch has two parts, Mechanism and Enabler. Key dates: proposal due 23 October 2026, judging 24 to 28 October, Top 10 announced 28 October, final submission 11 November, Top 10 pitch day 14 November, final 3 December. See [grading-self-assessment.md](grading-self-assessment.md).
+
 ## Sources
 - Star partner content for Sime Darby Property: [overview](https://www.urban-biodiversity.thestar.com.my/sime-darby-property/), [Bridging the disconnect](https://www.urban-biodiversity.thestar.com.my/sime-darby-property/bridging-the-disconnect/), [Growing tomorrow's forest today](https://www.urban-biodiversity.thestar.com.my/sime-darby-property/growing-tomorrows-forest-today/)
 - Sime Darby Property: [Enhancing urban biodiversity, City of Elmina](https://www.simedarbyproperty.com/sustainability/urbanbiodiversity/spotlight-city-of-elmina.html); [net zero press release, 27 Nov 2023](https://www.simedarbyproperty.com/sites/default/files/2023-11/20231127%20-%20FOR%20IMMEDIATE%20RELEASE%20-%20SIME%20DARBY%20PROPERTY%20PLEDGES%20TO%20ACHIEVE%20NET%20ZERO%20EMISSION%20BY%202050.pdf)
 - [EdgeProp: Sime Darby Property aims to achieve net zero emissions by 2050](https://www.edgeprop.my/content/1907825/sime-darby-property-aims-achieve-net-zero-emissions-2050)
 - [Wikipedia: Elmina, Malaysia](https://en.wikipedia.org/wiki/Elmina,_Malaysia); [bioSEA: Elmina Urban Biodiversity Corridor](https://biosea.sg/?p=23694)
 - Bursa reporting rules: [Slaughter and May, ESG in APAC 2024: Malaysia](https://insights.slaughterandmay.com/esg-in-apac-2024-malaysia/index.html); [Skrine alert, January 2025](https://www.skrine.com/insights/alerts/january-2025/bursa-malaysia-amends-sustainability-reporting-req); [IFRS Foundation Malaysia profile](https://www.ifrs.org/content/dam/ifrs/publications/sustainability-jurisdictions/pdf-profiles/malaysia-ifrs-profile.pdf)
+- Later findings: [The Star, hackathon launch (20 Sep 2026)](https://www.thestar.com.my/business/business-news/2026/09/20/sime-darby-property-launches-nationwide-university-hackathon); [EdgeProp, hackathon with Kolaxus](https://www.edgeprop.my/content/1917461/sime-darby-property-kolaxus-target-over-1000-students-sustainability-hackathon); [Sime Darby Property, Elmina spotlight](https://simedarbyproperty.com/sustainability/urbanbiodiversity/spotlight-city-of-elmina.html); [Star Property, Elmina Rainforest Knowledge Centre](https://www.starproperty.my/news/sime-darby-property-launches-elmina-rainforest-knowledge-centre/122643)
 - Heat-island paper: [UM research repository record](https://knova.um.edu.my/research_publications_2021_2025/3383); Heliyon 2023, vol. 9 issue 8

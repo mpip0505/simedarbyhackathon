@@ -7,7 +7,7 @@
 // Set CHROME_PATH if Chrome or Edge is installed somewhere unusual. Exit code 1 if any check fails.
 import { spawn } from "node:child_process";
 import http from "node:http";
-import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from "node:fs";
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import assert from "node:assert/strict";
@@ -16,6 +16,10 @@ const BASE = process.argv[2] || "http://127.0.0.1:8000";
 const SHOTS = process.argv[3] || join(tmpdir(), "elmina-ui-shots");
 const PORT = 9300 + Math.floor(Math.random() * 500);
 mkdirSync(SHOTS, { recursive: true });
+
+// axe-core is a dev dependency (frontend/package.json); without `npm install` the accessibility scan is skipped.
+const axePath = new URL("../node_modules/axe-core/axe.min.js", import.meta.url);
+const axeSource = existsSync(axePath) ? readFileSync(axePath, "utf8") : null;
 
 const CANDIDATES = [
   process.env.CHROME_PATH,
@@ -379,6 +383,42 @@ try {
     await evaluate(`document.querySelector('#view-tabs button[data-view="prioritise"]').click()`);
     assert.equal(await evaluate(`document.querySelector('#view-report').hidden`), true);
     assert.ok(await evaluate(`document.querySelector('#map canvas') !== null`));
+  });
+
+  // --- planning team exports and print ---------------------------------------------------------------------
+  await check("the planting brief fills with the top sites, the simulated label and the limits, and asks the browser to print", async () => {
+    await evaluate(`window.__printed = 0; window.print = () => { window.__printed++; }`);
+    await evaluate(`document.querySelector('[data-action="brief"]').click()`);
+    assert.equal(await evaluate(`window.__printed`), 1, "print was not requested");
+    const text = await evaluate(`document.querySelector('#print-brief').innerText || document.querySelector('#print-brief').textContent`);
+    assert.match(text, /Example sites \(simulated\)/);
+    assert.match(text, /Limits of this data/);
+    assert.equal(await evaluate(`document.querySelectorAll('#print-brief tbody tr').length`), 10);
+    assert.equal(await evaluate(`getComputedStyle(document.querySelector('#print-brief')).display`), "none", "the brief must not show on screen");
+  });
+  await check("the skip link is the first thing Tab reaches and it moves focus to the main content", async () => {
+    await evaluate(`document.activeElement.blur(); document.body.tabIndex = -1; document.body.focus(); document.body.removeAttribute('tabindex')`);   // Tab now starts from the top of the page
+    await send("Input.dispatchKeyEvent", { type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
+    await send("Input.dispatchKeyEvent", { type: "keyUp", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });
+    const first = await evaluate(`document.activeElement.className + " | " + document.activeElement.tagName + " " + (document.activeElement.textContent || "").slice(0, 30)`);
+    assert.ok(first.startsWith("skip-link"), `Tab reached "${first}" first, not the skip link`);
+    await evaluate(`document.activeElement.click()`);
+    assert.equal(await evaluate(`document.activeElement.id`), "main");
+  });
+  await check("accessibility scan (axe-core, WCAG 2 A and AA rules) finds no violations on either view", async () => {
+    if (!axeSource) { console.log("       (skipped: run `npm install` in frontend/ to enable the axe-core scan)"); return; }
+    await evaluate(axeSource);
+    const scan = () => evaluate(`axe.run(document, { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"] } })
+      .then(r => r.violations.map(v => v.id + ": " + v.help + " (" + v.nodes.length + " nodes, e.g. " + v.nodes[0].target.join(" ") + "; " + v.nodes[0].any.map(a => a.message).join(" / ").slice(0, 200) + ")"))`);
+    const found = [];
+    for (const view of ["prioritise", "report"]) {
+      await evaluate(`document.querySelector('#view-tabs button[data-view="${view}"]').click()`);
+      await evaluate(`document.querySelector('#main').scrollTop = 0; (document.querySelector('#map') || document.body).scrollIntoView({ block: 'center' })`);   // badges near the map's lower edge sit under the footer until scrolled into view
+      await sleep(600);
+      found.push(...(await scan()).map((v) => `${view}: ${v}`));
+    }
+    await evaluate(`document.querySelector('#view-tabs button[data-view="prioritise"]').click()`);
+    assert.deepEqual(found, [], found.join("\n"));
   });
 
   // --- security: data from the API must never run as code ---------------------------------------------------

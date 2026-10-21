@@ -1,0 +1,5 @@
+# Only what is needed to SERVE the demo from the committed cache (the web app and the API). Used by the Dockerfile and render.yaml.
+# The data pipeline, the ML scoring and the tests need backend/requirements.txt (and ml/requirements.txt).
+fastapi==0.115.6
+uvicorn==0.34.0
+pydantic==2.11.4
