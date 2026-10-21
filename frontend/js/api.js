@@ -89,4 +89,5 @@ export const api = {
   uncertainty: () => getOptional("/ml/uncertainty"),
   shortlist: () => getOptional("/ml/shortlist"),
   scenario: () => getOptional("/ml/scenario"),
+  impact: () => getOptional("/ml/impact"),
 };

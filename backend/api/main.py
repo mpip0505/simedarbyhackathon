@@ -235,6 +235,12 @@ def ml_scenario() -> dict:
     return _ml_or_404(store.load_scenario(), "scenario")
 
 
+@app.get("/ml/impact")
+def ml_impact() -> dict:
+    """What the first N ranked sites reach (footpath without canopy, mapped homes, corridor gaps). Reach, not outcome."""
+    return _ml_or_404(store.load_impact(), "impact")
+
+
 # ---- the bundled barebones web app (frontend/), served from the same process ----
 FRONTEND_DIR = Path(__file__).resolve().parents[2] / "frontend"
 

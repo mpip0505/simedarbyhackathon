@@ -26,7 +26,7 @@ def reports(tmp_path, monkeypatch):
 
 
 def test_missing_reports_are_404(reports):
-    for name in ("uncertainty", "shortlist", "scenario"):
+    for name in ("uncertainty", "shortlist", "scenario", "impact"):
         assert client.get(f"/ml/{name}").status_code == 404
 
 
@@ -52,6 +52,8 @@ def test_malformed_uncertainty_csv_is_404_not_500(reports):
 def test_reports_on_other_data_are_flagged_stale(reports):
     atomic.write_json(reports / "scenario.json", {"data_version": "old", "k": 50})
     atomic.write_json(reports / "shortlist.json", {"data_version": "v1", "diversified_sites": []})
+    atomic.write_json(reports / "impact_reach.json", {"data_version": "old", "rows": []})
+    assert client.get("/ml/impact").json()["stale"] is True
     assert client.get("/ml/scenario").json()["stale"] is True
     assert client.get("/ml/shortlist").json()["stale"] is False
 
@@ -70,7 +72,7 @@ def test_mock_mode_serves_no_ml_reports(reports, monkeypatch):
 def test_committed_reports_match_the_committed_data():
     """The reports in ml/reports were computed on the data the API serves (else re-run the ML scripts)."""
     store._parsed.clear()
-    for name in ("uncertainty", "shortlist", "scenario"):
+    for name in ("uncertainty", "shortlist", "scenario", "impact"):
         r = client.get(f"/ml/{name}")
         assert r.status_code == 200 and r.json()["stale"] is False, name
     sites = {f["properties"]["site_id"] for f in client.get("/sites").json()["features"]}

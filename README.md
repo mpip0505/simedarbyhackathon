@@ -247,7 +247,7 @@ they are exercised by `python -m backend.build_cache` with your login.
 - **Not disclosure-grade.** What a real pilot would need: [docs/pilot-readiness.md](docs/pilot-readiness.md).
 - **Outside facts in the pitch.** Checked in [docs/pitch-fact-check.md](docs/pitch-fact-check.md); several need softer wording
   (the "5% planted" figure is contradicted by the same source). Hard questions with honest answers: [docs/judge-qa.md](docs/judge-qa.md).
-- **Other canopy prioritisers.** What Tree Equity Score, i-Tree Landscape, Boston's Right Place Right Tree and others do, what is and is not proven, and where this project fits: [docs/prior-art.md](docs/prior-art.md). `python -m ml.method_agreement` compares our ranking with simplified stand-ins of those approaches (report in `ml/reports/method_agreement.md`).
+- **Other canopy prioritisers.** What Tree Equity Score, i-Tree Landscape, Boston's Right Place Right Tree and others do, what is and is not proven, and where this project fits: [docs/prior-art.md](docs/prior-art.md). `python -m ml.impact_reach` counts what the top sites reach (unshaded footpath, mapped homes, corridor gaps; reach, not outcome; report in `ml/reports/impact_reach.md`, served at `/ml/impact`). `python -m ml.method_agreement` compares our ranking with simplified stand-ins of those approaches (report in `ml/reports/method_agreement.md`).
 
 ## Data credits
 Map data (c) OpenStreetMap contributors (ODbL). Contains modified Copernicus Sentinel-2 data (European Space Agency).

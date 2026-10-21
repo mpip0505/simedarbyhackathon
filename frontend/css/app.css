@@ -602,3 +602,8 @@ dialog form[method="dialog"] { display: flex; justify-content: flex-end; margin:
   #print-brief tr { break-inside: avoid; }
   #print-brief ul { margin: 0; padding-left: 14pt; font-size: 9.5pt; }
 }
+
+/* ---------- "What the top sites reach" card ---------- */
+#card-impact { display: flex; flex-direction: column; gap: 12px; }
+#card-impact .caption { font-size: 12px; line-height: 16px; color: var(--text-muted); }
+#card-impact .seg { align-self: flex-start; }

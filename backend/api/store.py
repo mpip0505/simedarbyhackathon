@@ -313,3 +313,8 @@ def load_shortlist() -> Optional[dict]:
 def load_scenario() -> Optional[dict]:
     """ML's planting-impact scenario: labelled assumptions, not a forecast."""
     return _ml_report("scenario.json")
+
+
+def load_impact() -> Optional[dict]:
+    """What the top N sites reach (unshaded footpath, mapped homes, corridor gaps), de-duplicated. Reach, not outcome."""
+    return _ml_report("impact_reach.json")

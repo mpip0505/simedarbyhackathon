@@ -386,6 +386,18 @@ try {
   });
 
   // --- planning team exports and print ---------------------------------------------------------------------
+  await check("the impact card shows what the top sites reach, with the township share, a toggle and the not-a-benefit caveat", async () => {
+    const card = `document.querySelector('#card-impact')`;
+    assert.equal(await evaluate(`${card}.hidden`), false, "the card should show with ML scores");
+    const text = await evaluate(`${card}.innerText`);
+    assert.match(text, /What the top sites reach/);
+    assert.match(text, /Reach, not benefit/);
+    assert.match(text, /first 50 sites/);
+    assert.match(text, /does not show that planting there would cool/);
+    assert.equal(await evaluate(`${card}.querySelectorAll('.stat').length`), 3);
+    await evaluate(`${card}.querySelector('button[aria-pressed="false"]').click()`);
+    assert.doesNotMatch(await evaluate(`${card}.innerText`), /first 50 sites/, "the toggle should change the numbers");
+  });
   await check("the planting brief fills with the top sites, the simulated label and the limits, and asks the browser to print", async () => {
     await evaluate(`window.__printed = 0; window.print = () => { window.__printed++; }`);
     await evaluate(`document.querySelector('[data-action="brief"]').click()`);

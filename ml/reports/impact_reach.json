@@ -1,0 +1,120 @@
+{
+ "canopy_ndvi_threshold": 0.6,
+ "ceiling": {
+  "gap_m": 1510,
+  "homes": 443,
+  "unshaded_path_m": 9330
+ },
+ "data_version": "f12bc98c3fbd",
+ "definitions": {
+  "gap_m": "Corridor spine (approximate) with greenness below the gap threshold, within 50 m of a chosen site's centre. About, to the nearest 10 m.",
+  "homes": "Mapped residential buildings touching a 250 m circle around a chosen site's centre. OpenStreetMap under-maps some areas, so this is a lower bound.",
+  "unshaded_path_m": "OpenStreetMap footpath (sampled every 10 m) whose latest greenness is below 0.6, within 50 m of a chosen site. About, to the nearest 10 m."
+ },
+ "n_sites": 564,
+ "note": "REACH, not outcome. It counts what lies near the sites; it does not show planting there would cool, improve health or survive. The sites are simulated. Every footpath point, home and gap point is counted once, however many chosen sites are near it.",
+ "ranking": "ML default weights",
+ "rows": [
+  {
+   "area_m2": 4500,
+   "gap_m": 200,
+   "gap_pct_of_corridor_gaps": 12.1,
+   "gap_pct_of_reachable": 13.2,
+   "homes": 242,
+   "homes_pct_of_reachable": 54.6,
+   "homes_pct_of_township": 25.0,
+   "n": 5,
+   "unshaded_path_m": 1380,
+   "unshaded_path_pct_of_reachable": 14.8,
+   "unshaded_path_pct_of_township": 2.1
+  },
+  {
+   "area_m2": 9000,
+   "gap_m": 350,
+   "gap_pct_of_corridor_gaps": 21.2,
+   "gap_pct_of_reachable": 23.2,
+   "homes": 242,
+   "homes_pct_of_reachable": 54.6,
+   "homes_pct_of_township": 25.0,
+   "n": 10,
+   "unshaded_path_m": 2120,
+   "unshaded_path_pct_of_reachable": 22.7,
+   "unshaded_path_pct_of_township": 3.2
+  },
+  {
+   "area_m2": 18000,
+   "gap_m": 480,
+   "gap_pct_of_corridor_gaps": 29.1,
+   "gap_pct_of_reachable": 31.8,
+   "homes": 243,
+   "homes_pct_of_reachable": 54.9,
+   "homes_pct_of_township": 25.1,
+   "n": 20,
+   "unshaded_path_m": 2860,
+   "unshaded_path_pct_of_reachable": 30.7,
+   "unshaded_path_pct_of_township": 4.3
+  },
+  {
+   "area_m2": 45000,
+   "gap_m": 1150,
+   "gap_pct_of_corridor_gaps": 69.7,
+   "gap_pct_of_reachable": 76.2,
+   "homes": 349,
+   "homes_pct_of_reachable": 78.8,
+   "homes_pct_of_township": 36.1,
+   "n": 50,
+   "unshaded_path_m": 5400,
+   "unshaded_path_pct_of_reachable": 57.9,
+   "unshaded_path_pct_of_township": 8.2
+  },
+  {
+   "area_m2": 90000,
+   "gap_m": 1470,
+   "gap_pct_of_corridor_gaps": 89.1,
+   "gap_pct_of_reachable": 97.4,
+   "homes": 416,
+   "homes_pct_of_reachable": 93.9,
+   "homes_pct_of_township": 43.0,
+   "n": 100,
+   "unshaded_path_m": 7920,
+   "unshaded_path_pct_of_reachable": 84.9,
+   "unshaded_path_pct_of_township": 12.0
+  },
+  {
+   "area_m2": 180000,
+   "gap_m": 1510,
+   "gap_pct_of_corridor_gaps": 91.5,
+   "gap_pct_of_reachable": 100.0,
+   "homes": 443,
+   "homes_pct_of_reachable": 100.0,
+   "homes_pct_of_township": 45.8,
+   "n": 200,
+   "unshaded_path_m": 9280,
+   "unshaded_path_pct_of_reachable": 99.5,
+   "unshaded_path_pct_of_township": 14.1
+  },
+  {
+   "area_m2": 507600,
+   "gap_m": 1510,
+   "gap_pct_of_corridor_gaps": 91.5,
+   "gap_pct_of_reachable": 100.0,
+   "homes": 443,
+   "homes_pct_of_reachable": 100.0,
+   "homes_pct_of_township": 45.8,
+   "n": 564,
+   "unshaded_path_m": 9330,
+   "unshaded_path_pct_of_reachable": 100.0,
+   "unshaded_path_pct_of_township": 14.2
+  }
+ ],
+ "totals": {
+  "gap_m": 1650,
+  "homes": 968,
+  "unshaded_path_m": 65860
+ },
+ "weights": {
+  "connectivity": 0.3,
+  "cooling": 0.45,
+  "shade": 0.25
+ }
+}
