@@ -16,9 +16,10 @@ const measure = (label, value) => el("tr", {}, el("td", {}, label), el("td", {},
 
 /**
  * Fill the site card body for one feature.
- * options: { weights, ctx, total, placeholder } where total is the number of sites and placeholder is true unless scores are from ML.
+ * options: { weights, ctx, total, placeholder, steady, custom } where total is the number of sites, placeholder is true unless scores
+ * are from ML, steady is ml-logic.steadiness() for this site (or null) and custom is true once a slider has moved.
  */
-export function renderCard(body, feature, { weights, ctx, total, placeholder }) {
+export function renderCard(body, feature, { weights, ctx, total, placeholder, steady = null, custom = false }) {
   clear(body);
   const p = feature.properties;
   const parts = contributions(p, weights);
@@ -34,7 +35,11 @@ export function renderCard(body, feature, { weights, ctx, total, placeholder }) 
     el("p", { class: "card-headline" }, siteHeadline(p, ctx)),
     el("div", { class: "card-total" }, el("strong", {}, fmt(p.score_total)),
       el("span", {}, `${placeholder ? "Preview score" : "Score"}, out of 100 · ranked #${p.rank} of ${total}`)),
-    el("div", { class: "score-rows" }, ORDER.map((k) => scoreRow(k, p[`score_${k}`]))));
+    el("div", { class: "score-rows" }, ORDER.map((k) => scoreRow(k, p[`score_${k}`]))),
+    steady ? el("section", { class: "steady", "aria-label": "How steady is this rank?" },
+      el("div", { class: "steady-head" }, el("h3", {}, "How steady is this rank?"), el("span", { class: steady.chip }, steady.label)),
+      el("p", { class: "small-note" }, steady.detail),
+      custom ? el("p", { class: "small-note" }, "These ranges were worked out around the default weights, not the ones you have set.") : null) : null);
 
   const right = el("div", { class: "card-col" },
     el("h3", {}, "Why it ranks here"),

@@ -194,6 +194,10 @@
                     <span id="count" class="muted"></span>
                   </div>
                   <div class="sheet-body" id="top-body">
+                    <div id="list-mode" class="seg seg-sm" role="group" aria-label="Which list" hidden>
+                      <label class="pill" title="Strict order by score"><input type="radio" name="list-mode" value="ranked" checked><span>Ranked</span></label>
+                      <label class="pill" title="The ML team's top 20, capped per 250 m block so a first round covers more areas"><input type="radio" name="list-mode" value="shortlist"><span>Spread out</span></label>
+                    </div>
                     <div id="filters" class="seg seg-sm" role="group" aria-label="Filter sites">
                       <label class="pill"><input type="radio" name="origin" value="all" checked><span>All</span></label>
                       <label class="pill"><input type="radio" name="origin" value="open_land"><span>Open land</span></label>
@@ -207,6 +211,7 @@
                       <ol id="top-list" class="site-list"></ol>
                       <p id="no-match" hidden>No sites match these filters. <button type="button" id="clear-filters" class="link-button">Clear filters</button></p>
                     </div>
+                    <p id="list-note" class="small-note" hidden></p>
                     <div class="list-foot">
                       <button type="button" id="see-all" class="link-button"></button>
                       <button type="button" id="download-csv" class="link-button" data-action="download">Download list</button>
@@ -250,6 +255,11 @@
                 <article class="card" id="card-lst"></article>
               </div>
             </div>
+
+            <section class="year" aria-labelledby="h-scenario">
+              <h2 id="h-scenario">Looking ahead</h2>
+              <article class="card" id="card-scenario" hidden></article>
+            </section>
 
             <section class="year" aria-labelledby="h-year">
               <h2 id="h-year">Year by year</h2>

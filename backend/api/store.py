@@ -11,6 +11,7 @@ Resilience rules (the API must keep answering during a recorded demo):
 Parsed files are cached by modification time, and every caller gets its own copy.
 """
 import copy
+import csv
 import json
 import logging
 import os
@@ -20,7 +21,7 @@ from typing import Optional
 
 from backend import validate_scores
 from backend.api import scoring
-from backend.config import CACHE_DIR, DEFAULT_WEIGHTS, MOCK_DIR
+from backend.config import CACHE_DIR, DEFAULT_WEIGHTS, ML_REPORTS_DIR, MOCK_DIR
 
 log = logging.getLogger("backend.store")
 
@@ -243,3 +244,72 @@ def overlay_file(name: str) -> Optional[Path]:
     if index and name in {o["name"] for o in index["overlays"]}:
         return data_dir() / "overlays" / f"{name}.png"
     return None
+
+
+# ---- ML reports (ml/reports/): extra evidence beside the scores, never needed to rank ----
+# They describe the cached real data, so mock mode has none. Each carries `stale`: true when it was computed on a
+# different data_version than the sites being served (re-run the ML scripts).
+
+def ml_reports_dir() -> Path:
+    return ML_REPORTS_DIR
+
+
+def _ml_report(name: str) -> Optional[dict]:
+    if data_mode() == "mock":
+        return None
+    report = _optional(ml_reports_dir() / name)
+    if report is None:
+        return None
+    current = _load("sites.geojson").get("data_version")
+    rv = report.get("data_version")
+    report["stale"] = None if rv is None or current is None else rv != current
+    return report
+
+
+_UNCERTAINTY_FIELDS = {"baseline_rank": int, "rank_median": int, "rank_p05": int, "rank_p95": int,
+                       "score_median": float, "score_p05": float, "score_p95": float, "topk_frequency": float}
+_csv_cache: dict = {}   # path -> (mtime_ns, rows)
+
+
+def _uncertainty_rows(path: Path) -> Optional[dict]:
+    """site_id -> range numbers from uncertainty_sites.csv; None if missing or malformed (logged once)."""
+    try:
+        mtime = path.stat().st_mtime_ns
+    except OSError:
+        return None
+    last = _csv_cache.get(path)
+    if last is None or last[0] != mtime:
+        try:
+            with path.open(newline="", encoding="utf-8") as fh:
+                rows = {r["site_id"]: {k: cast(r[k]) for k, cast in _UNCERTAINTY_FIELDS.items()} for r in csv.DictReader(fh)}
+        except (OSError, KeyError, ValueError, TypeError) as exc:
+            _warn_once(f"uncertainty-{exc}", "%s ignored: %s", path.name, exc)
+            return None
+        last = _csv_cache[path] = (mtime, rows)
+    return copy.deepcopy(last[1])
+
+
+def load_uncertainty() -> Optional[dict]:
+    """How much each site's rank moves across ML's Monte Carlo over weights and judgement constants."""
+    report = _ml_report("uncertainty.json")
+    if report is None:
+        return None
+    sites = _uncertainty_rows(ml_reports_dir() / "uncertainty_sites.csv")
+    if sites is None:
+        return None
+    return {"data_version": report.get("data_version"), "stale": report["stale"], "draws": report.get("draws"),
+            "k": report.get("k"), "robust_threshold": report.get("robust_top_k", {}).get("threshold"),
+            "robust_count": report.get("robust_top_k", {}).get("count_within_baseline_top_k"),
+            "boundary_range": report.get("boundary_sites", {}).get("range"),
+            "spearman": report.get("rank_agreement", {}).get("spearman_baseline_vs_median"),
+            "sampled": report.get("sampled"), "sites": sites}
+
+
+def load_shortlist() -> Optional[dict]:
+    """ML's spread-out top N (capped per 250 m block), for "where to start" rather than the strict ranking."""
+    return _ml_report("shortlist.json")
+
+
+def load_scenario() -> Optional[dict]:
+    """ML's planting-impact scenario: labelled assumptions, not a forecast."""
+    return _ml_report("scenario.json")

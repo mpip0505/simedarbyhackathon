@@ -86,4 +86,7 @@ export const api = {
   overlays: () => getOptional("/layers/overlays"),
   series: () => getOptional("/summary/series"),
   crosscheck: () => getOptional("/summary/crosscheck"),
+  uncertainty: () => getOptional("/ml/uncertainty"),
+  shortlist: () => getOptional("/ml/shortlist"),
+  scenario: () => getOptional("/ml/scenario"),
 };

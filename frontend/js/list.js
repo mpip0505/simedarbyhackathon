@@ -6,19 +6,22 @@ import { rankColumnWidth } from "./badge.js";
 
 /**
  * Redraw the list for `rows` (already ranked and filtered).
- * options: { selectedId, onSelect, weights, ctx, limit } where limit caps how many rows are drawn.
+ * options: { selectedId, onSelect, weights, ctx, limit, steadyOf } where limit caps how many rows are drawn and steadyOf(id) gives
+ * ml-logic.steadiness() for a site (or null), shown as a small mark beside the steady ones.
  */
-export function renderTopList(ol, rows, { selectedId, onSelect, weights, ctx, limit }) {
+export function renderTopList(ol, rows, { selectedId, onSelect, weights, ctx, limit, steadyOf = () => null }) {
   clear(ol);
   const shown = rows.slice(0, limit);
   ol.style.setProperty("--rank-w", `${rankColumnWidth(shown.map((f) => f.properties.rank))}px`);   // the rank column fits the longest rank on show
   for (const f of shown) {
     const p = f.properties;
+    const steady = steadyOf(p.site_id);
     const button = el("button", {
       type: "button", class: "site-row", "data-id": p.site_id, "aria-current": p.site_id === selectedId ? "true" : "false",
       onclick: () => onSelect(p.site_id),
     },
-    el("span", { class: "rank" }, p.rank), el("span", { class: "site-name" }, p.site_id),
+    el("span", { class: "rank" }, p.rank),
+    el("span", { class: "site-name" }, p.site_id, steady?.kind === "steady" ? el("span", { class: "steady-mark", title: steady.label }, el("span", { class: "sr-only" }, ` (${steady.label})`)) : null),
     el("span", { class: "site-why" }, mainReason(p, weights, ctx)), el("span", { class: "site-score" }, fmt(p.score_total, 0)));
     ol.append(el("li", {}, button));
   }

@@ -209,6 +209,32 @@ def overlay_image(name: str) -> FileResponse:
     return FileResponse(path, media_type="image/png")
 
 
+# ---- ML reports: evidence beside the ranking (404 when absent, e.g. on mock data) ----
+
+def _ml_or_404(report: Optional[dict], what: str) -> dict:
+    if report is None:
+        raise HTTPException(status_code=404, detail=f"No ML {what} report in this data set")
+    return report
+
+
+@app.get("/ml/uncertainty")
+def ml_uncertainty() -> dict:
+    """Per-site rank and score range across ML's Monte Carlo over weights and judgement constants."""
+    return _ml_or_404(store.load_uncertainty(), "uncertainty")
+
+
+@app.get("/ml/shortlist")
+def ml_shortlist() -> dict:
+    """A spread-out top N (capped per 250 m block) for "where to start"; the live ranking stays /sites."""
+    return _ml_or_404(store.load_shortlist(), "shortlist")
+
+
+@app.get("/ml/scenario")
+def ml_scenario() -> dict:
+    """Planting-impact scenario under named growth assumptions. Not a forecast."""
+    return _ml_or_404(store.load_scenario(), "scenario")
+
+
 # ---- the bundled barebones web app (frontend/), served from the same process ----
 FRONTEND_DIR = Path(__file__).resolve().parents[2] / "frontend"
 

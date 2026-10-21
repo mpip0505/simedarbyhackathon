@@ -134,7 +134,10 @@ the top of the list should look familiar; if it does not, something changed upst
 
 ## Notes for the team
 
-- **Frontend:** nothing to change. `score_total`, the three components and `rank` arrive in the same
+- **Frontend:** the reports are now in the web app through `/ml/uncertainty`, `/ml/shortlist` and `/ml/scenario`
+  (rank ranges on the site card, a "Spread out" list, the scenario chart). Keep `data_version` in each JSON: the API flags a
+  report computed on other data as `stale`, and the UI says so.
+- **Frontend (scores):** nothing to change. `score_total`, the three components and `rank` arrive in the same
   fields as the placeholder did; `/meta.score_source` now reads `ml`, so the placeholder badge
   should disappear on its own. Sliders start from `/weights`, which now serves our defaults
   (`source: "file"`).

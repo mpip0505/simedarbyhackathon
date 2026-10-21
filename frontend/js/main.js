@@ -17,6 +17,8 @@ import { setupSliders } from "./sliders.js";
 import { setupReport } from "./report.js";
 import { plantStats } from "./stats.js";
 import { renderStrip } from "./strip.js";
+import { renderScenario } from "./scenario.js";
+import { steadiness, steadySummary, shortlistRows, shortlistNote } from "./ml-logic.js";
 
 const OSM_NAMES = ["open_land", "parks", "buildings", "roads", "paths"];
 const LIST_LIMIT = 5;       // rows shown before "See all"
@@ -24,7 +26,7 @@ const BADGES = 5;           // sites marked 1 to 5 on the map
 const OUTLINED = 10;        // sites with a dark outline
 const DEFAULT_NOTE = "The list and map update as you move these.";
 const VIEW_NAMES = { prioritise: "Plant first", report: "Before and after" };
-const store = createStore({ selectedId: null, filter: "all", query: "", usingServer: true, expanded: false });
+const store = createStore({ selectedId: null, filter: "all", query: "", usingServer: true, expanded: false, listMode: "ranked" });
 let started = false;
 
 // ---------- header, notices, dialogs ----------
@@ -147,14 +149,22 @@ async function boot() {
       "The ?api= address in the link was ignored: only a localhost address or this site's own address is accepted."));
   }
 
-  const optional = await Promise.all([api.spine(), api.overlays(), ...OSM_NAMES.map((n) => api.osm(n))].map((p) => p.catch(() => null)));
-  const [spine, overlays, ...osmList] = optional;
+  const optional = await Promise.all([api.spine(), api.overlays(), api.uncertainty(), api.shortlist(), ...OSM_NAMES.map((n) => api.osm(n))]
+    .map((p) => p.catch(() => null)));
+  const [spine, overlays, uncertainty, shortlist, ...osmList] = optional;
   const osm = Object.fromEntries(OSM_NAMES.map((n, i) => [n, osmList[i]]));
   if (!osmList.some(Boolean)) $("#notices").append(el("div", { class: "notice" }, "No OpenStreetMap basemap in this data set; showing the sites only."));
 
   const features = sites.features;
   const ctx = buildContext(features);
   const placeholder = meta.score_source !== "ml";
+  // the ML team's extra evidence describes the ML scores only, so it is left out while scores are previews
+  const steadyOf = (id) => (placeholder ? null : steadiness(uncertainty, id));
+  const hasShortlist = !placeholder && shortlist?.diversified_sites?.length > 0;
+  $("#list-mode").hidden = !hasShortlist;
+  if (!placeholder && (uncertainty?.stale || shortlist?.stale)) {
+    $("#notices").append(el("div", { class: "notice" }, "The ML rank ranges or shortlist were worked out on older data. Ask the ML developer to re-run them."));
+  }
   const defaults = Object.fromEntries(KEYS.map((k) => [k, Math.round(weightsResponse.default[k] * 100)]));
   store.set({ served: features, weights: defaults });
 
@@ -206,9 +216,10 @@ async function boot() {
   };
 
   function visibleRows(ranked) {
-    const { filter, query } = store.get();
+    const { filter, query, listMode } = store.get();
     const q = query.trim().toLowerCase();
-    return ranked.filter((f) => (filter === "all" || f.properties.origin === filter) && (!q || f.properties.site_id.toLowerCase().includes(q)));
+    const pool = listMode === "shortlist" && hasShortlist ? shortlistRows(shortlist, new Map(ranked.map((f) => [f.properties.site_id, f]))) : ranked;
+    return pool.filter((f) => (filter === "all" || f.properties.origin === filter) && (!q || f.properties.site_id.toLowerCase().includes(q)));
   }
 
   function renderLegend([min, max]) {
@@ -228,7 +239,7 @@ async function boot() {
     const feature = selectedId ? byId.get(selectedId) : null;
     $("#sheet-card").hidden = !feature;
     $(".map-box").classList.toggle("has-card", Boolean(feature));
-    if (feature) renderCard($("#card-body"), feature, { weights, ctx, total: byId.size, placeholder });
+    if (feature) renderCard($("#card-body"), feature, { weights, ctx, total: byId.size, placeholder, steady: steadyOf(selectedId), custom: !store.get().usingServer });
   }
 
   /** The part of the map the card leaves free, in map pixels: to its right as a side panel, above it when it spans the map (phones). */
@@ -265,12 +276,18 @@ async function boot() {
     badges.update(rows.slice(0, BADGES), (id) => sitesLayer.center(id), s.selectedId);
 
     const expanded = s.expanded || (s.selectedId && rows.findIndex((f) => f.properties.site_id === s.selectedId) >= LIST_LIMIT);
-    renderTopList(list, rows, { selectedId: s.selectedId, onSelect: (id) => select(id, "list"), weights: s.weights, ctx, limit: expanded ? rows.length : LIST_LIMIT });
+    renderTopList(list, rows, { selectedId: s.selectedId, onSelect: (id) => select(id, "list"), weights: s.weights, ctx, limit: expanded ? rows.length : LIST_LIMIT, steadyOf });
+    const spread = s.listMode === "shortlist" && hasShortlist;
+    $("#list-note").hidden = !spread && placeholder;
+    $("#list-note").textContent = spread
+      ? `${shortlistNote(shortlist)}${s.usingServer ? "" : " Chosen with the default weights; the ranks shown are yours."}`
+      : (steadySummary(uncertainty) ?? "");
+    if (!$("#list-note").textContent) $("#list-note").hidden = true;
     const seeAll = $("#see-all");
     seeAll.hidden = rows.length <= LIST_LIMIT;
     seeAll.textContent = expanded ? `Show the top ${LIST_LIMIT} only` : `See all ${rows.length} sites`;
     $("#no-match").hidden = rows.length > 0;
-    $("#count").textContent = rows.length === ranked.length ? `${ranked.length} in total` : `${rows.length} of ${ranked.length}`;
+    $("#count").textContent = spread ? `${rows.length} spread out` : rows.length === ranked.length ? `${ranked.length} in total` : `${rows.length} of ${ranked.length}`;
     renderLegend(range);
     renderStrip($("#stats-plant"), plantStats(ranked, { placeholder, usingServer: s.usingServer }));
     renderSelected();
@@ -312,6 +329,7 @@ async function boot() {
   const filterRadios = $$('input[name="origin"], input[name="origin-map"]');
   const showFilter = (value) => { for (const r of filterRadios) r.checked = r.value === value; };
   for (const r of filterRadios) r.addEventListener("change", () => { store.set({ filter: r.value }); showFilter(r.value); refresh(); });
+  for (const r of $$('input[name="list-mode"]')) r.addEventListener("change", () => { store.set({ listMode: r.value, expanded: false }); refresh(); });
   $("#search").addEventListener("input", (e) => { store.set({ query: e.target.value }); refresh(); });
   $("#clear-filters").addEventListener("click", () => {
     store.set({ filter: "all", query: "" });
@@ -349,7 +367,9 @@ async function boot() {
     if (name === "prioritise") { map.invalidateSize(); return; }
     if (!report) {
       try {
-        const [summary, series, crosscheck] = await Promise.all([api.summary(), api.series(), api.crosscheck()]);
+        const [summary, series, crosscheck, scenario] = await Promise.all([api.summary(), api.series(), api.crosscheck(), api.scenario().catch(() => null)]);
+        renderScenario($("#card-scenario"), placeholder ? null : scenario);
+        $("#card-scenario").closest("section").hidden = $("#card-scenario").hidden;
         report = setupReport({ summary, series, crosscheck, overlays, osm, corridor, spine, attribution: meta.attribution ?? [], bounds: sitesLayer.bounds() });
       } catch (error) {
         $("#view-report").append(el("p", { class: "notice notice-bad" }, `The before and after view could not load: ${error.message}`));

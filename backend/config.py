@@ -6,6 +6,7 @@ BACKEND_DIR = Path(__file__).resolve().parent
 MOCK_DIR = BACKEND_DIR / "data" / "mock"
 CACHE_DIR = BACKEND_DIR / "data" / "cache"
 INPUT_DIR = BACKEND_DIR / "data" / "input"
+ML_REPORTS_DIR = BACKEND_DIR.parent / "ml" / "reports"   # ML's uncertainty, shortlist and scenario reports
 
 # Google Cloud project registered for Earth Engine (set in your shell, never commit).
 GEE_PROJECT = os.environ.get("GEE_PROJECT", "")

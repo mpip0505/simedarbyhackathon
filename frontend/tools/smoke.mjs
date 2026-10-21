@@ -234,6 +234,33 @@ try {
     await evaluate(`document.querySelector('#see-all').click()`);
     assert.equal((await rows()).length, 5);
   });
+  await check("ML evidence: steady marks, rank range on the site card, and the spread-out shortlist", async () => {
+    if (!(await evaluate(`document.querySelector('#chip-scores').textContent.includes('ML model')`))) return;   // previews carry no ML evidence
+    await evaluate(`document.querySelector('#weights-reset').click()`);
+    await waitFor(`document.querySelectorAll('#top-list .steady-mark').length > 0`, "steady marks in the list");
+    assert.match(await evaluate(`document.querySelector('#list-note').textContent`), /of the top 20 stay there/);
+    await evaluate(`document.querySelector('${ROWS}').click()`);
+    await waitFor(`document.querySelector('#sheet-card .steady')`, "the steadiness block on the site card");
+    const steady = await evaluate(`document.querySelector('#sheet-card .steady').innerText`);
+    assert.match(steady, /How steady is this rank\?/);
+    assert.match(steady, /Steady top-20 pick/);
+    assert.match(steady, /plausible weightings/);
+    await shot("2b-site-card-steadiness");
+    const before = (await rows()).map((r) => r[1]).join();
+    await evaluate(`document.querySelector('input[name="list-mode"][value="shortlist"]').click()`);
+    await waitFor(`document.querySelector('#count').textContent.includes('spread out')`, "the spread-out list");
+    assert.match(await evaluate(`document.querySelector('#list-note').textContent`), /per 250 m block/);
+    assert.match(await evaluate(`document.querySelector('#count').textContent`), /^20 spread out$/);
+    await evaluate(`document.querySelector('#see-all').click()`);
+    const spread = (await rows()).map((r) => r[1]);
+    assert.equal(spread.length, 20);
+    assert.notEqual(spread.join(), before, "the shortlist differs from the strict ranking");
+    await shot("2c-spread-out-shortlist");
+    await evaluate(`document.querySelector('#see-all').click()`);
+    await evaluate(`document.querySelector('input[name="list-mode"][value="ranked"]').click()`);
+    await evaluate(`document.querySelector('#card-close').click()`);
+    await assertCleanText("ML evidence");
+  });
   await check("the list window stays the same height whether it shows five rows, all of them or none", async () => {
     const height = () => evaluate(`Math.round(document.querySelector('.list-window').getBoundingClientRect().height)`);
     const five = await height();
@@ -329,6 +356,18 @@ try {
     await assertCleanText("before and after view");
   });
   await shot("3-before-after-greenness");
+  await check("Before and after: the ML planting scenario is labelled as a scenario, with four lines and its numbers", async () => {
+    if (!(await evaluate(`document.querySelector('#chip-scores').textContent.includes('ML model')`))) return;
+    assert.equal(await evaluate(`document.querySelector('#card-scenario').hidden`), false);
+    const text = await evaluate(`document.querySelector('#card-scenario').textContent`);
+    assert.match(text, /Scenario, not a forecast/);
+    assert.match(text, /If the top \d+ sites are planted/);
+    assert.equal(await evaluate(`document.querySelectorAll('#card-scenario path.scn-line').length`), 4);
+    assert.equal(await evaluate(`document.querySelectorAll('#card-scenario .scn-table tbody tr').length`), 4);
+    await evaluate(`document.querySelector('#card-scenario').scrollIntoView()`);
+    await shot("3b-scenario");
+    await assertCleanText("scenario");
+  });
   await check("switching to ground heat swaps both overlays and says it is estimated", async () => {
     await evaluate(`document.querySelector('input[name="metric"][value="lst"]').click()`);
     await waitFor(`[...document.querySelectorAll('.report-map img.leaflet-image-layer')].every(i => i.src.includes('lst_'))`, "ground heat overlays");

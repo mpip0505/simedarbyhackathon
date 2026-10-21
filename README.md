@@ -81,6 +81,9 @@ All endpoints are `GET`. Errors are small JSON bodies with a `request_id` (also 
 | `/layers/corridor` | Approximate corridor polygon |
 | `/layers/overlays` and `/layers/overlays/{name}.png` | Before/after NDVI and temperature images with map bounds and a shared colour range |
 | `/weights` | Default weights the sliders should start from |
+| `/ml/uncertainty` | Per-site rank and score range across ML's 2000-draw Monte Carlo (from `ml/reports/`), plus the robust/boundary thresholds |
+| `/ml/shortlist` | ML's spread-out top 20 (at most 3 per 250 m block) for "where to start" |
+| `/ml/scenario` | ML's planting-impact scenario: three named growth assumptions, measured ceiling. Not a forecast |
 | `/meta` | Data mode, `score_source` (`ml`, `placeholder`, `mock`), `scores_stale`, `scores_error`, data version, build times, attribution, caveats |
 | `/health` and `/health/deep` | Liveness; and a full data check (200 sound, 503 otherwise; counts only, details in the server log) |
 
@@ -146,6 +149,10 @@ Canopy dashboard system in `css/app.css`, and it can be replaced without touchin
 - **API contract it is built on:** [docs/team-handoff.md](docs/team-handoff.md) section 3.
 - Reuse `frontend/js/weights.js`, `drivers.js`, `scale.js`, `report-logic.js` and `csv.js` unchanged; they are tested, and
   `weights.js` is checked against the Python backend so slider re-ranking always matches the API.
+- **ML evidence in the UI** (shown only when `score_source` is `ml`; each `/ml/*` report carries `stale`): a green tick beside
+  steady top-20 sites and a "How steady is this rank?" range on the site card (`/ml/uncertainty`), a **Ranked / Spread out**
+  switch on Top sites (`/ml/shortlist`), and a "Looking ahead" scenario chart on Before and after, labelled "Scenario, not a
+  forecast" (`/ml/scenario`). Re-run `python -m ml.uncertainty`, `ml.shortlist` and `ml.scenario` after a data rebuild.
 - Always show the "simulated sites" label, the caveats and attribution from `/meta`, and a badge when `score_source` is not `ml`.
 
 **Nothing to change now that ML has delivered** — the API contract is identical whether `score_source` is
@@ -179,8 +186,8 @@ backend's config placeholder (0.40 / 0.35 / 0.25), so sliders should start from 
 
 ## Testing and CI
 ```bash
-python -m pytest backend/tests -q          # 194 tests, no Earth Engine or network needed
-node --test "frontend/tests/*.test.mjs"    # 88 frontend unit tests (Node 22, no dependencies)
+python -m pytest backend/tests -q          # 201 tests, no Earth Engine or network needed
+node --test "frontend/tests/*.test.mjs"    # 94 frontend unit tests (Node 22, no dependencies)
 node frontend/tools/smoke.mjs              # real Chrome/Edge drives the web app (API must be running)
 python -m backend.api.selfcheck            # deep check of the committed data
 python -m backend.scripts.qa_plot          # draws docs/qa-map.png: sites, corridor, parks, paths, buildings
