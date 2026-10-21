@@ -623,3 +623,14 @@ dialog form[method="dialog"] { display: flex; justify-content: flex-end; margin:
 .tr-bar { display: block; height: 6px; margin-top: 4px; background: var(--hover); border-radius: 3px; overflow: hidden; }
 .tr-bar > span { display: block; height: 100%; background: var(--accent); }
 @media (forced-colors: active) { .tr-bar { border: 1px solid CanvasText; } .tr-bar > span { background: Highlight; forced-color-adjust: none; } }
+
+/* ---------- footpath greenness layer legend ---------- */
+.path-legend { position: absolute; z-index: 10; left: 12px; bottom: 148px; width: 224px; }
+.map-box.has-card .path-legend { left: auto; right: 12px; bottom: 148px; }
+.path-legend ul { margin: 6px 0 0; padding: 0; list-style: none; }
+.path-legend li { display: flex; align-items: center; gap: 8px; margin: 2px 0; }
+.path-legend .note { margin-top: 6px; color: var(--text-muted); font-size: 11px; line-height: 15px; }
+.pl-line { flex: none; width: 26px; height: 0; border-top: 4px solid #b13a06; }
+.pl-mid { border-top: 3px dashed #c9972c; }
+.pl-green { border-top: 2px dotted #2f7d32; }
+@media (max-width: 900px) { .path-legend { display: none; } }

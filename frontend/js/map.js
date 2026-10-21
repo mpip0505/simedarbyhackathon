@@ -26,7 +26,7 @@ export function createMap(elementId, { zoomControl = true } = {}) {
   const map = L.map(elementId, { preferCanvas: true, zoomControl: false, attributionControl: false, ...DEFAULT_VIEW });
   map.setView(DEFAULT_VIEW.center, DEFAULT_VIEW.zoom);
   if (zoomControl) L.control.zoom({ position: "topright" }).addTo(map);
-  const panes = { basemap: 250, overlays: 300, corridor: 420, sites: 450, badges: 480 };
+  const panes = { basemap: 250, overlays: 300, paths: 410, corridor: 420, sites: 450, badges: 480 };
   for (const [name, z] of Object.entries(panes)) map.createPane(name).style.zIndex = z;
   L.control.scale({ imperial: false, position: "bottomright" }).addTo(map);
   return map;
@@ -41,6 +41,19 @@ export function createBasemap(osmLayers) {
     L.geoJSON(data, { pane: "basemap", interactive: false, style: () => BASEMAP_STYLES[name] }).addTo(group);
   }
   return group.getLayers().length ? group : null;
+}
+
+// Footpath pieces by relative greenness. Colour is never the only signal: the least green pieces are thick and solid, the greenest thin and dotted.
+const PATH_STYLES = {
+  least_green: { color: "#b13a06", weight: 4, opacity: 0.95 },
+  middle: { color: "#c9972c", weight: 3, opacity: 0.9, dashArray: "8 4" },
+  greenest: { color: "#2f7d32", weight: 2, opacity: 0.9, dashArray: "1 5" },
+};
+
+/** Footpaths coloured by how green they are along their length (relative thirds). A satellite proxy, not a shade survey. */
+export function createPathShade(data) {
+  if (!data?.features?.length) return null;
+  return L.geoJSON(data, { pane: "paths", interactive: false, style: (f) => PATH_STYLES[f.properties?.third] ?? PATH_STYLES.middle });
 }
 
 /** Corridor outline plus the dashed connector lines. Always described as approximate in the UI. */

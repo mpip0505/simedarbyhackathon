@@ -5,7 +5,7 @@ Generated on data_version `f12bc98c3fbd`, 564 simulated sites. Regenerate with `
 
 ## The first 20 sites
 
-| method | footpath without tree cover (m) | mapped homes | corridor gap (m) | areas (250 m blocks) | hotter than (% of sites, average) |
+| method | footpath with little tree cover (m) | mapped homes | corridor gap (m) | areas (250 m blocks) | hotter than (% of sites, average) |
 |---|---|---|---|---|---|
 | Heat only | 580 (0.9%) | 78 (8.1%) | 200 (12.1%) | 9 | 98% |
 | Canopy gap only | 610 (0.9%) | 0 (0.0%) | 90 (5.5%) | 6 | 61% |
@@ -16,7 +16,7 @@ Generated on data_version `f12bc98c3fbd`, 564 simulated sites. Regenerate with `
 
 ## The first 50 sites
 
-| method | footpath without tree cover (m) | mapped homes | corridor gap (m) | areas (250 m blocks) | hotter than (% of sites, average) |
+| method | footpath with little tree cover (m) | mapped homes | corridor gap (m) | areas (250 m blocks) | hotter than (% of sites, average) |
 |---|---|---|---|---|---|
 | Heat only | 2,060 (3.1%) | 344 (35.5%) | 310 (18.8%) | 14 | 96% |
 | Canopy gap only | 1,130 (1.7%) | 36 (3.7%) | 90 (5.5%) | 13 | 72% |
@@ -25,4 +25,4 @@ Generated on data_version `f12bc98c3fbd`, 564 simulated sites. Regenerate with `
 | Ours (default) | 5,400 (8.2%) | 349 (36.1%) | 1,150 (69.7%) | 14 | 64% |
 | Spread out | 6,320 (9.6%) | 387 (40.0%) | 960 (58.2%) | 25 | 75% |
 
-Percentages are of the township's totals: about 65,860 m of footpath without tree cover, 968 mapped homes and about 1,650 m of corridor gap.
+Percentages are of the township's totals: about 65,860 m of footpath with little tree cover, 968 mapped homes and about 1,650 m of corridor gap.

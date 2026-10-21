@@ -4,7 +4,7 @@
     python -m ml.tradeoff --stdout    # prints the markdown, writes nothing
 
 For the first 20 and 50 sites chosen five ways (heat only, canopy gap only, heat plus canopy gap, our default weights, and our spread-out shortlist), this reports
-what each list REACHES (footpath without tree cover, mapped homes, corridor gaps, each counted once) and how hot and how spread out its sites are.
+what each list REACHES (footpath with little tree cover, mapped homes, corridor gaps, each counted once) and how hot and how spread out its sites are.
 
 Read it as a trade-off, not a league table. Our default weights favour footpath and corridor by design, so they reach more of those; a heat-only list picks the
 hottest surroundings. Which matters more is the planner's choice, which is why the weights are sliders. Reach is not benefit, the sites are simulated, and
@@ -40,7 +40,7 @@ def pick_lists(df: pd.DataFrame, k: int) -> dict[str, list[str]]:
 
 
 def build() -> dict:
-    order_ids, cells, centres, unshaded, homes, gaps = _load_inputs()
+    order_ids, cells, centres, unshaded, homes, gaps, _ = _load_inputs()
     index = {sid: i for i, sid in enumerate(order_ids)}
     df = load_sites_df()
     by_site = df.set_index("site_id")
@@ -73,12 +73,12 @@ def to_markdown(r: dict) -> str:
     short = {"heat_only": "Heat only", "canopy_gap_only": "Canopy gap only", "heat_and_gap": "Heat + gap", "equal_three": "Equal three", OURS: "Ours (default)", SPREAD: "Spread out"}
     lines = ["# Trade-off between ways of choosing the first sites", f"Generated on data_version `{r['data_version']}`, {r['n_sites']} simulated sites. Regenerate with `python -m ml.tradeoff`.", "", f"> {r['note']}", ""]
     for k in r["steps"]:
-        lines += [f"## The first {k} sites", "", "| method | footpath without tree cover (m) | mapped homes | corridor gap (m) | areas (250 m blocks) | hotter than (% of sites, average) |", "|---|---|---|---|---|---|"]
+        lines += [f"## The first {k} sites", "", "| method | footpath with little tree cover (m) | mapped homes | corridor gap (m) | areas (250 m blocks) | hotter than (% of sites, average) |", "|---|---|---|---|---|---|"]
         for m, x in r["results"][str(k)].items():
             lines.append(f"| {short.get(m, m)} | {x['unshaded_path_m']:,} ({x['unshaded_path_pct']}%) | {x['homes']:,} ({x['homes_pct']}%) | {x['gap_m']:,} ({x['gap_pct']}%) | {x['areas']} | {x['hotter_than_pct']:.0f}% |")
         lines.append("")
     t = r["totals"]
-    lines += [f"Percentages are of the township's totals: about {t['unshaded_path_m']:,} m of footpath without tree cover, {t['homes']:,} mapped homes and about {t['gap_m']:,} m of corridor gap.", ""]
+    lines += [f"Percentages are of the township's totals: about {t['unshaded_path_m']:,} m of footpath with little tree cover, {t['homes']:,} mapped homes and about {t['gap_m']:,} m of corridor gap.", ""]
     return "\n".join(lines)
 
 

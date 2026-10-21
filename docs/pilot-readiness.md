@@ -42,7 +42,7 @@ from our own data (simulated sites, ML default ranking, every footpath point, ho
 
 | What to measure | Baseline today (our data) | How a pilot would measure it | When |
 |---|---|---|---|
-| Footpath with no tree cover near planted sites | about 65,900 m township-wide (latest greenness below 0.6); the first 50 sites are within 50 m of about 5,400 m of it | re-run the same count on new imagery, and walk a sample of those paths to check shade on the ground | each season; field check at 6 and 12 months |
+| Footpath with little tree cover near planted sites | about 65,900 m township-wide (latest greenness below 0.6); the first 50 sites are within 50 m of about 5,400 m of it | re-run the same count on new imagery, and walk a sample of those paths to check shade on the ground | each season; field check at 6 and 12 months |
 | Planted-tree survival | none (no planting data) | count live and dead trees at the planted sites at 6, 12 and 24 months, including after any maintenance guarantee ends | 6, 12, 24 months |
 | Tree cover at the planted sites | the sites' own baseline canopy proxy (a vegetation-index estimate, not a tree count) | a field or drone sample of canopy at a set of planted and unplanted sites | 12 and 24 months |
 | Whether the ranking points at real shade gaps | none (no ground truth) | a field sheet for top and bottom ranked sites (`backend/scripts/field_sheet.py`, planned) compared with the ranking | before planting |

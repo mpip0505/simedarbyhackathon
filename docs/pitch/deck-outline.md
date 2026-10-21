@@ -60,7 +60,7 @@ One command rebuilds everything in about 4 minutes and reproduced the committed 
 
 ## Slide 6: Impact (Mechanism)
 **Reach, not outcome** ([impact_reach.md](../../ml/reports/impact_reach.md)). With the default ML ranking on the simulated sites, the first 50 sites are:
-- within 50 m of about **5,400 m of footpath with no tree cover** (8% of the township's 65,860 m; 58% of what any site can reach);
+- within 50 m of about **5,400 m of footpath where the satellite sees little tree cover** (8% of the township's 65,860 m; 58% of what any site can reach);
 - within 250 m of **349 of 968 mapped homes** (36%);
 - within 50 m of about **1,150 m of the approximate corridor's gaps** (70% of about 1,650 m).
 Say plainly: this counts what lies near the sites. It does not show cooling, health, survival or carbon; a pilot would measure those ([pilot-readiness.md](../pilot-readiness.md)).

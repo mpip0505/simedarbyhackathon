@@ -20,7 +20,7 @@ test("only the steps the report has are offered, in order", () => {
 test("the headline leads with the township share and says mapped homes", () => {
   const h = impactHeadline(report, 50);
   assert.match(h, /first 50 sites/);
-  assert.match(h, /5,400 m of footpath with no tree cover \(8% of the township's\)/);
+  assert.match(h, /5,400 m of footpath where the satellite sees little tree cover \(8% of the township's\)/);
   assert.match(h, /349 mapped homes \(36%\)/);
   assert.equal(impactHeadline(report, 20), null);
 });

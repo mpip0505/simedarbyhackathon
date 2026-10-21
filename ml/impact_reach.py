@@ -103,21 +103,22 @@ def _load_inputs():
         pts = line_points(list(paths), PATH_STEP_M)
         vals = sample_points(ndvi, pts)
         unshaded = [p for p, v in zip(pts, vals) if np.isfinite(v) and v < CANOPY_NDVI_THRESHOLD]
+        below_pct = 100.0 * len(unshaded) / max(1, int(np.isfinite(vals).sum()))
         spine = list(gpd.read_file(CACHE_DIR / "corridor_spine.geojson").to_crs(METRIC_CRS).geometry)
         gaps = gap_points(spine, ndvi)
     bld = gpd.read_file(OSM_DIR / "buildings.geojson").to_crs(METRIC_CRS)
     homes = [g for g, t in zip(bld.geometry, bld["building"]) if t in RESIDENTIAL]
-    return order_ids, cells, centres, unshaded, homes, gaps
+    return order_ids, cells, centres, unshaded, homes, gaps, below_pct
 
 
 def build() -> dict:
-    order_ids, cells, centres, unshaded, homes, gaps = _load_inputs()
+    order_ids, cells, centres, unshaded, homes, gaps, below_pct = _load_inputs()
     result = curve(list(range(len(cells))), cells, centres, unshaded, homes, gaps)
     return {
         "data_version": current_data_version(), "n_sites": len(cells), "ranking": "ML default weights",
-        "weights": DEFAULT_WEIGHTS, "canopy_ndvi_threshold": CANOPY_NDVI_THRESHOLD,
+        "weights": DEFAULT_WEIGHTS, "canopy_ndvi_threshold": CANOPY_NDVI_THRESHOLD, "path_samples_below_threshold_pct": round(below_pct),
         "definitions": {
-            "unshaded_path_m": f"OpenStreetMap footpath (sampled every {PATH_STEP_M:.0f} m) whose latest greenness is below {CANOPY_NDVI_THRESHOLD}, within {PATH_RADIUS_M} m of a chosen site. About, to the nearest 10 m.",
+            "unshaded_path_m": f"OpenStreetMap footpath (sampled every {PATH_STEP_M:.0f} m) whose latest greenness is below {CANOPY_NDVI_THRESHOLD}, within {PATH_RADIUS_M} m of a chosen site. About, to the nearest 10 m. About {round(below_pct)}% of all footpath samples fall below that threshold (a 10 m pixel mixes pavement with any trees beside it), so this is close to 'footpath near the sites' and is a satellite proxy, not a shade survey.",
             "homes": f"Mapped residential buildings touching a {HOME_RADIUS_M} m circle around a chosen site's centre. OpenStreetMap under-maps some areas, so this is a lower bound.",
             "gap_m": f"Corridor spine (approximate) with greenness below the gap threshold, within {GAP_FLAG_DIST_M} m of a chosen site's centre. About, to the nearest 10 m.",
         },
@@ -133,11 +134,11 @@ def to_markdown(r: dict) -> str:
         "# What the top sites reach", f"Generated on data_version `{r['data_version']}`, {r['n_sites']} simulated sites, ranked with the ML default weights. Regenerate with `python -m ml.impact_reach`.", "",
         f"> {r['note']}", "",
         "## Totals in the township (from our data)",
-        f"- Unshaded footpath: about **{t['unshaded_path_m']:,} m**; **{c['unshaded_path_m']:,} m** of it is within reach of at least one candidate site.",
+        f"- Footpath with little tree cover (satellite): about **{t['unshaded_path_m']:,} m**; **{c['unshaded_path_m']:,} m** of it is within reach of at least one candidate site.",
         f"- Mapped homes: **{t['homes']:,}**; **{c['homes']:,}** are within 250 m of at least one candidate site.",
         f"- Corridor gaps (approximate corridor): about **{t['gap_m']:,} m**; **{c['gap_m']:,} m** of it is within 50 m of at least one candidate site.", "",
         "## What the first N sites reach", "",
-        "| N sites | planting area (m²) | unshaded footpath (m) | % of reachable | homes | % of reachable | corridor gap (m) | % of reachable |", "|---|---|---|---|---|---|---|---|",
+        "| N sites | planting area (m²) | footpath with little tree cover (m) | % of reachable | homes | % of reachable | corridor gap (m) | % of reachable |", "|---|---|---|---|---|---|---|---|",
         *[f"| {x['n']} | {x['area_m2']:,} | {x['unshaded_path_m']:,} | {x['unshaded_path_pct_of_reachable']}% | {x['homes']:,} | {x['homes_pct_of_reachable']}% | {x['gap_m']:,} | {x['gap_pct_of_reachable']}% |" for x in r["rows"]], "",
         "## Definitions", *[f"- **{k}**: {v}" for k, v in r["definitions"].items()], "",
     ]

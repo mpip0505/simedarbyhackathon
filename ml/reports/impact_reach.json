@@ -9,10 +9,11 @@
  "definitions": {
   "gap_m": "Corridor spine (approximate) with greenness below the gap threshold, within 50 m of a chosen site's centre. About, to the nearest 10 m.",
   "homes": "Mapped residential buildings touching a 250 m circle around a chosen site's centre. OpenStreetMap under-maps some areas, so this is a lower bound.",
-  "unshaded_path_m": "OpenStreetMap footpath (sampled every 10 m) whose latest greenness is below 0.6, within 50 m of a chosen site. About, to the nearest 10 m."
+  "unshaded_path_m": "OpenStreetMap footpath (sampled every 10 m) whose latest greenness is below 0.6, within 50 m of a chosen site. About, to the nearest 10 m. About 95% of all footpath samples fall below that threshold (a 10 m pixel mixes pavement with any trees beside it), so this is close to 'footpath near the sites' and is a satellite proxy, not a shade survey."
  },
  "n_sites": 564,
  "note": "REACH, not outcome. It counts what lies near the sites; it does not show planting there would cool, improve health or survive. The sites are simulated. Every footpath point, home and gap point is counted once, however many chosen sites are near it.",
+ "path_samples_below_threshold_pct": 95,
  "ranking": "ML default weights",
  "rows": [
   {

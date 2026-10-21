@@ -399,6 +399,16 @@ try {
     await evaluate(`${card}.querySelector('button[aria-pressed="false"]').click()`);
     assert.doesNotMatch(await evaluate(`${card}.innerText`), /first 50 sites/, "the toggle should change the numbers");
   });
+  await check("the footpath greenness layer draws coloured paths, shows its legend, and hides again", async () => {
+    const box = `document.querySelector('#layer-toggles input[data-layer="pathshade"]')`;
+    assert.equal(await evaluate(`${box}.disabled`), false, "the layer should be available");
+    assert.equal(await evaluate(`document.querySelector('#path-legend').hidden`), true);
+    await evaluate(`${box}.click()`);
+    assert.equal(await evaluate(`document.querySelector('#path-legend').hidden`), false);
+    assert.match(await evaluate(`document.querySelector('#path-legend').innerText`), /Least green third[\s\S]*Not a shade survey/);
+    await evaluate(`${box}.click()`);
+    assert.equal(await evaluate(`document.querySelector('#path-legend').hidden`), true);
+  });
   await check("the trade-off card compares five ways of choosing, as a trade-off with no winner", async () => {
     const card = `document.querySelector('#card-tradeoff')`;
     assert.equal(await evaluate(`${card}.hidden`), false, "the card should show with scores from the scoring model");

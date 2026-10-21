@@ -82,6 +82,7 @@ export const api = {
   summary: () => getJSON("/summary"),
   corridor: () => getOptional("/layers/corridor"),
   spine: () => getOptional("/layers/corridor/spine"),
+  pathShade: () => getOptional("/layers/paths/shade"),
   osm: (name) => getOptional(`/layers/osm/${name}`),
   overlays: () => getOptional("/layers/overlays"),
   series: () => getOptional("/summary/series"),

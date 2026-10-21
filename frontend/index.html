@@ -128,6 +128,7 @@
                         <label><input class="cb" type="checkbox" data-layer="sites" checked> Example sites</label>
                         <label><input class="cb" type="checkbox" data-layer="corridor" checked> Green corridor (approximate)</label>
                         <label><input class="cb" type="checkbox" data-layer="basemap" checked> Map detail</label>
+                        <label><input class="cb" type="checkbox" data-layer="pathshade"> Footpath greenness (satellite)</label>
                         <label><input class="cb" type="checkbox" data-layer="ndvi"> Greenness (satellite)</label>
                         <label><input class="cb" type="checkbox" data-layer="lst"> Ground heat (satellite)</label>
                         <label class="quiet"><input class="cb" type="checkbox" data-layer="tiles"> Street map (needs internet)</label>
@@ -138,6 +139,15 @@
                   <div class="map-box">
                     <div id="map" role="application" aria-label="Map of example planting sites. The five highest priority sites are marked 1 to 5."></div>
                     <div id="legend" class="legend" aria-label="Legend"></div>
+                    <div id="path-legend" class="legend path-legend" aria-label="Footpath greenness legend" hidden>
+                      <strong>Footpath greenness</strong>
+                      <ul>
+                        <li><span class="pl-line pl-least" aria-hidden="true"></span>Least green third (thick, solid)</li>
+                        <li><span class="pl-line pl-mid" aria-hidden="true"></span>Middle third (dashed)</li>
+                        <li><span class="pl-line pl-green" aria-hidden="true"></span>Greenest third (thin, dotted)</li>
+                      </ul>
+                      <p class="note">Satellite greenness along OpenStreetMap footpaths, in thirds relative to this township's paths. Not a shade survey.</p>
+                    </div>
                     <div id="coach" class="coach" role="note">
                       <span>Click a site to see why it ranks here</span>
                       <button type="button" id="coach-dismiss" aria-label="Dismiss this hint">&times;</button>

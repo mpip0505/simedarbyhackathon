@@ -183,6 +183,15 @@ def osm_layer(name: str) -> dict:
     return layer
 
 
+@app.get("/layers/paths/shade")
+def layer_paths_shade() -> dict:
+    """OpenStreetMap footpaths in pieces of about 50 m, labelled least_green, middle or greenest relative to this township's paths."""
+    result = store.load_paths_shade()
+    if result is None:
+        raise HTTPException(status_code=404, detail="No footpath shade layer in this data set")
+    return result
+
+
 @app.get("/summary/crosscheck")
 def summary_crosscheck() -> dict:
     """Our canopy proxy against ESA WorldCover and Dynamic World (both satellite maps, not field truth)."""

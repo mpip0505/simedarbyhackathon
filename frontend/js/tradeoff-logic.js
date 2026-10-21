@@ -13,7 +13,7 @@ export const METHOD_NAMES = {
 };
 
 export const MEASURES = [
-  { key: "unshaded_path_m", pct: "unshaded_path_pct", label: "Footpath without tree cover", unit: "m" },
+  { key: "unshaded_path_m", pct: "unshaded_path_pct", label: "Footpath with little tree cover", unit: "m" },
   { key: "homes", pct: "homes_pct", label: "Mapped homes", unit: "" },
   { key: "gap_m", pct: "gap_pct", label: "Corridor gap (approximate)", unit: "m" },
 ];

@@ -4,13 +4,13 @@ Generated on data_version `f12bc98c3fbd`, 564 simulated sites, ranked with the M
 > REACH, not outcome. It counts what lies near the sites; it does not show planting there would cool, improve health or survive. The sites are simulated. Every footpath point, home and gap point is counted once, however many chosen sites are near it.
 
 ## Totals in the township (from our data)
-- Unshaded footpath: about **65,860 m**; **9,330 m** of it is within reach of at least one candidate site.
+- Footpath with little tree cover (satellite): about **65,860 m**; **9,330 m** of it is within reach of at least one candidate site.
 - Mapped homes: **968**; **443** are within 250 m of at least one candidate site.
 - Corridor gaps (approximate corridor): about **1,650 m**; **1,510 m** of it is within 50 m of at least one candidate site.
 
 ## What the first N sites reach
 
-| N sites | planting area (m²) | unshaded footpath (m) | % of reachable | homes | % of reachable | corridor gap (m) | % of reachable |
+| N sites | planting area (m²) | footpath with little tree cover (m) | % of reachable | homes | % of reachable | corridor gap (m) | % of reachable |
 |---|---|---|---|---|---|---|---|
 | 5 | 4,500 | 1,380 | 14.8% | 242 | 54.6% | 200 | 13.2% |
 | 10 | 9,000 | 2,120 | 22.7% | 242 | 54.6% | 350 | 23.2% |
@@ -21,6 +21,6 @@ Generated on data_version `f12bc98c3fbd`, 564 simulated sites, ranked with the M
 | 564 | 507,600 | 9,330 | 100.0% | 443 | 100.0% | 1,510 | 100.0% |
 
 ## Definitions
-- **unshaded_path_m**: OpenStreetMap footpath (sampled every 10 m) whose latest greenness is below 0.6, within 50 m of a chosen site. About, to the nearest 10 m.
+- **unshaded_path_m**: OpenStreetMap footpath (sampled every 10 m) whose latest greenness is below 0.6, within 50 m of a chosen site. About, to the nearest 10 m. About 95% of all footpath samples fall below that threshold (a 10 m pixel mixes pavement with any trees beside it), so this is close to 'footpath near the sites' and is a satellite proxy, not a shade survey.
 - **homes**: Mapped residential buildings touching a 250 m circle around a chosen site's centre. OpenStreetMap under-maps some areas, so this is a lower bound.
 - **gap_m**: Corridor spine (approximate) with greenness below the gap threshold, within 50 m of a chosen site's centre. About, to the nearest 10 m.

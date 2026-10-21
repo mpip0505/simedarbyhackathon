@@ -21,7 +21,7 @@ export function availableSteps(report) {
 export function impactHeadline(report, n) {
   const r = impactRow(report, n);
   if (!r) return null;
-  return `The first ${n} sites are within 50 m of about ${num(r.unshaded_path_m)} m of footpath with no tree cover (${pct(r.unshaded_path_pct_of_township)} of the township's), `
+  return `The first ${n} sites are within 50 m of about ${num(r.unshaded_path_m)} m of footpath where the satellite sees little tree cover (${pct(r.unshaded_path_pct_of_township)} of the township's), `
     + `and within 250 m of ${num(r.homes)} mapped homes (${pct(r.homes_pct_of_township)}).`;
 }
 
@@ -31,7 +31,7 @@ export function impactTiles(report, n) {
   if (!r) return [];
   const t = report.totals, c = report.ceiling;
   return [
-    { label: "Footpath without tree cover", value: num(r.unshaded_path_m), unit: "m",
+    { label: "Footpath with little tree cover", value: num(r.unshaded_path_m), unit: "m",
       note: `${pct(r.unshaded_path_pct_of_township)} of the township's ${num(t.unshaded_path_m)} m; ${pct(r.unshaded_path_pct_of_reachable)} of the ${num(c.unshaded_path_m)} m any site can reach` },
     { label: "Mapped homes", value: num(r.homes), unit: "",
       note: `${pct(r.homes_pct_of_township)} of ${num(t.homes)} mapped homes; ${pct(r.homes_pct_of_reachable)} of the ${num(c.homes)} any site can reach` },
@@ -41,4 +41,5 @@ export function impactTiles(report, n) {
 }
 
 export const IMPACT_CAPTION = "This counts what lies near the sites. It does not show that planting there would cool anything, improve health or survive. "
-  + "The sites are simulated, and the ranking uses the default weights, not your slider settings. Homes are the ones OpenStreetMap maps, so the count is a lower bound.";
+  + "The sites are simulated, and the ranking uses the default weights, not your slider settings. Homes are the ones OpenStreetMap maps, so the count is a lower bound. "
+  + "Most footpath in the data falls below the tree-cover threshold at 10 m (pavement and trees mix in one pixel), so the footpath figure is close to footpath near the sites.";

@@ -11,7 +11,7 @@ import { toCsv, rankedRows } from "./csv.js";
 import { toGeoJson } from "./export.js";
 import { renderBrief } from "./brief.js";
 import {
-  createMap, createBasemap, createCorridor, createOverlay, createStreetTiles, createSitesLayer, createBadges,
+  createMap, createBasemap, createCorridor, createPathShade, createOverlay, createStreetTiles, createSitesLayer, createBadges,
 } from "./map.js";
 import { renderTopList, highlightRow } from "./list.js";
 import { renderCard } from "./panel.js";
@@ -155,9 +155,9 @@ async function boot() {
       "The ?api= address in the link was ignored: only a localhost address or this site's own address is accepted."));
   }
 
-  const optional = await Promise.all([api.spine(), api.overlays(), api.uncertainty(), api.shortlist(), api.impact(), api.tradeoff(), ...OSM_NAMES.map((n) => api.osm(n))]
+  const optional = await Promise.all([api.spine(), api.pathShade(), api.overlays(), api.uncertainty(), api.shortlist(), api.impact(), api.tradeoff(), ...OSM_NAMES.map((n) => api.osm(n))]
     .map((p) => p.catch(() => null)));
-  const [spine, overlays, uncertainty, shortlist, impact, tradeoff, ...osmList] = optional;
+  const [spine, pathShade, overlays, uncertainty, shortlist, impact, tradeoff, ...osmList] = optional;
   const osm = Object.fromEntries(OSM_NAMES.map((n, i) => [n, osmList[i]]));
   if (!osmList.some(Boolean)) $("#notices").append(el("div", { class: "notice" }, "No OpenStreetMap basemap in this data set; showing the sites only."));
 
@@ -186,6 +186,7 @@ async function boot() {
   const find = (name) => overlays?.overlays.find((o) => o.name === name);
   const layers = {
     basemap: createBasemap(osm), corridor: createCorridor(corridor, spine), sites: sitesLayer.group,
+    pathshade: createPathShade(pathShade),
     ndvi: find("ndvi_latest") ? createOverlay(find("ndvi_latest")) : null,
     lst: find("lst_latest") ? createOverlay(find("lst_latest")) : null,
     tiles: createStreetTiles(),
@@ -203,6 +204,7 @@ async function boot() {
     if (box.checked) layer.addTo(map);
     box.addEventListener("change", () => {
       if (box.checked) layer.addTo(map); else map.removeLayer(layer);
+      if (box.dataset.layer === "pathshade") $("#path-legend").hidden = !box.checked;
       if (box.dataset.layer === "sites") (box.checked ? badges.group.addTo(map) : map.removeLayer(badges.group));
     });
   }

@@ -211,6 +211,11 @@ def load_spine() -> Optional[dict]:
     return _optional(data_dir() / "corridor_spine.geojson")
 
 
+def load_paths_shade() -> Optional[dict]:
+    """Footpath pieces labelled by relative greenness (thirds), for a map layer. Satellite proxy, not a shade survey."""
+    return _optional(data_dir() / "paths_shade.geojson")
+
+
 def load_crosscheck() -> Optional[dict]:
     """The independent canopy cross-check, trimmed to the threshold in use: one row per window and reference map."""
     raw = _optional(data_dir() / "crosscheck.json")

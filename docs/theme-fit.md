@@ -19,12 +19,12 @@ community connection, and we do not claim it does. People appears only as **who 
 | A **5 km Urban Biodiversity Corridor** linking six parks in City of Elmina, with more ecological corridors planned (developer material) | a corridor-connectivity score; the planting sites nearest corridor gaps rank higher; reach numbers show corridor gap length near the top sites | uses an **approximate** corridor from OpenStreetMap (about 2 km of spine); the official outline would replace it |
 | A stated target of **50,000 endangered (IUCN-listed) trees by 2030**, and a nursery growing native and endangered species (developer material) | helps choose where the next plantings of any species could go first | no species or soil model: species choice needs the developer's landscape data |
 | **Net zero by 2050**, with nature-based solutions named among the levers (developer press release, November 2023) | a documented, repeatable method for where to plant, which supports reporting | no carbon or sequestration figure, and none is claimed |
-| Walkable township with a long walking and cycling track (developer material) | a shade score for unshaded footpath near each site; reach shows footpath without tree cover near the top sites | no measure of walking, safety or health |
+| Walkable township with a long walking and cycling track (developer material) | a shade score for unshaded footpath near each site; reach shows footpath with little tree cover near the top sites | no measure of walking, safety or health |
 | Environmental education and research at the Elmina Rainforest Knowledge Centre (developer material) | open method and a plain-language "why this site" on every site | none |
 
 ## The People co-benefit (said carefully)
-Where the shade score is high, a site is near footpath with no tree cover; where reach is high, a mapped home is within 250 m. In the first 50 sites that is about 5,400 m of footpath
-with no tree cover (8% of the township's) and 349 of 968 mapped homes ([impact_reach.md](../ml/reports/impact_reach.md)). **That is reach, not benefit:** it counts what lies near the sites;
+Where the shade score is high, a site is near footpath where the satellite sees little tree cover; where reach is high, a mapped home is within 250 m. In the first 50 sites that is about 5,400 m of footpath
+with little tree cover (8% of the township's) and 349 of 968 mapped homes ([impact_reach.md](../ml/reports/impact_reach.md)). **That is reach, not benefit:** it counts what lies near the sites;
 it does not show anyone is cooler, healthier or safer. Say "shade where people walk", not "healthier residents".
 
 ## Wording for the pitch
