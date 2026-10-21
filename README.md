@@ -247,6 +247,7 @@ they are exercised by `python -m backend.build_cache` with your login.
 - **Not disclosure-grade.** What a real pilot would need: [docs/pilot-readiness.md](docs/pilot-readiness.md).
 - **Outside facts in the pitch.** Checked in [docs/pitch-fact-check.md](docs/pitch-fact-check.md); several need softer wording
   (the "5% planted" figure is contradicted by the same source). Hard questions with honest answers: [docs/judge-qa.md](docs/judge-qa.md).
+- **Evidence and field check.** What we checked and did not ([docs/evidence-summary.md](docs/evidence-summary.md)); a blind field sheet for a first walk (`python -m backend.scripts.field_sheet`, then `python -m backend.scripts.import_field_checks`). No field data has been collected yet.
 - **Commercial case.** Who it is for, what repeating it for another township needs (an audit of what is Elmina-specific), the Earth Engine licensing point and labelled hypotheses, with no invented figures: [docs/commercial-case.md](docs/commercial-case.md).
 - **Other canopy prioritisers.** What Tree Equity Score, i-Tree Landscape, Boston's Right Place Right Tree and others do, what is and is not proven, and where this project fits: [docs/prior-art.md](docs/prior-art.md). `python -m ml.impact_reach` counts what the top sites reach (unshaded footpath, mapped homes, corridor gaps; reach, not outcome; report in `ml/reports/impact_reach.md`, served at `/ml/impact`). `python -m ml.method_agreement` compares our ranking with simplified stand-ins of those approaches (report in `ml/reports/method_agreement.md`).
 

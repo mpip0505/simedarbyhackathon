@@ -46,3 +46,5 @@ No ground truth (tree inventory, LiDAR or field plots) and no real Sime Darby si
 - 22 Oct 2026, after Batch 2 (commercial case): Commercial moves from about 4 to 5 up to about **6 to 7 of 10**. `docs/commercial-case.md` names the users, other uses, cost drivers,
   the Earth Engine licensing point and labelled hypotheses, and lists exactly what is Elmina-specific in the code (so another township is a day or two of work, not a rebuild from scratch).
   It stays a hypothesis because nothing has been run on a second township and we do not know the buyer's budget or current process. Not built: the township kit (the audit showed it is not a small change).
+- 22 Oct 2026, after Batch 3 (evidence and validation): Team, Evidence and Pitch moves from about 5 to 6 up to about **7 to 8 of 10** (the deck and video are still to do), and Feasibility edges up
+  by about 1 (a tested field check kit, a one-page evidence summary and a "what we checked, what we did not" note in the app). The kit is built and tested on synthetic answers only; **no field data has been collected**.
