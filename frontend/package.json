@@ -1,0 +1,10 @@
+{
+  "name": "elmina-canopy-frontend",
+  "private": true,
+  "type": "module",
+  "description": "Barebones web app for the Elmina Canopy Prioritiser API. Nothing to install to run it; Node is used only for tests.",
+  "scripts": {
+    "test": "node --test",
+    "smoke": "node tools/smoke.mjs"
+  }
+}

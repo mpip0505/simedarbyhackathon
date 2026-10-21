@@ -19,7 +19,12 @@ jobs:
           cache-dependency-path: backend/requirements.txt
       - name: Install pinned requirements
         run: pip install -r backend/requirements.txt
-      - name: Run tests
+      - name: Run backend tests
         run: python -m pytest backend/tests -q
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Run frontend unit tests
+        run: node --test "frontend/tests/*.test.mjs"
       - name: Check the committed data is sound
         run: python -m backend.api.selfcheck
