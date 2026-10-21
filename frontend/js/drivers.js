@@ -14,6 +14,7 @@ export const SCORE_HINTS = {
   shade: "Adds shade along footpaths",
 };
 const NOTABLE = 66; // a site counts as "hot" or "bare" when it beats this share of the other sites
+export const MOSTLY_ESTIMATED = 0.5; // below this share of measured ground heat, a site's temperature is mostly filled in from neighbours
 
 /** The three scores with their weight share and points contributed to the total, largest contribution first. */
 export function contributions(props, weights) {
@@ -100,7 +101,7 @@ export function driverNotes(p, ctx) {
     notes.push("No mapped buildings within 250 m (OpenStreetMap may under-map this area).");
   }
 
-  if (Number.isFinite(p.lst_valid_frac) && p.lst_valid_frac < 0.5) {
+  if (Number.isFinite(p.lst_valid_frac) && p.lst_valid_frac < MOSTLY_ESTIMATED) {
     warnings.push(`Ground heat here is mostly estimated from nearby pixels (${Math.round(p.lst_valid_frac * 100)}% measured).`);
   }
   return { notes, warnings };

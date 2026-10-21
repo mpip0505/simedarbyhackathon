@@ -1,4 +1,5 @@
-// The site card: a one-sentence reason, three scores, why it ranks here, and the numbers behind it (collapsed).
+// The site card, shown in a modal over the map: a one-sentence reason, the total and three scores on the left; why it ranks
+// here and the numbers behind it on the right. The modal's frame and close button are in index.html; this fills its body.
 import { el, clear, append } from "./dom.js";
 import { SCORE_LABELS, contributions, driverNotes, siteHeadline } from "./drivers.js";
 import { fmt, fmtC, fmtMetres, fmtPct } from "./scale.js";
@@ -7,7 +8,7 @@ const ORDER = ["cooling", "connectivity", "shade"]; // the order used in the bri
 
 function scoreRow(key, value) {
   return el("div", { class: "score-row" },
-    el("span", {}, SCORE_LABELS[key]), el("strong", {}, fmt(value, 0)),
+    el("span", {}, SCORE_LABELS[key]), el("strong", {}, fmt(value)),
     el("div", { class: "meter", "aria-hidden": "true" }, el("span", { style: { width: `${Math.max(0, Math.min(100, value))}%` } })));
 }
 
@@ -24,17 +25,22 @@ export function renderCard(body, feature, { weights, ctx, total, placeholder }) 
   const pointsTotal = parts.reduce((a, x) => a + x.points, 0);
   const { notes, warnings } = driverNotes(p, ctx);
 
-  append(
-    body,
-    el("p", { class: "card-title" }, el("strong", {}, p.site_id), el("span", {}, `#${p.rank} of ${total}`)),
-    el("div", { class: "tags" }, el("span", { class: "tag" }, "Example site"),
-      el("span", { class: "tag tag-plain" }, p.origin === "corridor_edge" ? "Corridor edge" : "Open land")),
+  const left = el("div", { class: "card-col" },
+    el("div", { class: "card-title" }, el("span", { class: "card-rank" }, p.rank), el("strong", {}, p.site_id)),
+    el("div", { class: "card-chips" },
+      el("span", { class: "chip chip-warn" }, "Example site (simulated)"),
+      el("span", { class: "chip" }, p.origin === "corridor_edge" ? "Corridor edge" : "Open land"),
+      placeholder ? el("span", { class: "chip chip-warn chip-nodot" }, "Preview score") : null),
     el("p", { class: "card-headline" }, siteHeadline(p, ctx)),
-    ORDER.map((k) => scoreRow(k, p[`score_${k}`])),
-    el("h3", { class: "card-section" }, "Why it ranks here"),
+    el("div", { class: "card-total" }, el("strong", {}, fmt(p.score_total)),
+      el("span", {}, `${placeholder ? "Preview score" : "Score"}, out of 100 · ranked #${p.rank} of ${total}`)),
+    el("div", { class: "score-rows" }, ORDER.map((k) => scoreRow(k, p[`score_${k}`]))));
+
+  const right = el("div", { class: "card-col" },
+    el("h3", {}, "Why it ranks here"),
     el("ul", { class: "card-list" }, notes.map((n) => el("li", {}, n))),
-    warnings.length ? el("ul", { class: "card-list warn-text" }, warnings.map((w) => el("li", {}, w))) : null,
-    el("details", {}, el("summary", {}, "The numbers"),
+    warnings.map((w) => el("p", { class: "notice" }, w)),
+    el("details", {}, el("summary", {}, "The numbers behind it"),
       el("p", { class: "small-note" }, `Total ${fmt(p.score_total)} out of 100, built from each score times its weight:`),
       el("table", { class: "measure-table" }, el("tbody", {},
         parts.map((c) => measure(`${c.label} (weight ${Math.round(c.share * 100)}%)`,
@@ -51,7 +57,7 @@ export function renderCard(body, feature, { weights, ctx, total, placeholder }) 
         measure("Buildings within 250 m", p.buildings_within_250m ?? fmt(null)),
         measure("Ground heat measured, not estimated", fmtPct(100 * p.lst_valid_frac, 0)),
         measure("Site size", `${fmt(p.area_m2, 0)} m²`)))),
-    el("p", { class: "small-note" }, "Ground heat is for ranking sites against each other, not for exact readings."),
-    placeholder ? el("p", { class: "notice-inline" }, "Preview score: the ML model is not connected yet.") : null,
-  );
+    el("p", { class: "notice notice-info" }, "Temperatures rank sites. They are not exact readings."));
+
+  append(body, el("div", { class: "card-cols" }, left, right));
 }

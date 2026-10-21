@@ -1,4 +1,4 @@
-// Entry point: loads the data from the API and connects the map, sheets, sliders, site card and report view.
+// Entry point: loads the data from the API and connects the map, panels, sliders, site card and report view.
 // Until a slider moves, the list shows the ranking the API served (the ML model's, once it is merged).
 // Moving a slider re-ranks in the browser with the same formula as the API (js/weights.js, tested against Python).
 import { api, ApiError, ignoredApiParam } from "./api.js";
@@ -6,7 +6,7 @@ import { el, clear, $, $$ } from "./dom.js";
 import { createStore } from "./state.js";
 import { KEYS, retotal, topChange } from "./weights.js";
 import { buildContext } from "./drivers.js";
-import { extent, legendBins } from "./scale.js";
+import { extent, fmt, legendBins } from "./scale.js";
 import { toCsv, rankedRows } from "./csv.js";
 import {
   createMap, createBasemap, createCorridor, createOverlay, createStreetTiles, createSitesLayer, createBadges,
@@ -15,34 +15,41 @@ import { renderTopList, highlightRow } from "./list.js";
 import { renderCard } from "./panel.js";
 import { setupSliders } from "./sliders.js";
 import { setupReport } from "./report.js";
+import { plantStats } from "./stats.js";
+import { renderStrip } from "./strip.js";
 
 const OSM_NAMES = ["open_land", "parks", "buildings", "roads", "paths"];
-const LIST_LIMIT = 8;       // rows shown before "See all"
+const LIST_LIMIT = 5;       // rows shown before "See all"
 const BADGES = 5;           // sites marked 1 to 5 on the map
 const OUTLINED = 10;        // sites with a dark outline
 const DEFAULT_NOTE = "The list and map update as you move these.";
+const VIEW_NAMES = { prioritise: "Plant first", report: "Before and after" };
 const store = createStore({ selectedId: null, filter: "all", query: "", usingServer: true, expanded: false });
 let started = false;
 
 // ---------- header, notices, dialogs ----------
 
 function setChip(id, text, kind) {
-  const chip = $(id);
-  chip.textContent = text;
-  chip.classList.toggle("chip-warn", kind === "warn");
-  chip.classList.toggle("chip-bad", kind === "bad");
-  chip.classList.toggle("chip-quiet", kind === "quiet");
+  // the chip in the page header and its copy in the sidebar's Data status card
+  for (const chip of [$(id), ...$$(`[data-mirror="${id.slice(1)}"]`)]) {
+    chip.textContent = text;
+    chip.classList.toggle("chip-ok", kind === "ok");
+    chip.classList.toggle("chip-warn", kind === "warn");
+    chip.classList.toggle("chip-bad", kind === "bad");
+    chip.classList.toggle("chip-quiet", kind === "quiet");
+  }
 }
 
 function showStatus(meta) {
   const mock = meta.data_mode === "mock";
   setChip("#chip-mode", mock ? "Data: MOCK (invented)" : "Data: cached real data", mock ? "bad" : "quiet");
   const scores = {
-    ml: ["Scores: ML model", ""],
+    ml: ["Scores: ML model", "ok"],
     placeholder: ["Preview scores: ML model not connected yet", "warn"],
     mock: ["Scores: mock data", "bad"],
   };
   setChip("#chip-scores", ...(scores[meta.score_source] ?? ["Scores: unknown", "warn"]));
+  $("#preview-note").hidden = meta.score_source === "ml" || meta.score_source === "mock";   // the mock case has its own, louder notice below
   $("#honesty-text").textContent = meta.score_source === "ml"
     ? "Example sites, not Sime Darby Property's list."
     : "Example sites, not Sime Darby Property's list. Scores are previews until the ML model is connected.";
@@ -90,11 +97,35 @@ function setupSheets() {
       const open = button.getAttribute("aria-expanded") === "true";
       body.hidden = open;
       button.setAttribute("aria-expanded", String(!open));
-      button.textContent = open ? "+" : "−";
       button.title = open ? "Expand" : "Collapse";
+      button.setAttribute("aria-label", button.title);
     });
   }
 }
+
+/** The Layers button opens a small panel of checkboxes; a click elsewhere closes it (so does Escape, see boot). Returns set(open). */
+function setupLayersMenu() {
+  const button = $("#layers-button");
+  const menu = $("#layer-toggles");
+  const set = (open) => { menu.hidden = !open; button.setAttribute("aria-expanded", String(open)); };
+  button.addEventListener("click", () => set(menu.hidden));
+  document.addEventListener("click", (e) => {
+    const inside = menu.contains(e.target) || button.contains(e.target) || e.target.closest?.('[data-action="layers"]');   // the sidebar's Layers opens it too
+    if (!menu.hidden && !inside) set(false);
+  });
+  return set;
+}
+
+/** Buttons marked data-action (sidebar, top bar, map card, list, honesty bar) all go through one handler. */
+const actions = {
+  limits: () => openDialog("#dlg-limits"),
+  credits: () => openDialog("#dlg-credits"),
+  download: () => {},                       // these three need the loaded data, so boot() fills them in
+  sites: () => {},
+  layers: () => {},
+};
+const scrollBehavior = () => (matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth");
+document.addEventListener("click", (e) => actions[e.target.closest?.("[data-action]")?.dataset.action]?.());
 
 // ---------- the app ----------
 
@@ -129,6 +160,9 @@ async function boot() {
 
   // ----- map and layers -----
   const map = createMap("map");
+  if (typeof ResizeObserver === "function") {   // the map card changes size with the window and the sidebar
+    new ResizeObserver(([entry]) => { if (entry.contentRect.width > 0 && entry.contentRect.height > 0) map.invalidateSize(); }).observe($("#map"));
+  }
   const sitesLayer = createSitesLayer(features, (id) => select(id, "map"));
   const badges = createBadges((id) => select(id, "map"), map);
   const find = (name) => overlays?.overlays.find((o) => o.name === name);
@@ -179,17 +213,45 @@ async function boot() {
 
   function renderLegend([min, max]) {
     const legend = clear($("#legend"));
-    legend.append(el("div", {}, el("strong", {}, "Higher priority = plant sooner")),
+    legend.append(el("strong", {}, "Higher priority = plant sooner"),
       el("div", { class: "swatches" }, legendBins(min, max).map((b) => el("span", { style: { background: b.color } }))),
-      el("div", { class: "range" }, el("span", {}, "Lower"), el("span", {}, "Higher")),
-      el("div", { class: "muted" }, meta.score_source === "mock" ? "Invented mock data" : placeholder ? "Example sites, preview scores" : "Example sites"));
+      el("div", { class: "range" }, el("span", {}, fmt(min, 0)), el("span", {}, placeholder ? "Preview score" : "Score"), el("span", {}, fmt(max, 0))),
+      el("div", { class: "note" }, meta.score_source === "mock" ? "Invented mock data" : placeholder ? "Example sites, preview scores" : "Example sites"));
   }
+
+  // The site card is a panel on the left of the map. The rest of the map stays visible and usable, and so do the list and the
+  // sliders beside it: picking another site anywhere swaps the card in place. Escape or the close button closes it.
+  let openedFrom = "map";                // where the card was opened, so closing it can hand focus back
 
   function renderSelected() {
     const { selectedId, weights } = store.get();
     const feature = selectedId ? byId.get(selectedId) : null;
     $("#sheet-card").hidden = !feature;
+    $(".map-box").classList.toggle("has-card", Boolean(feature));
     if (feature) renderCard($("#card-body"), feature, { weights, ctx, total: byId.size, placeholder });
+  }
+
+  /** The part of the map the card leaves free, in map pixels: to its right as a side panel, above it when it spans the map (phones). */
+  function freeArea() {
+    const box = $(".map-box").getBoundingClientRect();
+    const card = $("#sheet-card").getBoundingClientRect();
+    if (card.width < box.width * 0.7) return { x: card.right - box.left + 12, y: 0, w: box.right - card.right - 12, h: box.height };
+    return { x: 0, y: 0, w: box.width, h: card.top - box.top - 12 };
+  }
+
+  function closeCard() {
+    const { selectedId } = store.get();
+    store.set({ selectedId: null });
+    sitesLayer.select(null);
+    refresh();
+    // focus goes back to the row it was opened from, or to the map
+    const row = openedFrom === "list" && selectedId ? list.querySelector(`.site-row[data-id="${CSS.escape(selectedId)}"]`) : null;
+    (row ?? map.getContainer()).focus({ preventScroll: true });
+  }
+
+  /** Bring the whole card into view: the least scrolling that shows it (none when the map is already on screen). */
+  function revealCard() {
+    $("#sheet-card").scrollIntoView({ block: "nearest", behavior: scrollBehavior() });
   }
 
   function refresh({ announce = false } = {}) {
@@ -210,6 +272,7 @@ async function boot() {
     $("#no-match").hidden = rows.length > 0;
     $("#count").textContent = rows.length === ranked.length ? `${ranked.length} in total` : `${rows.length} of ${ranked.length}`;
     renderLegend(range);
+    renderStrip($("#stats-plant"), plantStats(ranked, { placeholder, usingServer: s.usingServer }));
     renderSelected();
     if (s.selectedId) sitesLayer.select(s.selectedId);
 
@@ -221,11 +284,16 @@ async function boot() {
   }
 
   function select(id, source) {
+    const wasOpen = !$("#sheet-card").hidden;
+    if (!wasOpen) openedFrom = source;
     store.set({ selectedId: id });
     $("#coach").hidden = true;
     refresh();
     highlightRow(list, id);
-    if (source === "list") sitesLayer.focus(id, map);
+    // keep the picked site clear of the card: centred in the free part of the map for a pick from the list, nudged into it for a pick on the map
+    sitesLayer.focus(id, map, { free: freeArea(), center: source === "list" });
+    if (!wasOpen) $("#sheet-card").focus({ preventScroll: true });
+    revealCard();
   }
 
   // ----- sliders, filters, search, download -----
@@ -240,34 +308,49 @@ async function boot() {
     note.textContent = DEFAULT_NOTE;
     refresh();
   });
-  for (const r of $$('input[name="origin"]')) r.addEventListener("change", () => { store.set({ filter: r.value }); refresh(); });
+  // the origin filter appears twice (above the map and in Top sites); both groups show the same choice
+  const filterRadios = $$('input[name="origin"], input[name="origin-map"]');
+  const showFilter = (value) => { for (const r of filterRadios) r.checked = r.value === value; };
+  for (const r of filterRadios) r.addEventListener("change", () => { store.set({ filter: r.value }); showFilter(r.value); refresh(); });
   $("#search").addEventListener("input", (e) => { store.set({ query: e.target.value }); refresh(); });
   $("#clear-filters").addEventListener("click", () => {
     store.set({ filter: "all", query: "" });
-    $('input[name="origin"][value="all"]').checked = true;
+    showFilter("all");
     $("#search").value = "";
     refresh();
   });
   $("#see-all").addEventListener("click", () => { store.set({ expanded: !store.get().expanded }); refresh(); });
-  $("#download-csv").addEventListener("click", () => download("elmina-ranked-sites.csv", toCsv(rankedRows(currentRanked()))));
-  $("#card-close").addEventListener("click", () => { store.set({ selectedId: null }); sitesLayer.select(null); refresh(); });
+  actions.download = () => download("elmina-ranked-sites.csv", toCsv(rankedRows(currentRanked())));
   $("#coach-dismiss").addEventListener("click", () => { $("#coach").hidden = true; });
+  $("#card-close").addEventListener("click", closeCard);
   setupSheets();
+  const setLayersOpen = setupLayersMenu();
+  document.addEventListener("keydown", (e) => {
+    if (e.key !== "Escape" || document.querySelector("dialog[open]")) return;        // an open dialog handles its own Escape
+    if (!$("#layer-toggles").hidden) { setLayersOpen(false); $("#layers-button").focus(); }
+    else if (!$("#sheet-card").hidden) closeCard();
+  });
 
   refresh();
   $("#loading").hidden = true;
 
   // ----- tabs -----
   let report = null;
+  let currentView = "prioritise";
   async function showView(name) {
-    for (const b of $$("#view-tabs button")) b.setAttribute("aria-pressed", String(b.dataset.view === name));
+    for (const b of $$("#view-tabs button")) {
+      if (b.dataset.view === name) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
+    }
+    $("#crumb-view").textContent = VIEW_NAMES[name];
     $("#view-prioritise").hidden = name !== "prioritise";
     $("#view-report").hidden = name !== "report";
+    if (name !== currentView) $("#main").scrollTop = 0;
+    currentView = name;
     if (name === "prioritise") { map.invalidateSize(); return; }
     if (!report) {
       try {
         const [summary, series, crosscheck] = await Promise.all([api.summary(), api.series(), api.crosscheck()]);
-        report = setupReport({ summary, series, crosscheck, overlays, osm, bounds: sitesLayer.bounds() });
+        report = setupReport({ summary, series, crosscheck, overlays, osm, corridor, spine, attribution: meta.attribution ?? [], bounds: sitesLayer.bounds() });
       } catch (error) {
         $("#view-report").append(el("p", { class: "notice notice-bad" }, `The before and after view could not load: ${error.message}`));
         return;
@@ -276,9 +359,20 @@ async function boot() {
     report.show();
   }
   for (const b of $$("#view-tabs button")) b.addEventListener("click", () => showView(b.dataset.view));
+
+  // sidebar shortcuts: both live on Plant first, so they switch to it, bring the right part into view and open it
+  actions.sites = async () => {
+    await showView("prioritise");
+    $("#sheet-top").scrollIntoView({ block: "start", behavior: scrollBehavior() });
+    $("#search").focus({ preventScroll: true });
+  };
+  actions.layers = async () => {
+    await showView("prioritise");
+    $(".map-card").scrollIntoView({ block: "start", behavior: scrollBehavior() });
+    setLayersOpen(true);
+    $("#layer-toggles input:not(:disabled)").focus({ preventScroll: true });
+  };
 }
 
-$("#open-limits").addEventListener("click", () => openDialog("#dlg-limits"));
-$("#open-credits").addEventListener("click", () => openDialog("#dlg-credits"));
 $("#fatal-retry").addEventListener("click", boot);
 boot();

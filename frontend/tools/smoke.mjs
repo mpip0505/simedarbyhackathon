@@ -131,13 +131,17 @@ try {
   await check("loads: headline, top sites, count, honesty labels, loading overlay gone", async () => {
     const r = await rows();
     initialTop = r[0];
-    assert.equal(r.length, 8, `expected the top 8, got ${r.length}`);
+    assert.equal(r.length, 5, `expected the top 5, got ${r.length}`);
     assert.equal(await evaluate(`document.querySelector('h1').textContent`), "Where to plant first in City of Elmina");
     assert.match(await evaluate(`document.querySelector('#count').textContent`), /^\d+ in total$/);
     assert.match(await evaluate(`document.querySelector('#chip-simulated').textContent`), /simulated/i);
     assert.match(await evaluate(`document.querySelector('#chip-scores').textContent`), /Preview scores|ML model|mock/i);
     assert.match(await evaluate(`document.querySelector('#honesty-text').textContent`), /not Sime Darby Property's list/);
     assert.ok(r.every((row) => row[2].length > 3), "every row gives a short reason");
+    assert.equal(await evaluate(`document.querySelectorAll('#stats-plant .stat').length`), 4, "four figures above the map");
+    assert.match(await evaluate(`document.querySelector('#stats-plant').textContent`), /Candidate sites.*Top (preview )?score.*Near a corridor gap.*Reliable ground heat/s);
+    assert.match(await evaluate(`document.querySelector('[data-mirror="chip-simulated"]').textContent`), /simulated/i, "the sidebar repeats the simulated label");
+    assert.match(await evaluate(`document.querySelector('#crumb-view').textContent`), /Plant first/);
     await assertCleanText("opening screen");
   });
   await check("map: drawing layers, legend, rank badges 1 to 5, first-visit hint", async () => {
@@ -176,6 +180,9 @@ try {
     assert.equal(await evaluate(`document.querySelector('.rank-badge.selected')?.textContent`), "1");
     assert.equal(await evaluate(`document.querySelector('#coach').hidden`), true);
     if (await evaluate(`document.querySelector('#chip-scores').textContent.includes('Preview')`)) assert.match(text, /Preview score/);
+    const g = await evaluate(`(() => { const box = document.querySelector('.map-box').getBoundingClientRect(), card = document.querySelector('#sheet-card').getBoundingClientRect();
+      return { inBox: document.querySelector('.map-box').contains(document.querySelector('#sheet-card')), left: card.left - box.left, share: card.width / box.width }; })()`);
+    assert.ok(g.inBox && g.left < 24 && g.share < 0.6, `the site card should be a panel on the left of the map, not cover it: ${JSON.stringify(g)}`);
     await assertCleanText("site card");
   });
   await shot("2-site-card");
@@ -220,12 +227,37 @@ try {
     assert.equal(await evaluate(`document.querySelector('#no-match').hidden`), true);
     assert.match(await evaluate(`document.querySelector('#count').textContent`), /in total/);
   });
-  await check("See all expands the list and Show the top 8 only collapses it", async () => {
+  await check("See all expands the list and Show the top 5 only collapses it", async () => {
     await evaluate(`document.querySelector('#see-all').click()`);
     assert.ok((await rows()).length > 100);
-    assert.match(await evaluate(`document.querySelector('#see-all').textContent`), /Show the top 8 only/);
+    assert.match(await evaluate(`document.querySelector('#see-all').textContent`), /Show the top 5 only/);
     await evaluate(`document.querySelector('#see-all').click()`);
-    assert.equal((await rows()).length, 8);
+    assert.equal((await rows()).length, 5);
+  });
+  await check("the list window stays the same height whether it shows five rows, all of them or none", async () => {
+    const height = () => evaluate(`Math.round(document.querySelector('.list-window').getBoundingClientRect().height)`);
+    const five = await height();
+    await evaluate(`document.querySelector('#see-all').click()`);
+    assert.equal(await height(), five, "See all must scroll inside the window, not grow it");
+    await evaluate(`document.querySelector('#see-all').click()`);
+    await evaluate(`(() => { const s = document.querySelector('#search'); s.value = 'zzzz'; s.dispatchEvent(new Event('input', { bubbles: true })); })()`);
+    assert.equal(await height(), five, "an empty result must keep the window's height");
+    await evaluate(`document.querySelector('#clear-filters').click()`);
+    const [card, rail] = await evaluate(`[document.querySelector('.map-card'), document.querySelector('.rail')].map((e) => Math.round(e.getBoundingClientRect().bottom))`);
+    if (await evaluate(`innerWidth > 1200`)) assert.ok(Math.abs(card - rail) <= 1, `the map card (bottom ${card}) should end where the right-hand column ends (${rail})`);
+  });
+  await check("a rank of 100 or more fits its label on the map and in the list", async () => {
+    await evaluate(`document.querySelector('#see-all').click()`);
+    const pill = await evaluate(`(() => { const p = [...document.querySelectorAll('${ROWS} .rank')].find((e) => e.textContent.length >= 3);
+      return p ? { id: p.closest('.site-row').querySelector('.site-name').textContent, fits: p.scrollWidth <= p.clientWidth, width: p.getBoundingClientRect().width } : null; })()`);
+    assert.ok(pill, "the full list should reach a rank of 100 or more");
+    assert.ok(pill.fits && pill.width >= 36, `the list's rank pill is too narrow for three digits (${pill.width}px)`);
+    await evaluate(`(() => { const s = document.querySelector('#search'); s.value = ${JSON.stringify(pill.id)}; s.dispatchEvent(new Event('input', { bubbles: true })); })()`);
+    await sleep(400);
+    const badge = await evaluate(`(() => { const b = document.querySelector('.rank-badge'); const r = b.getBoundingClientRect(); return { text: b.textContent, fits: b.scrollWidth <= b.clientWidth, w: r.width, h: r.height }; })()`);
+    assert.ok(badge.text.length >= 3 && badge.fits && badge.w > badge.h, `the map badge for ${badge.text} should be a pill that holds its number (${badge.w} x ${badge.h})`);
+    await evaluate(`(() => { const s = document.querySelector('#search'); s.value = ''; s.dispatchEvent(new Event('input', { bubbles: true })); })()`);
+    await evaluate(`document.querySelector('#see-all').click()`);
   });
   await check("sheets collapse and expand, and the site card can be closed", async () => {
     await evaluate(`document.querySelector('#sheet-matters .sheet-toggle').click()`);
@@ -235,6 +267,35 @@ try {
     assert.equal(await evaluate(`document.querySelector('#matters-body').hidden`), false);
     await evaluate(`document.querySelector('#card-close').click()`);
     assert.equal(await evaluate(`document.querySelector('#sheet-card').hidden`), true);
+  });
+  await check("Escape closes the site card, and a pick on the map swaps it in place", async () => {
+    await evaluate(`document.querySelector('${ROWS}').click()`);
+    await waitFor(`!document.querySelector('#sheet-card').hidden`, "the site card");
+    assert.equal(await evaluate(`document.querySelector('.map-box').classList.contains('has-card')`), true);
+    const first = await evaluate(`document.querySelector('#card-body .card-title strong').textContent`);
+    const second = await evaluate(`document.querySelectorAll('.leaflet-marker-icon')[1].textContent`);     // the second numbered badge
+    await evaluate(`document.querySelectorAll('.leaflet-marker-icon')[1].click()`);
+    await waitFor(`document.querySelector('#card-body .card-rank').textContent === ${JSON.stringify(second)}`, "the card of the badge that was picked");
+    assert.notEqual(await evaluate(`document.querySelector('#card-body .card-title strong').textContent`), first);
+    assert.equal(await evaluate(`document.querySelector('#sheet-card').hidden`), false, "picking on the map keeps the card open");
+    await evaluate(`document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))`);
+    assert.equal(await evaluate(`document.querySelector('#sheet-card').hidden`), true);
+    assert.equal(await evaluate(`document.querySelector('.map-box').classList.contains('has-card')`), false);
+  });
+  await check("the Layers button opens the layer panel, and Escape closes it", async () => {
+    assert.equal(await evaluate(`document.querySelector('#layer-toggles').hidden`), true);
+    await evaluate(`document.querySelector('#layers-button').click()`);
+    assert.equal(await evaluate(`document.querySelector('#layer-toggles').hidden`), false);
+    assert.equal(await evaluate(`document.querySelector('#layers-button').getAttribute('aria-expanded')`), "true");
+    await evaluate(`document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))`);
+    assert.equal(await evaluate(`document.querySelector('#layer-toggles').hidden`), true);
+  });
+  await check("the filter above the map and the one in Top sites show the same choice", async () => {
+    await evaluate(`document.querySelector('input[name="origin-map"][value="open_land"]').click()`);
+    assert.equal(await evaluate(`document.querySelector('input[name="origin"][value="open_land"]').checked`), true);
+    await waitFor(`/^\\d+ of \\d+$/.test(document.querySelector('#count').textContent)`, "the filtered count");
+    await evaluate(`document.querySelector('input[name="origin"][value="all"]').click()`);
+    assert.equal(await evaluate(`document.querySelector('input[name="origin-map"][value="all"]').checked`), true);
   });
   await check("layer toggles add and remove layers", async () => {
     await evaluate(`document.querySelector('input[data-layer="ndvi"]').click()`);
@@ -253,9 +314,13 @@ try {
     assert.match(canopy, /not a tree count/);
     assert.match(await evaluate(`document.querySelector('#card-lst').textContent`), /Indicative only/);
     const sure = await evaluate(`document.querySelector('#card-sure').textContent`);
-    assert.match(sure, /\d+% to \d+%/);
+    assert.match(sure, /from \d+(\.\d+)?% to \d+(\.\d+)?%/);
     assert.match(sure, /Independent maps disagree/);
-    assert.equal(await evaluate(`document.querySelectorAll('#card-sure .bar-row').length`), 3);
+    assert.equal(await evaluate(`document.querySelectorAll('#card-sure .hbar').length`), 5, "ESA WorldCover once, Dynamic World and our estimate for both periods");
+    assert.equal(await evaluate(`document.querySelectorAll('#stats-report .stat').length`), 5, "five figures above the maps");
+    assert.match(await evaluate(`document.querySelector('#crumb-view').textContent`), /Before and after/);
+    assert.equal(await evaluate(`document.querySelector('#view-tabs button[data-view="report"]').getAttribute('aria-current')`), "page");
+    assert.ok((await evaluate(`document.querySelector('#report-credits').textContent`)).includes("OpenStreetMap"), "the credits line is shown under the numbers");
     assert.equal(await evaluate(`document.querySelectorAll('#series-table tbody tr').length`), 5);
     assert.equal(await evaluate(`document.querySelectorAll('#crosscheck-table tbody tr').length`), 6);
     assert.equal(await evaluate(`document.querySelectorAll('.report-map img.leaflet-image-layer').length`), 2);
@@ -304,22 +369,27 @@ try {
     await sleep(800);
     assert.ok((await rows())[0][1].includes("<img src=x"), "the payload should appear as literal text in the list");
     assert.equal(await evaluate(`document.querySelectorAll('#top-list img, .rank-badge img, #legend img').length`), 0);
-    // pick the 8th site: it has no rank badge on top of it, so the hover reaches its polygon
+    // pick the 8th site (the list shows five, so open it up first): it has no rank badge on top of it, so the hover reaches its polygon
+    await evaluate(`document.querySelector('#see-all').click()`);
     await evaluate(`document.querySelectorAll('${ROWS}')[7].click()`);
     await waitFor(`!document.querySelector('#sheet-card').hidden`, "the site card");
     assert.ok((await evaluate(`document.querySelector('#card-body').textContent`)).includes("<img src=x"));
     assert.equal(await evaluate(`document.querySelectorAll('#card-body img').length`), 0);
-    await sleep(1500); // let the pan to the selected site finish before zooming, or the zoom starts from a half-way centre
-    for (let i = 0; i < 3; i++) { await evaluate(`document.querySelector('.leaflet-control-zoom-in').click()`); await sleep(600); }
-    await sleep(1200);
-    const centre = await evaluate(`(() => { const r = document.querySelector('#map').getBoundingClientRect();
-      return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; })()`);
-    await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: centre.x - 80, y: centre.y - 80, button: "none" });
-    await sleep(250);
-    for (const [dx, dy] of [[0, 0], [1, 1], [-1, 1], [1, -1], [-2, 0], [2, 0], [0, 3], [0, -3]]) {
-      await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: centre.x + dx, y: centre.y + dy, button: "none" });
-      await sleep(250);
-      if (await evaluate(`document.querySelector('.leaflet-tooltip') !== null`)) break;
+    await sleep(1500); // let the map finish moving the picked site into the free part beside the card
+    // the card covers the left of the map, so the site sits in the middle of the rest: zoom in around that spot with the wheel,
+    // then sweep the pointer over it until a tooltip opens
+    await evaluate(`document.querySelector('.map-box').scrollIntoView({ block: 'center', behavior: 'instant' })`);
+    await sleep(300);
+    const spot = await evaluate(`(() => { const box = document.querySelector('.map-box').getBoundingClientRect(), card = document.querySelector('#sheet-card').getBoundingClientRect();
+      return { x: (card.right + 12 + box.right) / 2, y: box.top + box.height / 2 }; })()`);
+    for (let i = 0; i < 3; i++) { await send("Input.dispatchMouseEvent", { type: "mouseWheel", x: spot.x, y: spot.y, deltaX: 0, deltaY: -120 }); await sleep(700); }
+    await sleep(800);
+    sweep: for (let dy = -48; dy <= 48; dy += 12) {
+      for (let dx = -48; dx <= 48; dx += 12) {
+        await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: spot.x + dx, y: spot.y + dy, button: "none" });
+        await sleep(40);
+        if (await evaluate(`document.querySelector('.leaflet-tooltip') !== null`)) break sweep;
+      }
     }
     await waitFor(`document.querySelector('.leaflet-tooltip') !== null`, "a map tooltip to open");
     const tip = await evaluate(`document.querySelector('.leaflet-tooltip').textContent`);
@@ -339,7 +409,7 @@ try {
     assert.equal(await evaluate(`document.querySelector('#fatal').hidden`), true);
   });
 
-  await check("a narrow screen stacks the sheets under the map without breaking, and the hint can be dismissed", async () => {
+  await check("a narrow screen turns the sidebar into a strip and stacks everything without breaking, and the hint can be dismissed", async () => {
     await open(`${BASE}/app/`, 390, 844);
     await waitFor(`document.querySelectorAll('${ROWS}').length > 0`, "the list on a narrow screen");
     await sleep(600);

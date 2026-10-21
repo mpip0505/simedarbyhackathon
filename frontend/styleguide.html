@@ -1,0 +1,541 @@
+<!doctype html>
+<!--
+  Style guide: every component of the Canopy dashboard system, drawn by css/app.css (the same file the app uses).
+  Open it at http://localhost:8000/app/styleguide.html once the API is running. Rules and reasons: docs/design-system.md.
+  Nothing here talks to the API. The one script only builds a sample bar chart with js/charts.js.
+-->
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Canopy dashboard system: style guide</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='7' fill='%23FF4D00'/%3E%3Cg transform='translate(4.5 4.5) scale(.625)'%3E%3Ccircle cx='12' cy='9.5' r='6' fill='%23fff'/%3E%3Crect x='11' y='14' width='2' height='7' rx='1' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="css/app.css">
+  <link rel="stylesheet" href="css/styleguide.css">
+</head>
+<body class="sg">
+  <!-- icon sprite: stroke icons on a 24 grid, drawn small (the app has the same set at the top of index.html) -->
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <symbol id="i-map" viewBox="0 0 24 24"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon><line x1="9" y1="3" x2="9" y2="18"></line><line x1="15" y1="6" x2="15" y2="21"></line></symbol>
+    <symbol id="i-columns" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M12 3v18"></path></symbol>
+    <symbol id="i-table" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18M3 15h18M12 3v18"></path></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"></path></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"></path></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"></path></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></symbol>
+    <symbol id="i-pin" viewBox="0 0 24 24"><path d="M20 10c0 6-8 12-8 12s-8-6-8-12a8 8 0 0 1 16 0Z"></path><circle cx="12" cy="10" r="3"></circle></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="8" y="8" width="14" height="14" rx="2" ry="2"></rect><path d="M4 16c-1.1 0-2-.9-2-2V4c0-1.1.9-2 2-2h10c1.1 0 2 .9 2 2"></path></symbol>
+    <symbol id="i-circle-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="m9 12 2 2 4-4"></path></symbol>
+    <symbol id="i-inbox" viewBox="0 0 24 24"><polyline points="22 12 16 12 14 15 10 15 8 12 2 12"></polyline><path d="M5.45 5.11 2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11z"></path></symbol>
+  </svg>
+
+  <header class="sg-head">
+    <h1>Canopy dashboard system</h1>
+    <p>A calm, dense system for data-heavy screens: flat surfaces, hairline borders, 13px type and one hot accent. This page draws every component
+      with <code>css/app.css</code>, the same file the app loads. Rules and reasons are in <code>docs/design-system.md</code>.</p>
+    <nav class="sg-nav" aria-label="Sections">
+      <a href="#color">Color</a><a href="#type">Type</a><a href="#shape">Shape</a><a href="#buttons">Buttons</a><a href="#fields">Fields</a>
+      <a href="#choice">Choice and range</a><a href="#chips">Chips</a><a href="#data">Data</a><a href="#feedback">Feedback</a>
+      <a href="#charts">Charts</a><a href="#map-kit">Map kit</a><a href="#app">App pieces</a><a href="#app-shell">App shell</a>
+    </nav>
+  </header>
+
+  <main class="sg-main">
+
+    <!-- ================= COLOR ================= -->
+    <section class="sg-section" id="color">
+      <h2>Color</h2>
+      <p>Stone does almost all the work. Ember is the single accent. Colour that carries meaning (status, data) is kept apart from the colour that carries the brand.</p>
+      <div class="sg-swatches" aria-label="Stone neutrals">
+        <div class="sg-swatch"><div class="sg-color" style="background:var(--stone-0)"></div><div><b>Stone 0</b><code>--stone-0</code> Canvas, cards</div></div>
+        <div class="sg-swatch"><div class="sg-color" style="background:var(--stone-25)"></div><div><b>Stone 25</b><code>--stone-25</code> Page tint</div></div>
+        <div class="sg-swatch"><div class="sg-color" style="background:var(--stone-50)"></div><div><b>Stone 50</b><code>--stone-50</code> Subtle fill</div></div>
+        <div class="sg-swatch"><div class="sg-color" style="background:var(--stone-100)"></div><div><b>Stone 100</b><code>--stone-100</code> Hover, tracks</div></div>
+        <div class="sg-swatch"><div class="sg-color" style="background:var(--stone-150)"></div><div><b>Stone 150</b><code>--stone-150</code> Selected, row rules</div></div>
+        <div class="sg-swatch"><div class="sg-color" style="background:var(--stone-200)"></div><div><b>Stone 200</b><code>--stone-200</code> Hairline border</div></div>
+        <div class="sg-swatch"><div class="sg-color" style="background:var(--stone-300)"></div><div><b>Stone 300</b><code>--stone-300</code> Strong rule, search edge</div></div>
+        <div class="sg-swatch"><div class="sg-color" style="background:var(--stone-400)"></div><div><b>Stone 400</b><code>--stone-400</code> Disabled, rules</div></div>
+        <div class="sg-swatch"><div class="sg-color" style="background:var(--stone-500)"></div><div><b>Stone 500</b><code>--stone-500</code> Field border, 3.2:1</div></div>
+        <div class="sg-swatch"><div class="sg-color" style="background:var(--stone-600)"></div><div><b>Stone 600</b><code>--stone-600</code> Muted text, 5.4:1</div></div>
+        <div class="sg-swatch"><div class="sg-color" style="background:var(--stone-700)"></div><div><b>Stone 700</b><code>--stone-700</code> Secondary text</div></div>
+        <div class="sg-swatch"><div class="sg-color" style="background:var(--stone-800)"></div><div><b>Stone 800</b><code>--stone-800</code> Strong text</div></div>
+        <div class="sg-swatch"><div class="sg-color" style="background:var(--stone-900)"></div><div><b>Stone 900</b><code>--stone-900</code> Primary text</div></div>
+        <div class="sg-swatch"><div class="sg-color" style="background:var(--stone-950)"></div><div><b>Stone 950</b><code>--stone-950</code> Ink fill</div></div>
+      </div>
+      <h3>Accent: Ember</h3>
+      <div class="sg-swatches" aria-label="Ember accent">
+        <div class="sg-swatch"><div class="sg-color" style="background:var(--accent)"></div><div><b>Vivid</b><code>--accent</code> Marks, focus, charts. White on it is 3.3:1: graphics only</div></div>
+        <div class="sg-swatch"><div class="sg-color" style="background:var(--accent-fill)"></div><div><b>Fill</b><code>--accent-fill</code> Buttons under white text, 4.8:1</div></div>
+        <div class="sg-swatch"><div class="sg-color" style="background:var(--accent-hover)"></div><div><b>Hover, text</b><code>--accent-hover</code> Text on the tint, 6.4:1</div></div>
+        <div class="sg-swatch"><div class="sg-color" style="background:var(--accent-tint)"></div><div><b>Tint</b><code>--accent-tint</code> Selected row</div></div>
+        <div class="sg-swatch"><div class="sg-color" style="background:var(--accent-line)"></div><div><b>Line</b><code>--accent-line</code> Selected edge, focus ring</div></div>
+      </div>
+      <h3>Status</h3>
+      <p>A chip pairs a tone with a word. Text on its own tint is 6:1 or better in every set. Tokens: <code>--ok</code> <code>--info</code> <code>--bad</code> <code>--warn</code> <code>--plan</code>, each with <code>-bg</code>, <code>-line</code> and <code>-dot</code>.</p>
+      <div class="sg-row">
+        <span class="chip chip-ok">Measured</span><span class="chip chip-info">Estimated</span><span class="chip chip-bad">Failed</span>
+        <span class="chip chip-warn">Preview</span><span class="chip chip-plan">Current</span>
+      </div>
+      <h3>Data</h3>
+      <p>The priority ramp is the map's purple, seven classes, colour-blind safe. Chart series lead with Ember (<code>--series</code>), highlight with <code>--series-hi</code> and compare with blue (<code>--series-compare</code>).</p>
+      <div class="legend" style="width:300px">
+        <strong>Higher priority = plant sooner</strong>
+        <div class="swatches"><span style="background:#edf8fb"></span><span style="background:#bfd3e6"></span><span style="background:#9ebcda"></span><span style="background:#8c96c6"></span><span style="background:#8c6bb1"></span><span style="background:#88419d"></span><span style="background:#6e016b"></span></div>
+        <div class="range"><span>5</span><span>Preview score</span><span>83</span></div>
+      </div>
+    </section>
+
+    <!-- ================= TYPE ================= -->
+    <section class="sg-section" id="type">
+      <h2>Type</h2>
+      <p>Geist for the interface and Geist Mono for identifiers, bundled in <code>vendor/fonts/geist/</code> so the demo works offline. 13px is the working size.</p>
+      <div class="sg-box">
+        <table class="sg-scale">
+          <tbody>
+            <tr><td>Page title</td><td><h1>Where to plant first in City of Elmina</h1></td><td>24/32 · 600 · <code>h1</code></td></tr>
+            <tr><td>Section title</td><td><h2>Top sites</h2></td><td>15/22 · 600 · <code>h2</code></td></tr>
+            <tr><td>Card title</td><td><h3 style="margin:0">What matters most?</h3></td><td>13/20 · 600 · <code>h3</code></td></tr>
+            <tr><td>Body</td><td>Surroundings are hotter than 76% of sites.</td><td>13/20 · 400</td></tr>
+            <tr><td>Secondary</td><td class="muted">Closes gaps in the green corridor</td><td>13/20 · <code>.muted</code></td></tr>
+            <tr><td>Key figure</td><td><span class="stat-value">42.1</span><span class="stat-unit">°C</span></td><td>24/28 · 500 · <code>.stat-value</code></td></tr>
+            <tr><td>Mono</td><td><span class="mono">ELM-3719-11715</span></td><td>12/16 · <code>.mono</code></td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- ================= SHAPE ================= -->
+    <section class="sg-section" id="shape">
+      <h2>Shape</h2>
+      <p>A 4px grid, four radii, hairline edges, and shadows only for things that float.</p>
+      <div class="sg-grid">
+        <div class="sg-box"><h3>Radius</h3>
+          <div class="sg-row">
+            <div class="sg-radius" style="border-radius:var(--r-1)" title="--r-1: 4px"></div><div class="sg-radius" style="border-radius:var(--r-2)" title="--r-2: 6px"></div>
+            <div class="sg-radius" style="border-radius:var(--r-3)" title="--r-3: 8px"></div><div class="sg-radius" style="border-radius:var(--r-4)" title="--r-4: 12px"></div>
+          </div>
+          <span class="sg-note"><code>--r-1</code> 4 tags · <code>--r-2</code> 6 controls · <code>--r-3</code> 8 cards · <code>--r-4</code> 12 dialogs · pills are 999</span>
+        </div>
+        <div class="sg-box"><h3>Depth</h3>
+          <div class="sg-row" style="padding:12px;background:var(--stone-50);border-radius:var(--r-3);align-self:stretch">
+            <div class="sg-shadow" style="box-shadow:var(--shadow-xs);border:1px solid var(--border)" title="--shadow-xs"></div>
+            <div class="sg-shadow" style="box-shadow:var(--shadow-sm)" title="--shadow-sm"></div>
+            <div class="sg-shadow" style="box-shadow:var(--shadow-pop)" title="--shadow-pop"></div>
+            <div class="sg-shadow" style="box-shadow:var(--shadow-modal)" title="--shadow-modal"></div>
+          </div>
+          <span class="sg-note"><code>xs</code> controls · <code>sm</code> floating panels · <code>pop</code> menus, tooltips · <code>modal</code> dialogs</span>
+        </div>
+        <div class="sg-box"><h3>Cards</h3>
+          <div class="card card-flat sg-wide">Flat: a hairline and nothing else. The default for page content.</div>
+          <div class="card card-raised sg-wide">Raised: a hairline and shadow sm, for panels that float over other content.</div>
+        </div>
+        <div class="sg-box"><h3>Control height</h3>
+          <div class="sg-row"><button class="btn btn-secondary btn-sm" type="button">28 small</button><button class="btn btn-secondary" type="button">32 default</button><button class="btn btn-secondary btn-lg" type="button">44 touch</button></div>
+          <span class="sg-note">Below 640px every control grows to 44px.</span>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= BUTTONS ================= -->
+    <section class="sg-section" id="buttons">
+      <h2>Buttons</h2>
+      <p>Buttons say what they do. Only the primary action gets colour, and there is one per view.</p>
+      <div class="sg-grid">
+        <div class="sg-box"><h3>Kinds</h3>
+          <div class="sg-row">
+            <button class="btn btn-primary" type="button">Download list</button><button class="btn btn-secondary" type="button">Reset weights</button>
+            <button class="btn btn-ghost" type="button">Cancel</button><button class="btn btn-ink" type="button">Upgrade</button><button class="btn btn-danger" type="button">Delete list</button>
+          </div>
+          <div class="sg-row">
+            <button class="btn btn-primary" type="button" disabled>Disabled</button><button class="btn btn-secondary" type="button" disabled>Disabled</button>
+            <button class="btn-link" type="button">Limits of this data</button>
+          </div>
+        </div>
+        <div class="sg-box"><h3>With icons</h3>
+          <div class="sg-row">
+            <button class="btn btn-primary" type="button"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-download"></use></svg>Download list</button>
+            <button class="btn btn-secondary btn-sm" type="button"><svg class="ic" width="14" height="14" aria-hidden="true"><use href="#i-layers"></use></svg>Layers</button>
+            <button class="btn btn-secondary btn-icon" type="button" aria-label="Copy ID"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-copy"></use></svg></button>
+            <button class="btn btn-secondary btn-icon btn-sm" type="button" aria-label="Download list"><svg class="ic" width="14" height="14" aria-hidden="true"><use href="#i-download"></use></svg></button>
+            <button class="btn btn-ghost btn-icon btn-sm" type="button" aria-label="Collapse"><svg class="ic" width="14" height="14" aria-hidden="true"><use href="#i-minus"></use></svg></button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= FIELDS ================= -->
+    <section class="sg-section" id="fields">
+      <h2>Fields</h2>
+      <p>Always a visible label, except an icon-led search. Field borders are Stone 500 (3.2:1, the lightest grey that passes WCAG 1.4.11); search keeps the light edge because its magnifier and placeholder identify it.</p>
+      <div class="sg-grid">
+        <div class="sg-box"><h3>Text</h3>
+          <div class="sg-stack">
+            <div><label class="field-label" for="sg-site">Site ID</label><div class="field"><input id="sg-site" placeholder="Site ID, e.g. ELM-3672"></div></div>
+            <div><label class="field-label" for="sg-focus">Focus</label><div class="field sg-focus"><input id="sg-focus" value="ELM-37"></div></div>
+            <div><label class="field-label" for="sg-bad">Error</label><div class="field field-error"><input id="sg-bad" value="ELM-9999"></div><p class="field-hint field-hint-bad">No site with that ID.</p></div>
+            <div><label class="field-label" for="sg-off">Disabled</label><div class="field"><input id="sg-off" value="Locked while scores are previews" disabled></div></div>
+          </div>
+        </div>
+        <div class="sg-box"><h3>Search, prefix, select, text area</h3>
+          <div class="sg-stack">
+            <div class="field field-search"><svg class="ic" width="14" height="14" aria-hidden="true"><use href="#i-search"></use></svg><input type="search" placeholder="Find a site, e.g. ELM-3672" aria-label="Find a site"></div>
+            <div class="field"><span class="field-prefix">canopy.app/org/</span><input value="elmina" aria-label="Organisation slug"></div>
+            <select class="select" aria-label="Origin"><option>All</option><option>Open land</option><option>Corridor edge</option></select>
+            <textarea class="textarea" placeholder="Notes for the landscape team" aria-label="Notes"></textarea>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= CHOICE ================= -->
+    <section class="sg-section" id="choice">
+      <h2>Choice and range</h2>
+      <p>Checkboxes, radios and switches use the accent only when on. The segmented control is how filters and the metric switch are chosen (views are chosen in the sidebar).</p>
+      <div class="sg-grid">
+        <div class="sg-box"><h3>Checkbox, radio</h3>
+          <label class="check"><input class="cb" type="checkbox" checked> Show corridor</label>
+          <label class="check"><input class="cb" type="checkbox"> Show footpaths</label>
+          <label class="check"><input class="cb" type="checkbox" checked disabled> Locked option</label>
+          <label class="check"><input class="rd" type="radio" name="sg-r" checked> All sites</label>
+          <label class="check"><input class="rd" type="radio" name="sg-r"> Open land</label>
+        </div>
+        <div class="sg-box"><h3>Switch, segmented</h3>
+          <label class="check"><input class="sw" type="checkbox" role="switch"> Street map tiles (needs internet)</label>
+          <label class="check"><input class="sw" type="checkbox" role="switch" checked> Gap-filled ground heat</label>
+          <div class="seg"><button type="button" aria-pressed="true">Greenness</button><button type="button" aria-pressed="false">Ground heat</button></div>
+          <div class="seg seg-sm" role="group" aria-label="Origin filter">
+            <label class="pill"><input type="radio" name="sg-f" checked><span>All</span></label>
+            <label class="pill"><input type="radio" name="sg-f"><span>Open land</span></label>
+            <label class="pill"><input type="radio" name="sg-f"><span>Corridor edge</span></label>
+          </div>
+        </div>
+        <div class="sg-box"><h3>Range</h3>
+          <div class="sg-stack">
+            <div><div class="kv" style="border:0;padding:0 0 4px"><span style="color:var(--text);font-size:13px;font-weight:500">Heat relief</span><b>40%</b></div><input type="range" min="0" max="100" value="40" style="--p:40%" aria-label="Heat relief weight"></div>
+            <div><div class="kv" style="border:0;padding:0 0 4px"><span style="color:var(--text);font-size:13px;font-weight:500">Shade for walkers</span><b>25%</b></div><input type="range" min="0" max="100" value="25" style="--p:25%" aria-label="Shade for walkers weight"></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= CHIPS ================= -->
+    <section class="sg-section" id="chips">
+      <h2>Chips and tags</h2>
+      <p>A chip always carries a word. The dot repeats the tone; it never carries the meaning alone. The honesty chips are components, not footnotes.</p>
+      <div class="sg-grid">
+        <div class="sg-box"><h3>Status</h3>
+          <div class="sg-row"><span class="chip chip-ok">Completed</span><span class="chip chip-info">Running</span><span class="chip chip-bad">Failed</span><span class="chip chip-warn">Timed out</span><span class="chip chip-plan">Current</span></div>
+          <div class="sg-row"><span class="chip">Corridor edge</span><span class="chip chip-quiet">Data: cached real data</span><span class="chip chip-accent">Selected</span><span class="chip chip-dot">No detectable change</span><span class="chip chip-warn chip-nodot">Preview score</span></div>
+        </div>
+        <div class="sg-box"><h3>Honesty (always on screen)</h3>
+          <div class="sg-row"><span class="chip chip-warn">Example sites (simulated)</span></div>
+          <div class="sg-row"><span class="chip chip-warn">Preview scores: ML model not connected yet</span></div>
+          <div class="sg-row"><span class="chip chip-ok">Scores: ML model</span><span class="chip chip-bad">Data: MOCK (invented)</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= DATA ================= -->
+    <section class="sg-section" id="data">
+      <h2>Data display</h2>
+      <p>Numbers are tabular. Rows are 44px with hairline rules, headers are 11px muted, and the selected row takes the accent tint. A strip of key figures sits above the work, one tile per number, each with a note that says where it comes from.</p>
+      <div class="stats">
+        <div class="stat"><div class="stat-label">Candidate sites</div><div class="stat-value">564</div><div class="stat-note">simulated</div></div>
+        <div class="stat"><div class="stat-label">Top preview score</div><div class="stat-value">82.5</div><div class="stat-note">placeholder weights</div></div>
+        <div class="stat"><div class="stat-label">Near a corridor gap</div><div class="stat-value">91<span class="stat-unit">sites</span></div><div class="stat-note">within 50 m</div></div>
+        <div class="stat"><div class="stat-label">Reliable ground heat</div><div class="stat-value">471<span class="stat-unit">of 564</span></div><div class="stat-note">93 are estimated</div></div>
+      </div>
+      <div class="sg-grid" style="margin-top:16px">
+        <div class="table-card">
+          <div class="table-scroll">
+            <table class="table">
+              <thead><tr><th>Year (Oct to Sep)</th><th>Tree-cover estimate (low to high)</th><th class="num">Ground heat</th></tr></thead>
+              <tbody>
+                <tr aria-selected="true"><td>2021–22</td><td>14.2% (6.6% to 21.9%)</td><td class="num">37.0 °C</td></tr>
+                <tr><td>2022–23</td><td>9.1% (2.0% to 17.1%)</td><td class="num">39.8 °C</td></tr>
+                <tr><td>2023–24</td><td>10.2% (3.9% to 17.7%)</td><td class="num">40.2 °C</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>A table card: a hairline, the table, and a note underneath that says how to read it. Sample values.</p>
+        </div>
+        <div class="sg-box"><h3>Key figures and progress</h3>
+          <div class="sg-stack">
+            <div class="kv"><span>Site ID</span><span class="mono">ELM-3719-11715</span></div>
+            <div class="kv"><span>Ground heat, 250 m</span><span>42.9 °C</span></div>
+            <div class="kv"><span>Nearest corridor gap</span><span>3 m</span></div>
+            <div><div class="kv" style="border:0;padding:4px 0"><span>Reliable ground heat</span><span>471 of 564</span></div><div class="progress"><span style="width:84%"></span></div></div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= FEEDBACK ================= -->
+    <section class="sg-section" id="feedback">
+      <h2>Feedback and overlays</h2>
+      <p>Notices explain, toasts confirm, tooltips clarify, and every empty or error state says what happened and what to do. None of them uses the accent. Notices carry their own icon.</p>
+      <div class="sg-grid">
+        <div class="sg-box"><h3>Notices</h3>
+          <div class="sg-stack">
+            <p class="notice">Preview scores: the ML model is not connected yet. The ranking works, but treat it as an example.</p>
+            <p class="notice notice-bad">This is invented MOCK data for development. Do not present it as Elmina results.</p>
+            <p class="notice notice-info">Temperatures rank sites. They are not exact readings.</p>
+            <p class="notice notice-ok">Scores come from the ML model and match this data version.</p>
+          </div>
+        </div>
+        <div class="sg-box"><h3>Toast, tooltip, hint, menu</h3>
+          <div class="toast"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-circle-check"></use></svg><span style="flex:1">List downloaded</span></div>
+          <span class="tooltip">Temperature ranks sites. It is not an exact reading.</span>
+          <div class="coach">Click a site to see why it ranks here <button type="button" aria-label="Dismiss this hint">×</button></div>
+          <div class="menu" role="menu" aria-label="Example menu" style="box-shadow:var(--shadow-pop)">
+            <div class="menu-item" role="menuitem">Download list</div><div class="menu-item" role="menuitem" aria-selected="true">View on map</div><div class="menu-sep"></div><div class="menu-item" role="menuitem">Clear selection</div>
+          </div>
+        </div>
+        <div class="sg-box"><h3>Empty and error states</h3>
+          <div class="empty sg-wide">
+            <svg class="ic" width="20" height="20" aria-hidden="true"><use href="#i-pin"></use></svg>
+            <div class="empty-title">No site selected</div><div class="empty-text">Click a numbered badge or a site on the map to see why it ranks where it does.</div>
+          </div>
+          <div class="empty sg-wide">
+            <svg class="ic" width="24" height="24" aria-hidden="true"><use href="#i-inbox"></use></svg>
+            <div class="empty-title">No sites match these filters.</div><div class="empty-text">Loosen the origin filter or clear the search.</div>
+            <button class="btn btn-secondary" type="button">Clear filters</button>
+          </div>
+          <div class="empty sg-wide">
+            <div class="empty-title" style="color:var(--bad)">The data service is not reachable</div>
+            <div class="code">uvicorn backend.api.main:app --port 8000</div>
+            <button class="btn btn-primary" type="button">Retry</button>
+          </div>
+        </div>
+        <div class="sg-box"><h3>Dialog</h3>
+          <dialog class="sg-dialog" open>
+            <h2>Limits of this data</h2>
+            <p class="muted">Read these before quoting a number.</p>
+            <ul><li>Candidate sites are simulated from open land.</li><li>The green corridor is approximate.</li><li>Ground heat ranks sites. It is not an exact temperature.</li></ul>
+            <form method="dialog"><button type="submit" class="btn btn-secondary">Close</button></form>
+          </dialog>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= CHARTS ================= -->
+    <section class="sg-section" id="charts">
+      <h2>Charts</h2>
+      <p>Ember leads, blue compares, Stone is the reference. Gridlines are dashed, the average is one dashed ink line, and every column is a button: hover or focus it to see its numbers. Vertical bars are built by <code>js/charts.js</code>; comparison bars are plain markup. The values below are samples, not Elmina data.</p>
+      <div class="sg-grid">
+        <div class="card" id="demo-chart"><div class="card-head"><h3>Sample bars with a range</h3><p class="card-sub">Sample values only</p></div></div>
+        <div class="card" style="display:flex;flex-direction:column;gap:14px">
+          <div class="card-head"><h3>Comparison bars</h3><p class="card-sub">Blue = reference maps, Ember = ours. Sample values.</p></div>
+          <div class="hbars">
+            <div class="hbar"><span class="hbar-label">Reference A</span><div class="hbar-track"><div class="hbar-fill" style="width:92%"></div></div><span class="hbar-value">27.7%</span></div>
+            <div class="hbar"><span class="hbar-label">Reference B</span><div class="hbar-track"><div class="hbar-fill" style="width:24%"></div></div><span class="hbar-value">7.1%</span></div>
+            <div class="hbar"><span class="hbar-label">Ours</span><div class="hbar-track"><div class="hbar-fill hbar-fill-ours" style="width:32%"></div></div><span class="hbar-value">9.7%</span></div>
+          </div>
+          <div class="card-foot"><div class="chart-legend"><span class="lg-ref">Reference maps</span><span>Our estimate</span></div><p class="caption">Reference maps are satellite-derived, not field truth.</p></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= MAP KIT ================= -->
+    <section class="sg-section" id="map-kit">
+      <h2>Map kit</h2>
+      <p>What Leaflet draws, restyled with the tokens (colours live in <code>js/map.js</code>). Top five sites get a numbered badge; rank 1 stays on its site; the selected badge is ink with an accent ring. Controls float over the map: white, hairline, shadow sm.</p>
+      <div class="sg-grid">
+        <div class="sg-box"><h3>Badges and legend</h3>
+          <div class="sg-row"><span class="rank-badge selected">1</span><span class="rank-badge">2</span><span class="rank-badge">3</span><span class="rank-badge">4</span><span class="rank-badge">5</span><span class="rank-badge">42</span><span class="rank-badge wide">100</span><span class="rank-badge wide selected">564</span></div>
+          <span class="sg-note">A circle up to two digits; from 100 a pill with a smaller number (<code>.wide</code>, sized by <code>js/badge.js</code>).</span>
+          <div class="legend sg-wide">
+            <strong>Higher priority = plant sooner</strong>
+            <div class="swatches"><span style="background:#edf8fb"></span><span style="background:#bfd3e6"></span><span style="background:#9ebcda"></span><span style="background:#8c96c6"></span><span style="background:#8c6bb1"></span><span style="background:#88419d"></span><span style="background:#6e016b"></span></div>
+            <div class="range"><span>5</span><span>Preview score</span><span>83</span></div>
+            <div class="note">Example sites, preview scores</div>
+          </div>
+        </div>
+        <div class="sg-box"><h3>Zoom, scale and layers</h3>
+          <div class="sg-row" style="align-items:flex-end;gap:16px">
+            <div class="leaflet-bar"><a class="leaflet-control-zoom-in" role="button" aria-label="Zoom in" href="#map"></a><a class="leaflet-control-zoom-out" role="button" aria-label="Zoom out" href="#map"></a></div>
+            <div class="leaflet-control-scale-line" style="width:64px;margin:0">500 m</div>
+          </div>
+          <div class="popover sg-popover">
+            <p class="popover-title">Map layers</p>
+            <label><input class="cb" type="checkbox" checked> Example sites</label>
+            <label><input class="cb" type="checkbox" checked> Green corridor (approximate)</label>
+            <label><input class="cb" type="checkbox"> Greenness (satellite)</label>
+            <label class="quiet"><input class="cb" type="checkbox"> Street map (needs internet)</label>
+          </div>
+        </div>
+        <div class="sg-box"><h3>Lines and fills</h3>
+          <div class="sg-line"><div style="height:18px;background:rgba(47,125,50,.09);border:1.2px dashed var(--corridor);border-radius:3px"></div>Green corridor, approximate (polygon)</div>
+          <div class="sg-line"><div style="border-top:2px dashed var(--corridor)"></div>Corridor connectors</div>
+          <div class="sg-line"><div style="height:18px;background:#DCE9D2;border-radius:3px"></div>Park</div>
+          <div class="sg-line"><div style="height:18px;background:#E9E8DE;border-radius:3px"></div>Open land</div>
+          <div class="sg-line"><div style="border-top:1px dashed #A9A9A1"></div>Footpath</div>
+          <div class="sg-line"><div style="border-top:2px solid #D6D6CF"></div>Road</div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= APP PIECES ================= -->
+    <section class="sg-section" id="app">
+      <h2>App pieces</h2>
+      <p>The panels of the Plant first and Before and after screens, built from the components above.</p>
+      <div class="sg-grid">
+        <section class="sheet" aria-labelledby="sg-h-matters">
+          <div class="sheet-head"><h2 id="sg-h-matters">What matters most?</h2>
+            <button type="button" class="btn btn-ghost btn-sm btn-icon sheet-toggle" aria-expanded="true" aria-label="Collapse"><svg class="ic ic-minus" width="14" height="14" aria-hidden="true"><use href="#i-minus"></use></svg><svg class="ic ic-plus" width="14" height="14" aria-hidden="true"><use href="#i-plus"></use></svg></button></div>
+          <div class="sheet-body">
+            <div class="weight-row"><label for="sg-w1">Heat relief</label><output>40%</output><span class="hint">Favours hot, bare areas</span><input id="sg-w1" type="range" min="0" max="100" value="40" style="--p:40%"></div>
+            <div class="weight-row"><label for="sg-w2">Links green areas</label><output>35%</output><span class="hint">Closes gaps in the green corridor</span><input id="sg-w2" type="range" min="0" max="100" value="35" style="--p:35%"></div>
+            <div class="weight-row"><label for="sg-w3">Shade for walkers</label><output>25%</output><span class="hint">Adds shade along footpaths</span><input id="sg-w3" type="range" min="0" max="100" value="25" style="--p:25%"></div>
+            <div class="form-foot"><button type="button" class="link-button">Reset</button><p class="muted" style="font-size:12px">The list and map update as you move these.</p></div>
+          </div>
+        </section>
+        <section class="sheet" aria-labelledby="sg-h-top">
+          <div class="sheet-head"><h2 id="sg-h-top">Top sites</h2><span class="muted">564 in total</span></div>
+          <div class="sheet-body">
+            <div class="seg seg-sm" role="group" aria-label="Filter sites" style="align-self:flex-start">
+              <label class="pill"><input type="radio" name="sg-f2" checked><span>All</span></label><label class="pill"><input type="radio" name="sg-f2"><span>Open land</span></label><label class="pill"><input type="radio" name="sg-f2"><span>Corridor edge</span></label>
+            </div>
+            <div class="field field-search"><svg class="ic" width="14" height="14" aria-hidden="true"><use href="#i-search"></use></svg><input type="search" placeholder="Find a site, e.g. ELM-3672" aria-label="Find a site by name"></div>
+            <ol class="site-list">
+              <li><button type="button" class="site-row" aria-current="true"><span class="rank">1</span><span class="site-name">ELM-3719-11715</span><span class="site-why">next to a corridor gap</span><span class="site-score">83</span></button></li>
+              <li><button type="button" class="site-row" aria-current="false"><span class="rank">2</span><span class="site-name">ELM-3766-11758</span><span class="site-why">next to a corridor gap</span><span class="site-score">82</span></button></li>
+              <li><button type="button" class="site-row" aria-current="false"><span class="rank">3</span><span class="site-name">ELM-3766-11756</span><span class="site-why">hot surroundings</span><span class="site-score">81</span></button></li>
+            </ol>
+            <div class="list-foot"><button type="button" class="link-button">See all 564 sites</button><button type="button" class="link-button">Download list</button></div>
+          </div>
+        </section>
+        <section class="sheet" aria-labelledby="sg-h-wide">
+          <div class="sheet-head"><h2 id="sg-h-wide">Ranks of 100 and more</h2></div>
+          <div class="sheet-body">
+            <p class="muted" style="font-size:12px;line-height:18px">The rank column takes its width from the longest rank on show (<code>--rank-w</code>, set by <code>js/list.js</code>), so every row lines up.</p>
+            <ol class="site-list" style="--rank-w:40px">
+              <li><button type="button" class="site-row" aria-current="false"><span class="rank">99</span><span class="site-name">ELM-3796-11699</span><span class="site-why">bare surroundings</span><span class="site-score">52</span></button></li>
+              <li><button type="button" class="site-row" aria-current="true"><span class="rank">100</span><span class="site-name">ELM-3796-11757</span><span class="site-why">hot and bare around it</span><span class="site-score">51</span></button></li>
+              <li><button type="button" class="site-row" aria-current="false"><span class="rank">564</span><span class="site-name">ELM-3801-11602</span><span class="site-why">walkers nearby</span><span class="site-score">19</span></button></li>
+            </ol>
+          </div>
+        </section>
+      </div>
+
+      <h3>Site card</h3>
+      <p>A panel on the left of the map, so the rest of the map stays visible and usable. The map moves to keep the picked site clear of it, and the legend steps aside. One column, scrolling inside the panel when it is taller than the map. On a phone it becomes a sheet along the bottom.</p>
+      <div class="sg-mapframe">
+        <span class="rank-badge" style="position:absolute;left:68%;top:30%">2</span><span class="rank-badge selected" style="position:absolute;left:62%;top:44%">1</span><span class="rank-badge" style="position:absolute;left:78%;top:40%">3</span>
+        <div class="legend" style="position:absolute;right:12px;bottom:12px;width:224px">
+          <strong>Higher priority = plant sooner</strong>
+          <div class="swatches"><span style="background:#edf8fb"></span><span style="background:#bfd3e6"></span><span style="background:#9ebcda"></span><span style="background:#8c96c6"></span><span style="background:#8c6bb1"></span><span style="background:#88419d"></span><span style="background:#6e016b"></span></div>
+          <div class="range"><span>5</span><span>Preview score</span><span>83</span></div>
+        </div>
+        <section class="map-panel" aria-labelledby="sg-h-card">
+          <div class="map-panel-head"><h2 id="sg-h-card">Site card</h2><button type="button" class="btn btn-ghost btn-sm btn-icon" aria-label="Close the site card"><svg class="ic" width="14" height="14" aria-hidden="true"><use href="#i-x"></use></svg></button></div>
+          <div class="map-panel-body">
+            <div class="card-cols">
+              <div class="card-col">
+                <div class="card-title"><span class="card-rank">1</span><strong>ELM-3719-11715</strong></div>
+                <div class="card-chips"><span class="chip chip-warn">Example site (simulated)</span><span class="chip">Corridor edge</span><span class="chip chip-warn chip-nodot">Preview score</span></div>
+                <p class="card-headline">Hot surroundings, a footpath with no shade and right next to a gap in the corridor.</p>
+                <div class="card-total"><strong>82.5</strong><span>Preview score, out of 100 · ranked #1 of 564</span></div>
+                <div class="score-rows">
+                  <div class="score-row"><span>Heat relief</span><strong>57.4</strong><div class="meter" aria-hidden="true"><span style="width:57.4%"></span></div></div>
+                  <div class="score-row"><span>Links green areas</span><strong>98.8</strong><div class="meter" aria-hidden="true"><span style="width:98.8%"></span></div></div>
+                  <div class="score-row"><span>Shade for walkers</span><strong>100.0</strong><div class="meter" aria-hidden="true"><span style="width:100%"></span></div></div>
+                </div>
+              </div>
+              <div class="card-col">
+                <h3>Why it ranks here</h3>
+                <ul class="card-list"><li>Surroundings are hotter than 76% of sites (250 m average 42.9 °C).</li><li>459 m of the 469 m of nearby path has no shade.</li><li>Next to a gap in the approximate corridor (3 m away).</li></ul>
+                <details><summary>The numbers behind it</summary><p class="small-note">Total 82.5 out of 100, built from each score times its weight.</p></details>
+                <p class="notice notice-info">Temperatures rank sites. They are not exact readings.</p>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+
+      <h3>Before and after cards</h3>
+      <div class="sg-grid" style="margin-top:8px">
+        <article class="card"><div class="verdict"><h3>Tree-cover estimate</h3><div class="big">9.7% to 10.4%</div><span class="chip chip-dot">No detectable change</span>
+          <p>The difference is within the year-to-year swing of about 6 percentage points.</p><p>A satellite greenness estimate, not a tree count.</p></div></article>
+        <article class="card"><div class="verdict"><h3>Ground heat</h3><div class="big">38.6 °C to 42.1 °C</div><span class="chip chip-warn">Indicative only</span>
+          <p>Indicative only: each period pools different clear days and seasons, and satellite ground heat is for ranking, not exact values.</p></div></article>
+      </div>
+
+      <h3>Honesty bar and preview notice</h3>
+      <p class="notice" style="margin-top:8px">Preview scores: the ML model is not connected yet. Sites are examples (simulated), not Sime Darby Property's list.</p>
+      <footer class="honesty" style="margin-top:12px;border:1px solid var(--border);border-radius:var(--r-3)">
+        <p class="honesty-text">Example sites, not Sime Darby Property's list. Scores are previews until the ML model is connected.</p>
+        <button type="button" class="link-button">Limits of this data</button><button type="button" class="link-button">Data credits</button>
+      </footer>
+    </section>
+
+    <!-- ================= APP SHELL ================= -->
+    <section class="sg-section" id="app-shell">
+      <h2>App shell</h2>
+      <p>A sidebar (views, shortcuts, data status), a top bar (breadcrumb and the one download action), then the page. Below 900px the sidebar becomes a strip along the top. The honesty bar stays on screen at the bottom.</p>
+      <div class="sg-frame">
+        <aside class="sidebar">
+          <div class="side-org">
+            <span class="logo" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24"><circle cx="12" cy="9.5" r="6" fill="#fff"></circle><rect x="11" y="14" width="2" height="7" rx="1" fill="#fff"></rect></svg></span>
+            <span class="side-org-name">Canopy Prioritiser</span><span class="chip">Screening</span>
+          </div>
+          <p class="side-label">Project</p>
+          <p class="side-project">City of Elmina</p>
+          <nav class="side-nav" aria-label="Views (example)">
+            <button type="button" class="nav-item" aria-current="page"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-map"></use></svg><span>Plant first</span></button>
+            <button type="button" class="nav-item"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-columns"></use></svg><span>Before and after</span></button>
+          </nav>
+          <div class="side-nav" role="group" aria-label="Shortcuts (example)">
+            <button type="button" class="nav-item"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-table"></use></svg><span>Sites</span></button>
+            <button type="button" class="nav-item"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-layers"></use></svg><span>Layers</span></button>
+            <button type="button" class="nav-item"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-file"></use></svg><span>Methods and limits</span></button>
+          </div>
+          <div class="side-quick">
+            <p class="side-label">Quick access</p>
+            <button type="button" class="nav-item"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-download"></use></svg><span>Download ranked list</span></button>
+            <button type="button" class="nav-item"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-book"></use></svg><span>Data credits</span></button>
+          </div>
+          <section class="side-status" aria-label="Data status (example)">
+            <h2>Data status</h2>
+            <ul><li><span class="chip chip-warn">Example sites (simulated)</span></li><li><span class="chip chip-warn">Preview scores: ML model not connected yet</span></li><li><span class="chip chip-quiet">Data: cached real data</span></li></ul>
+          </section>
+        </aside>
+        <div class="sg-frame-body">
+          <header class="topbar">
+            <nav class="crumbs" aria-label="Breadcrumb (example)"><span>City of Elmina</span><span class="crumb-sep" aria-hidden="true">/</span><span aria-current="page">Plant first</span></nav>
+            <button type="button" class="btn btn-secondary btn-sm"><svg class="ic" width="14" height="14" aria-hidden="true"><use href="#i-download"></use></svg>Download list</button>
+          </header>
+          <div class="sg-frame-page">
+            <div class="page-head">
+              <div class="page-title"><h1>Where to plant first in City of Elmina</h1><p>A screening tool: sites ranked by heat relief, green links and shade for walkers. Not a tree count or a carbon figure.</p></div>
+              <ul class="chips"><li class="chip chip-warn">Example sites (simulated)</li><li class="chip chip-quiet">Data: cached real data</li></ul>
+            </div>
+          </div>
+          <footer class="honesty"><p class="honesty-text">Example sites, not Sime Darby Property's list. Scores are previews until the ML model is connected.</p><button type="button" class="link-button">Limits of this data</button><button type="button" class="link-button">Data credits</button></footer>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <script type="module">
+    // A sample chart, to show the component. The numbers are made up and labelled as such on the page.
+    import { barChart, chartLegend, mean, niceScale } from "./js/charts.js";
+    const values = [4, 9, 6, 12, 8];
+    const ranges = [[2, 8], [5, 14], [3, 11], [7, 17], [4, 13]];
+    const scale = niceScale(Math.max(...ranges.map((r) => r[1])));
+    const average = mean(values);
+    document.getElementById("demo-chart").append(
+      barChart({
+        values, ranges, average, vmax: scale.vmax, ticks: scale.ticks, tickFormat: (t) => `${t}%`, labels: ["Year 1", "Year 2", "Year 3", "Year 4", "Year 5"],
+        subLabels: values.map((v) => `${v}%`),
+        tips: values.map((v, i) => ({ title: `Year ${i + 1}`, lines: [`Sample estimate ${v}%`, `Sample range ${ranges[i][0]}% to ${ranges[i][1]}%`] })),
+      }),
+      chartLegend([["", "Estimate"], ["lg-range", "Range"], ["lg-dash", `Average ${average.toFixed(1)}%`]]));
+  </script>
+</body>
+</html>

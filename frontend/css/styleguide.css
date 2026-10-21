@@ -1,0 +1,43 @@
+/* Layout for styleguide.html only. Every component on that page is drawn by css/app.css; nothing here restyles one. */
+body.sg { display: block; height: auto; }
+.sg-head { max-width: 1180px; margin: 0 auto; padding: 32px 24px 8px; }
+.sg-head p { max-width: 72ch; margin-top: 8px; color: var(--text-2); }
+.sg-nav { display: flex; flex-wrap: wrap; gap: 4px 16px; margin-top: 16px; }
+.sg-nav a { color: var(--text); font-weight: 500; text-decoration-color: var(--stone-300); text-underline-offset: 3px; }
+.sg-main { max-width: 1180px; margin: 0 auto; padding: 0 24px 64px; }
+.sg-section { padding-top: 40px; }
+.sg-section > h2 { padding-top: 14px; border-top: 1px solid var(--border); font-size: 18px; line-height: 26px; }
+.sg-section > p { max-width: 72ch; margin: 4px 0 16px; color: var(--text-muted); }
+.sg-grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(min(300px, 100%), 1fr)); align-items: start; }
+.sg-box { display: flex; flex-direction: column; align-items: flex-start; gap: 12px; padding: 16px; background: #fff; border: 1px solid var(--border); border-radius: var(--r-3); }
+.sg-box > h3 { margin: 0; font: 500 11px/16px var(--font-sans); color: var(--text-muted); }
+.sg-box > .sg-wide { align-self: stretch; }
+.sg-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
+.sg-stack { display: flex; flex-direction: column; gap: 8px; align-self: stretch; }
+.sg-swatches { display: grid; gap: 12px; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); }
+.sg-swatch { background: #fff; border: 1px solid var(--border); border-radius: var(--r-3); overflow: hidden; }
+.sg-color { height: 56px; border-bottom: 1px solid var(--border); }
+.sg-swatch > div + div { padding: 8px 10px; font-size: 11px; line-height: 16px; color: var(--text-muted); }
+.sg-swatch b { display: block; font-size: 12px; font-weight: 500; color: var(--text); }
+.sg code { padding: 1px 5px; background: var(--stone-100); border-radius: var(--r-1); font: 400 11px/16px var(--font-mono); }
+.sg-note { font-size: 12px; line-height: 18px; color: var(--text-muted); }
+.sg-focus { border-color: var(--accent) !important; box-shadow: 0 0 0 3px var(--accent-line) !important; }
+.sg-shadow { width: 120px; height: 56px; background: #fff; border-radius: var(--r-3); }
+.sg-radius { width: 72px; height: 56px; background: var(--stone-50); border: 1px solid var(--border-strong); }
+.sg-scale { width: 100%; }
+.sg-scale td { height: auto; padding: 10px 12px 10px 0; vertical-align: baseline; }
+.sg-scale td:first-child { width: 130px; color: var(--text-muted); font-size: 12px; }
+.sg-scale td:last-child { width: 200px; color: var(--text-muted); font-size: 12px; }
+.sg-dialog { position: static; margin: 0; }
+.sg-map { position: relative; width: 100%; height: 150px; background: var(--stone-100); border: 1px solid var(--border); border-radius: var(--r-3); overflow: hidden; }
+.sg-map .rank-badge { position: absolute; }
+.sg-line { display: grid; grid-template-columns: 64px minmax(0, 1fr); gap: 12px; align-items: center; width: 100%; font-size: 12px; }
+.ic { flex: 0 0 auto; }
+.sg-popover { position: static; width: 100%; box-shadow: var(--shadow-sm); }
+.sg-box .leaflet-bar { position: static; }
+.sg-frame { display: flex; height: 520px; background: #fff; border: 1px solid var(--border); border-radius: var(--r-3); overflow: hidden; }
+.sg-frame-body { flex: 1 1 auto; min-width: 0; display: flex; flex-direction: column; }
+.sg-frame-page { flex: 1 1 auto; padding: 24px; overflow: hidden; }
+@media (max-width: 900px) { .sg-frame { flex-direction: column; height: auto; } }
+#demo-chart { display: flex; flex-direction: column; gap: 14px; }
+.sg-mapframe { position: relative; isolation: isolate; height: 660px; margin-top: 8px; overflow: hidden; background: var(--stone-100); border: 1px solid var(--border); border-radius: var(--r-3); }

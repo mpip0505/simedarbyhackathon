@@ -4,7 +4,7 @@ A geospatial screening tool that ranks where to plant trees first in **City of E
 before/after view of vegetation and surface temperature. Built for the Sime Darby Property *Township of Tomorrow*
 hackathon (Planet / biodiversity track).
 
-This repository is the **backend**: satellite and map data in, a small tested API out, plus a **barebones web app** in
+This repository is the **backend**: satellite and map data in, a small tested API out, plus a **web app** in
 `frontend/` that proves the API end to end. The scoring model (ML) and the final interface design are built by teammates
 against the API and data contract described here.
 
@@ -24,7 +24,7 @@ Needs Python 3.12. The demo runs **offline**: no Earth Engine login and no inter
 pip install -r backend/requirements.txt
 uvicorn backend.api.main:app --port 8000
 ```
-Open http://localhost:8000/ for the web app (map-first: top sites, sliders, site card, before/after view) or
+Open http://localhost:8000/ for the web app (map, top sites, sliders, site card, before/after view; the component page is at `/app/styleguide.html`) or
 http://localhost:8000/docs for the interactive API. The API serves the committed files in
 `backend/data/cache/`; if that folder is incomplete it says so in the log and serves invented mock data
 (`GET /meta` reports `data_mode`).
@@ -110,12 +110,15 @@ write_scores(df_scores)  # validates, stamps the data version, writes backend/da
 - **There are no ground-truth labels.** Validation can only check consistency, not that the ranking is right.
 
 ## Web app and the designer
-A working **map-first** interface lives in `frontend/` (plain HTML, JavaScript and Leaflet, no build step, works offline).
-The map is the screen: numbered badges mark the top five sites, "What matters most?" sliders re-rank live, "Top sites" gives a
-one-sentence reason per site, a site card explains the rank, and a before/after view compares the two periods. The styling in
-`css/app.css` can be replaced without touching the logic.
-- **Designer brief and wireframe:** [docs/frontend.md](docs/frontend.md) (callout numbers, data sources, what must stay).
-- **UX direction (what the client should see and do):** [docs/ux-wireframe.md](docs/ux-wireframe.md), a map-first wireframe with the user journey, plain wording and states.
+A working dashboard lives in `frontend/` (plain HTML, JavaScript and Leaflet, no build step, works offline). A sidebar and a top
+bar frame two views. **Plant first**: a strip of figures, the map with numbered badges on the top five sites, "What matters most?"
+sliders that re-rank live, "Top sites" with a one-sentence reason per site, and a site card that explains the rank. **Before and
+after**: the two periods side by side with honest verdicts, an independent-map comparison and year-by-year charts. The look is the
+Canopy dashboard system in `css/app.css`, and it can be replaced without touching the logic.
+- **Design system:** [docs/design-system.md](docs/design-system.md) (tokens, components, layout, accessibility) and the live
+  component page `frontend/styleguide.html` (http://localhost:8000/app/styleguide.html).
+- **Designer brief:** [docs/frontend.md](docs/frontend.md) (components, data sources, what must stay).
+- **UX direction (what the client should see and do):** [docs/ux-wireframe.md](docs/ux-wireframe.md), the earlier map-first wireframe with the user journey, plain wording and states.
 - **API contract it is built on:** [docs/team-handoff.md](docs/team-handoff.md) section 3.
 - Reuse `frontend/js/weights.js`, `drivers.js`, `scale.js`, `report-logic.js` and `csv.js` unchanged; they are tested, and
   `weights.js` is checked against the Python backend so slider re-ranking always matches the API.
@@ -148,7 +151,7 @@ one-sentence reason per site, a site card explains the rank, and a before/after 
 ## Testing and CI
 ```bash
 python -m pytest backend/tests -q          # 194 tests, no Earth Engine or network needed
-node --test "frontend/tests/*.test.mjs"    # 71 frontend unit tests (Node 22, no dependencies)
+node --test "frontend/tests/*.test.mjs"    # 88 frontend unit tests (Node 22, no dependencies)
 node frontend/tools/smoke.mjs              # real Chrome/Edge drives the web app (API must be running)
 python -m backend.api.selfcheck            # deep check of the committed data
 python -m backend.scripts.qa_plot          # draws docs/qa-map.png: sites, corridor, parks, paths, buildings
@@ -169,9 +172,9 @@ they are exercised by `python -m backend.build_cache` with your login.
 | `backend/atomic.py`, `retry.py`, `logging_config.py` | Atomic writes, transient-failure retries, logging |
 | `backend/data/cache/` | Generated files the API serves (committed so the demo works offline) |
 | `backend/data/mock/` | Invented placeholder data for development |
-| `frontend/` | Web app (map-first: top sites, sliders, site card, before/after), Leaflet bundled, unit tests and a browser smoke test |
+| `frontend/` | Web app (sidebar dashboard: map, top sites, sliders, site card, before/after), design-system style guide, Leaflet and fonts bundled, unit tests and a browser smoke test |
 | `backend/tests/` | Test suite |
-| `docs/` | Data contract, data dictionary, team handoff, ML prompt, frontend brief and wireframe, UX wireframe, pitch fact-check, judge Q&A, pilot-readiness, QA map |
+| `docs/` | Data contract, data dictionary, team handoff, ML prompt, design system, frontend brief and wireframe, UX wireframe, pitch fact-check, judge Q&A, pilot-readiness, QA map |
 
 ## Limitations (read this before quoting any number)
 - **Simulated sites.** 30 m cells on OSM open land, not a real planting list. OSM tags little undeveloped land in the

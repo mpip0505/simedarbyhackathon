@@ -2,6 +2,7 @@
 import { el, clear } from "./dom.js";
 import { fmt } from "./scale.js";
 import { mainReason } from "./drivers.js";
+import { rankColumnWidth } from "./badge.js";
 
 /**
  * Redraw the list for `rows` (already ranked and filtered).
@@ -9,7 +10,9 @@ import { mainReason } from "./drivers.js";
  */
 export function renderTopList(ol, rows, { selectedId, onSelect, weights, ctx, limit }) {
   clear(ol);
-  for (const f of rows.slice(0, limit)) {
+  const shown = rows.slice(0, limit);
+  ol.style.setProperty("--rank-w", `${rankColumnWidth(shown.map((f) => f.properties.rank))}px`);   // the rank column fits the longest rank on show
+  for (const f of shown) {
     const p = f.properties;
     const button = el("button", {
       type: "button", class: "site-row", "data-id": p.site_id, "aria-current": p.site_id === selectedId ? "true" : "false",
@@ -21,8 +24,15 @@ export function renderTopList(ol, rows, { selectedId, onSelect, weights, ctx, li
   }
 }
 
-/** Mark one row as the selected site and make sure it is visible in the list. */
-export function highlightRow(ol, id) {
+/**
+ * Mark one row as the selected site and, if the list is scrolled, bring that row into view. Only the list's own scrolling
+ * window moves (its parent, a positioned box), never the page.
+ */
+export function highlightRow(ol, id, scroller = ol.parentElement) {
   for (const b of ol.querySelectorAll(".site-row")) b.setAttribute("aria-current", b.dataset.id === id ? "true" : "false");
-  ol.querySelector(`.site-row[data-id="${CSS.escape(id)}"]`)?.scrollIntoView({ block: "nearest" });
+  const row = ol.querySelector(`.site-row[data-id="${CSS.escape(id)}"]`);
+  if (!row) return;
+  const top = row.offsetTop, bottom = top + row.offsetHeight;   // offsetTop is measured from the positioned scrolling window
+  if (top < scroller.scrollTop) scroller.scrollTop = top;
+  else if (bottom > scroller.scrollTop + scroller.clientHeight) scroller.scrollTop = bottom - scroller.clientHeight;
 }

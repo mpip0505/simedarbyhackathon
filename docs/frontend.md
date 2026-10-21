@@ -1,13 +1,14 @@
-# Frontend: barebones build and designer brief
+# Frontend: the dashboard build and designer brief
 
-Written for: whoever designs or extends the interface. The app is a **working map-first build**: the map is the screen, and
-"What matters most?", "Top sites" and the site card float over it. The look lives in `css/app.css` and can be replaced
-without touching the data or the maths. The UX it implements (journey, wording, states) is in [ux-wireframe.md](ux-wireframe.md).
+Written for: whoever designs or extends the interface. The app is a **working dashboard**: a sidebar, a top bar and two views
+(Plant first, Before and after). Its look is the Canopy dashboard system, documented in [design-system.md](design-system.md) and
+drawn live on `frontend/styleguide.html`. The look lives in `css/app.css` and can be replaced without touching the data or the
+maths. The UX it implements (journey, wording, states) is in [ux-wireframe.md](ux-wireframe.md), which describes the earlier
+map-first wireframe; the content, wording and honesty rules there still apply, the layout is now the one in the design system.
 
 ![Wireframe of the earlier barebones layout, kept for the component list below](wireframe.png)
 
-`docs/wireframe.svg` is the earlier table-based layout. The component list below still describes the data each part uses;
-the ranked table is now the "Top sites" list with a one-sentence reason per site, and the detail panel is the site card.
+`docs/wireframe.svg` is the earlier table-based layout. The component list below describes the data each part uses.
 
 ## Run it
 ```bash
@@ -24,28 +25,30 @@ crafted link cannot make the page load data from someone else's server.
 ## What each part is, where its data comes from, and what must stay
 | # | Component | Data (all `GET`) | Notes for the designer |
 |---|---|---|---|
-| 1 | Title and screening note | static text | **Keep** the screening-tool wording: it is not a tree count or a carbon figure |
-| 2 | Status chips | `/meta`: `data_mode`, `score_source`, `generated_at` | **Keep** "Simulated sites" always, and the score-source chip (amber while scores are placeholders) |
-| 3 | View tabs | none | Two views: Prioritise, Before / after |
-| 4 | Notice strip | `/meta`: `data_mode`, `scores_error`, `scores_stale` | Shown only when needed. Red for mock data or a rejected score file |
-| 5 | Weight sliders | `/weights` (starting values) | Three sliders, 0 to 100, shown as a share of the total. Reset returns to the API's ranking |
-| 6 | Filters and search | `/sites` | Origin (all, open land, corridor edge) and a site-id search |
-| 7 | Top sites list | `/sites` | Top 8 by default ("See all" expands), each with a one-sentence reason. Click or Enter selects; shared with the map. Numbered badges 1 to 5 mark the top sites on the map |
-| 8 | CSV download | built in the browser | The ranked list with the `source` (simulated) and `score_source` columns kept |
-| 9 | Map | `/layers/osm/{name}`, `/layers/corridor`, `/layers/corridor/spine`, `/sites` | Offline basemap, approximate corridor (dashed spine), sites coloured by total score |
-| 10 | Legend | computed | Score range of the current ranking, with a colourblind-safe ramp |
-| 11 | Layer toggles | `/layers/overlays` | Sites, corridor, map detail, vegetation and temperature overlays, optional online street tiles |
-| 12 | Site card | `/sites` | One-sentence reason, three score bars, "Why it ranks here", the numbers (collapsed). Preview-score notice when relevant |
-| 13 | Footer | `/meta`: `caveats`, `attribution` | **Keep** the limits list and the data credits (OpenStreetMap's licence requires attribution) |
-| 14 | Metric toggle | none | Vegetation (NDVI) or surface temperature |
-| 15 | Two synced maps | `/layers/overlays` | Baseline left, latest right, same colour scale, panning and zooming linked |
-| 16 | Shared legend | `/layers/overlays` | **Keep** "gap-filled, ranking-grade" for temperature |
-| 17 | Summary cards | `/summary`, `/summary/series` | **Keep** the honest verdicts: "No detectable change" and "Indicative only" |
-| 18 | Year-by-year table | `/summary/series` | Canopy with a low to high range, temperature, clear Landsat looks per pixel |
-| 19 | Independent-map comparison | `/summary/crosscheck`, `/summary` | **Keep**: it shows canopy estimates range from about 4% to 28% depending on the method |
+| 1 | Page title and screening note | static text | **Keep** the screening-tool wording: it is not a tree count or a carbon figure |
+| 2 | Status chips (page header) and the sidebar's Data status card | `/meta`: `data_mode`, `score_source`, `generated_at` | **Keep** "Example sites (simulated)" always, and the score-source chip (amber while scores are placeholders). The sidebar repeats them (`data-mirror`) |
+| 3 | Sidebar and top bar | none | Views (Plant first, Before and after), shortcuts (Sites, Layers, Methods and limits), Quick access (download, credits), breadcrumb |
+| 4 | Notices | `/meta`: `data_mode`, `scores_error`, `scores_stale` | A preview-scores notice shows while scores are placeholders; red notices for mock data or a rejected score file |
+| 5 | Strip of figures | computed from `/sites` (Plant first) and `/summary` (Before and after) | Four tiles over the map (sites, top score, near a corridor gap, reliable ground heat), five over the before/after maps |
+| 6 | Weight sliders | `/weights` (starting values) | Three sliders, 0 to 100, shown as a share of the total. Reset returns to the API's ranking |
+| 7 | Filters and search | `/sites` | Origin (all, open land, corridor edge) above the map and in Top sites (kept in step), and a site-id search |
+| 8 | Top sites list | `/sites` | Five rows in a window of fixed height ("See all" scrolls through the rest inside it, so the page never jumps), each with a one-sentence reason. Click or Enter selects; shared with the map. Numbered badges (up to 5) mark the top sites on the map; a rank of 100 or more gets a wider pill |
+| 9 | CSV download | built in the browser | The ranked list with the `source` (simulated) and `score_source` columns kept. Offered in the top bar, the map card, the list and the sidebar |
+| 10 | Map card | `/layers/osm/{name}`, `/layers/corridor`, `/layers/corridor/spine`, `/sites` | Offline basemap, approximate corridor (dashed spine), sites coloured by total score, source credit on the map. The card is as tall as the right-hand column ("What matters most?" plus "Top sites") |
+| 11 | Legend | computed | Score range of the current ranking, with a colourblind-safe ramp |
+| 12 | Layers panel | `/layers/overlays` | A popover from the map card: sites, corridor, map detail, vegetation and temperature overlays, optional online street tiles |
+| 13 | Site card | `/sites` | A panel on the left of the map, so the rest of the map stays usable: a one-sentence reason, total and three score bars, then "Why it ranks here" and the numbers (collapsed). The map moves to keep the picked site clear of it. Escape or the close button closes it; picking another site swaps it in place. A sheet along the bottom of the map on a phone |
+| 14 | Honesty bar and dialogs | `/meta`: `caveats`, `attribution` | **Keep** the limits list and the data credits (OpenStreetMap's licence requires attribution) |
+| 15 | Metric toggle | none | Vegetation (NDVI) or surface temperature |
+| 16 | Two synced maps | `/layers/overlays` | Earlier left, recent right, same colour scale, panning and zooming linked, approximate corridor outlined |
+| 17 | Shared legend | `/layers/overlays` | Numeric range from the overlay metadata. **Keep** "gap-filled, ranking-grade" for temperature |
+| 18 | Verdict cards | `/summary`, `/summary/series` | **Keep** the honest verdicts: "No detectable change" and "Indicative only" |
+| 19 | Independent-map comparison ("How sure are we?") | `/summary/crosscheck`, `/summary` | **Keep**: it shows tree-cover estimates range from about 4% to 28% depending on the method |
+| 20 | Year by year: two charts and a table | `/summary/series` | Tree cover with a low to high range, ground heat with the warmest year marked, clear Landsat looks per pixel. Hover or focus a bar for its numbers |
 
 ### States to design
-A. API not reachable. B. Mock data. C. Placeholder scores. D. Score file problem or out of date. See the wireframe.
+A. API not reachable (the shell stays, the page explains how to start the API). B. Mock data. C. Placeholder scores.
+D. Score file problem or out of date. E. Nothing selected (the first-visit hint). F. No sites match the filters. See the wireframe.
 
 ## Content rules (a Node test enforces the first three)
 Always show that sites are **simulated** and when scores are **placeholders**; never show per-site temperature change;
@@ -57,19 +60,25 @@ never word the canopy change as growth; never say "reportable", "defensible" or 
 ## Reuse this, restyle the rest
 ```
 frontend/
-  index.html            structure, element ids (the scripts find elements by id)
-  css/app.css           barebones styling: replace freely, keep the ids and classes the scripts use
+  index.html            structure, element ids (the scripts find elements by id), the icon sprite
+  css/app.css           tokens and components of the dashboard system: replace freely, keep the ids and classes the scripts use
+  styleguide.html       every component on one page, drawn with app.css (css/styleguide.css is only its page layout)
   js/
     weights.js          re-total and re-rank for new weights. MUST match the API exactly. Reuse unchanged.
     drivers.js          "what drives this site's rank": weighted points and plain-language notes. Reuse.
     scale.js            colour ramp, number formats, percentiles. Reuse.
-    report-logic.js     honest wording and numbers for the before/after view. Reuse.
+    report-logic.js     honest wording and numbers for the before/after view (headline, verdicts, figures, bars). Reuse.
+    stats.js            the four figures above the Plant first map. Pure. Reuse.
+    badge.js            sizes of the rank labels (circle, or a pill from 100) and the list's rank column. Pure. Reuse.
+    charts.js           vertical bar charts from DOM nodes (scale, geometry, tooltips). No chart library. Reuse.
     csv.js              CSV export. Reuse.
     api.js              fetch helpers with timeouts and one retry; apiUrl() for overlay images. Reuse.
-    dom.js, state.js    tiny helpers. Replace if you adopt a framework.
+    dom.js, state.js    tiny helpers (el(), icon(), a small store). Replace if you adopt a framework.
+    strip.js            draws a strip of figures. Replace as needed.
     map.js, list.js, panel.js, sliders.js, report.js, main.js   the interface wiring. Replace as needed.
   vendor/leaflet/       Leaflet 1.9.4 (BSD-2), bundled so the demo works offline
-  vendor/fonts/         Atkinson Hyperlegible (SBIL Open Font License 1.1, licence file included), bundled for offline use
+  vendor/fonts/         Geist and Geist Mono (OFL 1.1) and Atkinson Hyperlegible (fallback, OFL 1.1), bundled for offline use;
+                        provenance and hashes in vendor/fonts/geist/README.md
   tests/                Node unit tests + the Python-generated fixture
   tools/smoke.mjs       real-browser test; tools/make_wireframe.py draws the wireframe
 ```
@@ -84,13 +93,14 @@ the browser re-rank, and the page says so.
 
 ## Test it
 ```bash
-node --test "frontend/tests/*.test.mjs"   # 71 unit tests, no dependencies (Node 22; quote the pattern)
+node --test "frontend/tests/*.test.mjs"   # 88 unit tests, no dependencies (Node 22; quote the pattern)
 # or:  cd frontend && npm test
 python -m pytest backend/tests -q       # includes the static-serving and endpoint tests
 node frontend/tools/smoke.mjs           # real Chrome or Edge drives the app; needs the API running on port 8000
 ```
-The smoke test loads the page, clicks a row, drags the sliders, filters, searches, toggles layers, switches views and
-temperature/vegetation, checks the unreachable-API message and a narrow screen, fails on any console error or stray
+The smoke test loads the page, clicks a row, drags the sliders, filters (both filters stay in step), searches, opens the layers
+panel, toggles layers, switches views and temperature/vegetation, checks the unreachable-API message and a narrow screen
+(the sidebar becomes a strip), fails on any console error or stray
 text such as `null` or `[object ...]`, and writes screenshots (`node frontend/tools/smoke.mjs <baseUrl> <folder>`).
 Set `CHROME_PATH` if the browser is somewhere unusual.
 
@@ -103,8 +113,9 @@ Set `CHROME_PATH` if the browser is somewhere unusual.
   HTML with an `onerror` handler) against the real page and fails if any script runs or markup becomes an element.
 
 ## Known limits of this build
-- Charts are tables and bars, not plotted lines. It has been checked at 1440x900 and a phone width only through screenshots
-  and the smoke test (headless Chrome), not on other browsers or real touch devices.
+- Charts are bars drawn from DOM nodes (`js/charts.js`), not a chart library and not plotted lines. The layout has been checked
+  at 1440, 1100 and 390px wide in Chromium, not on other browsers or real touch devices.
+- The site card is a panel over the left of the map. On a small map it can cover the sites you are looking at, so the map is moved to keep the picked site clear of it; a tall card scrolls inside itself.
 - Rank badges that would overlap are nudged apart (rank 1 stays on its site), so a badge can sit a few pixels off its cell.
 - The online street-map toggle needs internet, and OpenStreetMap's tile policy applies (light use, with attribution).
 - While ML scores are not merged, everything shows the labelled placeholder. The interface switches automatically when

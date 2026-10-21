@@ -4,6 +4,7 @@ import { $ } from "./dom.js";
 
 /** Wire the sliders to `onChange(weights)`. Returns { set(weights), get() } for resetting from outside. */
 export function setupSliders(root, initial, onChange) {
+  const paint = (input) => input.style.setProperty("--p", `${input.value}%`);  // the filled part of the track (css/app.css)
   const inputs = Object.fromEntries(KEYS.map((k) => [k, $(`#w-${k}`, root)]));
   const outputs = Object.fromEntries(KEYS.map((k) => [k, $(`#o-${k}`, root)]));
   const get = () => Object.fromEntries(KEYS.map((k) => [k, Number(inputs[k].value)]));
@@ -19,11 +20,11 @@ export function setupSliders(root, initial, onChange) {
   }
 
   const set = (weights) => {
-    for (const k of KEYS) inputs[k].value = String(Math.round(weights[k]));
+    for (const k of KEYS) { inputs[k].value = String(Math.round(weights[k])); paint(inputs[k]); }
     showShares();
   };
   for (const k of KEYS) {
-    inputs[k].addEventListener("input", () => { showShares(); onChange(get()); });
+    inputs[k].addEventListener("input", () => { paint(inputs[k]); showShares(); onChange(get()); });
   }
   set(initial);
   return { set, get };

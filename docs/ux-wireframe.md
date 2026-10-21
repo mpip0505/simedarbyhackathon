@@ -2,7 +2,7 @@
 
 Written for: the designer, and anyone deciding what the client sees and does. **UX, not UI**: structure, content, flow and
 wording. Colour, type and styling are left to the designer. This is the **target** experience; the app that exists today
-(`frontend/`, see [frontend.md](frontend.md)) is a barebones three-column build of the same data.
+(`frontend/`, see [frontend.md](frontend.md)) is the dashboard build of the same data: a sidebar and two views, with the panels beside and under the map (see [design-system.md](design-system.md)).
 
 ![UX wireframe: main screen, before and after, journey and states](ux-wireframe.png)
 
@@ -64,7 +64,7 @@ Never say: reportable, defensible, accurate, "canopy increased". Never show the 
 - **Example data in use:** an unmissable banner that this is invented sample data.
 - **Preview scores / score file problem:** an amber note until the ML model is connected; a clear notice if its file is rejected
   or out of date. The ranking keeps working.
-- **Small screens:** the three floating panels become sheets that slide up from the bottom.
+- **Small screens:** (target) panels become sheets. In the built app the sidebar becomes a strip along the top and the panels stack under the map.
 
 ## Priorities
 - **Must have:** the map with the top sites marked, the top-sites list, the site card with reasons, the three sliders, the
@@ -74,7 +74,7 @@ Never say: reportable, defensible, accurate, "canopy increased". Never show the 
 
 ## What changed in the app to deliver this (implemented)
 Mostly presentation, plus small logic that reuses the tested modules. No backend change was needed.
-1. Full-size map with collapsible floating panels (sheets on small screens).
+1. A large map card with the panels beside it (stacked under it on small screens), and the site card as a panel on the left of the map.
 2. Larger markers with rank numbers for the top five sites, so they are visible at the opening zoom.
 3. A one-line main reason per site in the list (derived from `drivers.js`).
 4. The plain-language renames above.

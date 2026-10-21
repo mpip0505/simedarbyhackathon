@@ -1,197 +1,311 @@
 <!doctype html>
 <!--
-  Map-first interface (see docs/ux-wireframe.md). Structure, wording and behaviour are the product; the styling lives in
-  css/app.css and can be replaced. Keep every element marked data-required="honesty": the sites are simulated and the
-  scores may be previews, and the screen must always say so. See docs/frontend.md.
+  Dashboard interface (see docs/design-system.md and the live component page, styleguide.html): a sidebar, a top bar and two
+  views. Structure, wording and behaviour are the product; the styling lives in css/app.css and can be replaced.
+  Keep every element marked data-required="honesty": the sites are simulated and the scores may be previews, and the screen
+  must always say so. See docs/frontend.md.
 -->
 <html lang="en">
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Where to plant first in City of Elmina</title>
-  <link rel="icon" href="data:,">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='7' fill='%23FF4D00'/%3E%3Cg transform='translate(4.5 4.5) scale(.625)'%3E%3Ccircle cx='12' cy='9.5' r='6' fill='%23fff'/%3E%3Crect x='11' y='14' width='2' height='7' rx='1' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
   <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
   <link rel="stylesheet" href="css/app.css">
 </head>
 <body>
-  <header id="app-header">
-    <div id="title-block">
-      <h1>Where to plant first in City of Elmina</h1>
-      <p id="screening-note" data-required="honesty">
-        A screening tool: sites ranked by heat relief, green links and shade for walkers. Not a tree count or a carbon figure.
-      </p>
+  <!-- icons, drawn once and used with <use href="#i-name"> -->
+  <svg class="sprite" aria-hidden="true" focusable="false">
+    <symbol id="i-map" viewBox="0 0 24 24"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon><line x1="9" y1="3" x2="9" y2="18"></line><line x1="15" y1="6" x2="15" y2="21"></line></symbol>
+    <symbol id="i-columns" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M12 3v18"></path></symbol>
+    <symbol id="i-table" viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="2"></rect><path d="M3 9h18M3 15h18M12 3v18"></path></symbol>
+    <symbol id="i-layers" viewBox="0 0 24 24"><polygon points="12 2 2 7 12 12 22 7 12 2"></polygon><polyline points="2 17 12 22 22 17"></polyline><polyline points="2 12 12 17 22 12"></polyline></symbol>
+    <symbol id="i-download" viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="7 10 12 15 17 10"></polyline><line x1="12" y1="15" x2="12" y2="3"></line></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></symbol>
+    <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"></path></symbol>
+    <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"></path></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"></path></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"></path></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></symbol>
+  </svg>
+
+  <div id="shell">
+    <!-- ========== sidebar ========== -->
+    <aside id="sidebar" class="sidebar">
+      <div class="side-org">
+        <span class="logo" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24"><circle cx="12" cy="9.5" r="6" fill="#fff"></circle><rect x="11" y="14" width="2" height="7" rx="1" fill="#fff"></rect></svg></span>
+        <span class="side-org-name">Canopy Prioritiser</span>
+        <span class="chip">Screening</span>
+      </div>
+      <p class="side-label">Project</p>
+      <p class="side-project">City of Elmina</p>
+      <nav id="view-tabs" class="side-nav" aria-label="Views">
+        <button type="button" class="nav-item" data-view="prioritise" aria-current="page"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-map"></use></svg><span>Plant first</span></button>
+        <button type="button" class="nav-item" data-view="report"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-columns"></use></svg><span>Before and after</span></button>
+      </nav>
+      <div class="side-nav" role="group" aria-label="Shortcuts">
+        <button type="button" class="nav-item" data-action="sites"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-table"></use></svg><span>Sites</span></button>
+        <button type="button" class="nav-item" data-action="layers"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-layers"></use></svg><span>Layers</span></button>
+        <button type="button" class="nav-item" data-action="limits"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-file"></use></svg><span>Methods and limits</span></button>
+      </div>
+      <div class="side-quick">
+        <p class="side-label">Quick access</p>
+        <button type="button" class="nav-item" data-action="download"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-download"></use></svg><span>Download ranked list</span></button>
+        <button type="button" class="nav-item" data-action="credits"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-book"></use></svg><span>Data credits</span></button>
+      </div>
+      <section class="side-status" aria-label="Data status">
+        <h2>Data status</h2>
+        <ul>
+          <li><span class="chip chip-warn" data-mirror="chip-simulated" data-required="honesty">Example sites (simulated)</span></li>
+          <li><span class="chip" data-mirror="chip-scores" data-required="honesty">Scores: loading</span></li>
+          <li><span class="chip chip-quiet" data-mirror="chip-mode">Data: loading</span></li>
+        </ul>
+      </section>
+    </aside>
+
+    <div id="content">
+      <!-- ========== top bar ========== -->
+      <header id="topbar" class="topbar">
+        <nav class="crumbs" aria-label="Breadcrumb">
+          <span>City of Elmina</span><span class="crumb-sep" aria-hidden="true">/</span><span id="crumb-view" aria-current="page">Plant first</span>
+        </nav>
+        <button type="button" class="btn btn-secondary btn-sm" data-action="download"><svg class="ic" width="14" height="14" aria-hidden="true"><use href="#i-download"></use></svg>Download list</button>
+      </header>
+
+      <div id="notices" role="status" aria-live="polite"></div>
+
+      <div id="fatal" hidden role="alert">
+        <h2>The data service is not reachable</h2>
+        <p id="fatal-reason"></p>
+        <p>Start it from the project folder, then retry:</p>
+        <pre>uvicorn backend.api.main:app --port 8000</pre>
+        <button type="button" id="fatal-retry" class="btn btn-primary">Retry</button>
+      </div>
+
+      <div id="stage">
+        <main id="main">
+          <!-- ========== Plant first ========== -->
+          <section id="view-prioritise" class="page" aria-label="Plant first">
+            <p id="preview-note" class="notice" role="note" data-required="honesty" hidden>
+              Preview scores: the ML model is not connected yet. Sites are examples (simulated), not Sime Darby Property's list.
+            </p>
+
+            <div class="page-head">
+              <div class="page-title">
+                <h1>Where to plant first in City of Elmina</h1>
+                <p id="screening-note" data-required="honesty">
+                  A screening tool: sites ranked by heat relief, green links and shade for walkers. Not a tree count or a carbon figure.
+                </p>
+              </div>
+              <ul id="status" class="chips" aria-label="Data status">
+                <li id="chip-simulated" class="chip chip-warn" data-required="honesty">Example sites (simulated)</li>
+                <li id="chip-scores" class="chip" data-required="honesty">Scores: loading</li>
+                <li id="chip-mode" class="chip chip-quiet">Data: loading</li>
+              </ul>
+            </div>
+
+            <div id="stats-plant" class="stats" aria-label="At a glance"></div>
+
+            <div class="work work-fill">
+              <div class="work-main">
+                <section class="map-card" aria-label="Map">
+                  <div class="map-head">
+                    <div id="filters-map" class="seg seg-sm" role="group" aria-label="Filter sites on the map">
+                      <label class="pill"><input type="radio" name="origin-map" value="all" checked><span>All</span></label>
+                      <label class="pill"><input type="radio" name="origin-map" value="open_land"><span>Open land</span></label>
+                      <label class="pill"><input type="radio" name="origin-map" value="corridor_edge"><span>Corridor edge</span></label>
+                    </div>
+                    <span class="grow"></span>
+                    <div class="layers-wrap">
+                      <button type="button" id="layers-button" class="btn btn-secondary btn-sm" aria-expanded="false" aria-controls="layer-toggles"><svg class="ic" width="14" height="14" aria-hidden="true"><use href="#i-layers"></use></svg>Layers</button>
+                      <div id="layer-toggles" class="popover" role="group" aria-labelledby="h-layers" hidden>
+                        <p id="h-layers" class="popover-title">Map layers</p>
+                        <label><input class="cb" type="checkbox" data-layer="sites" checked> Example sites</label>
+                        <label><input class="cb" type="checkbox" data-layer="corridor" checked> Green corridor (approximate)</label>
+                        <label><input class="cb" type="checkbox" data-layer="basemap" checked> Map detail</label>
+                        <label><input class="cb" type="checkbox" data-layer="ndvi"> Greenness (satellite)</label>
+                        <label><input class="cb" type="checkbox" data-layer="lst"> Ground heat (satellite)</label>
+                        <label class="quiet"><input class="cb" type="checkbox" data-layer="tiles"> Street map (needs internet)</label>
+                      </div>
+                    </div>
+                    <button type="button" class="btn btn-secondary btn-sm btn-icon" data-action="download" aria-label="Download list" title="Download list"><svg class="ic" width="14" height="14" aria-hidden="true"><use href="#i-download"></use></svg></button>
+                  </div>
+                  <div class="map-box">
+                    <div id="map" role="application" aria-label="Map of example planting sites. The five highest priority sites are marked 1 to 5."></div>
+                    <div id="legend" class="legend" aria-label="Legend"></div>
+                    <div id="coach" class="coach" role="note">
+                      <span>Click a site to see why it ranks here</span>
+                      <button type="button" id="coach-dismiss" aria-label="Dismiss this hint">&times;</button>
+                    </div>
+                    <p class="map-credit">Map data &copy; OpenStreetMap contributors</p>
+                    <!-- the site card: a panel on the left of the map, so the rest of the map stays visible and usable -->
+                    <section id="sheet-card" class="map-panel" aria-labelledby="h-card" tabindex="-1" hidden>
+                      <div class="map-panel-head">
+                        <h2 id="h-card">Site card</h2>
+                        <button type="button" id="card-close" class="btn btn-ghost btn-sm btn-icon" aria-label="Close the site card" title="Close the site card"><svg class="ic" width="14" height="14" aria-hidden="true"><use href="#i-x"></use></svg></button>
+                      </div>
+                      <div class="map-panel-body" id="card-body"></div>
+                    </section>
+                  </div>
+                </section>
+              </div>
+
+              <div class="rail">
+                <section class="sheet" id="sheet-matters" aria-labelledby="h-matters">
+                  <div class="sheet-head">
+                    <h2 id="h-matters">What matters most?</h2>
+                    <button type="button" class="btn btn-ghost btn-sm btn-icon sheet-toggle" aria-expanded="true" aria-controls="matters-body" aria-label="Collapse" title="Collapse">
+                      <svg class="ic ic-minus" width="14" height="14" aria-hidden="true"><use href="#i-minus"></use></svg>
+                      <svg class="ic ic-plus" width="14" height="14" aria-hidden="true"><use href="#i-plus"></use></svg>
+                    </button>
+                  </div>
+                  <div class="sheet-body" id="matters-body">
+                    <form id="weights-form" onsubmit="return false">
+                      <div class="weight-row">
+                        <label for="w-cooling">Heat relief</label>
+                        <span class="hint" id="hint-cooling">Favours hot, bare areas</span>
+                        <input id="w-cooling" type="range" min="0" max="100" step="1" data-key="cooling" aria-describedby="hint-cooling">
+                        <output id="o-cooling" for="w-cooling"></output>
+                      </div>
+                      <div class="weight-row">
+                        <label for="w-connectivity">Links green areas</label>
+                        <span class="hint" id="hint-connectivity">Closes gaps in the green corridor</span>
+                        <input id="w-connectivity" type="range" min="0" max="100" step="1" data-key="connectivity" aria-describedby="hint-connectivity">
+                        <output id="o-connectivity" for="w-connectivity"></output>
+                      </div>
+                      <div class="weight-row">
+                        <label for="w-shade">Shade for walkers</label>
+                        <span class="hint" id="hint-shade">Adds shade along footpaths</span>
+                        <input id="w-shade" type="range" min="0" max="100" step="1" data-key="shade" aria-describedby="hint-shade">
+                        <output id="o-shade" for="w-shade"></output>
+                      </div>
+                      <div class="form-foot">
+                        <button type="button" id="weights-reset" class="link-button">Reset</button>
+                        <p id="weights-note" role="status">The list and map update as you move these.</p>
+                      </div>
+                    </form>
+                  </div>
+                </section>
+
+                <section class="sheet" id="sheet-top" aria-labelledby="h-top">
+                  <div class="sheet-head">
+                    <h2 id="h-top">Top sites</h2>
+                    <span id="count" class="muted"></span>
+                  </div>
+                  <div class="sheet-body" id="top-body">
+                    <div id="filters" class="seg seg-sm" role="group" aria-label="Filter sites">
+                      <label class="pill"><input type="radio" name="origin" value="all" checked><span>All</span></label>
+                      <label class="pill"><input type="radio" name="origin" value="open_land"><span>Open land</span></label>
+                      <label class="pill"><input type="radio" name="origin" value="corridor_edge"><span>Corridor edge</span></label>
+                    </div>
+                    <div class="field field-search">
+                      <svg class="ic" width="14" height="14" aria-hidden="true"><use href="#i-search"></use></svg>
+                      <input id="search" type="search" placeholder="Find a site, e.g. ELM-3672" aria-label="Find a site by name">
+                    </div>
+                    <div class="list-window">
+                      <ol id="top-list" class="site-list"></ol>
+                      <p id="no-match" hidden>No sites match these filters. <button type="button" id="clear-filters" class="link-button">Clear filters</button></p>
+                    </div>
+                    <div class="list-foot">
+                      <button type="button" id="see-all" class="link-button"></button>
+                      <button type="button" id="download-csv" class="link-button" data-action="download">Download list</button>
+                    </div>
+                  </div>
+                </section>
+              </div>
+            </div>
+          </section>
+
+          <!-- ========== Before and after ========== -->
+          <section id="view-report" class="page" hidden aria-label="Before and after">
+            <div class="page-head">
+              <div class="page-title">
+                <h1 id="report-headline"></h1>
+                <p id="report-period"></p>
+              </div>
+              <fieldset id="metric-toggle">
+                <legend class="sr-only">Show</legend>
+                <span class="seg">
+                  <label class="pill"><input type="radio" name="metric" value="ndvi" checked><span>Greenness</span></label>
+                  <label class="pill"><input type="radio" name="metric" value="lst"><span>Ground heat</span></label>
+                </span>
+              </fieldset>
+            </div>
+
+            <div id="stats-report" class="stats" aria-label="At a glance"></div>
+
+            <div class="work">
+              <div class="work-main">
+                <div id="report-maps">
+                  <figure><figcaption id="cap-baseline"></figcaption><div id="map-baseline" class="report-map"></div></figure>
+                  <figure><figcaption id="cap-latest"></figcaption><div id="map-latest" class="report-map"></div></figure>
+                </div>
+                <div id="report-legend"></div>
+                <p id="report-missing" hidden class="notice">Map layers for this view are not in the current data set.</p>
+              </div>
+              <div id="cards">
+                <article class="card" id="card-sure"></article>
+                <article class="card" id="card-canopy"></article>
+                <article class="card" id="card-lst"></article>
+              </div>
+            </div>
+
+            <section class="year" aria-labelledby="h-year">
+              <h2 id="h-year">Year by year</h2>
+              <div id="year-charts" hidden>
+                <article class="card" id="chart-canopy"></article>
+                <article class="card" id="chart-lst"></article>
+              </div>
+              <div class="table-card">
+                <div class="table-scroll">
+                  <table id="series-table">
+                    <thead><tr><th>Year (Oct to Sep)</th><th>Tree-cover estimate (low to high)</th><th class="num">Ground heat</th><th class="num">Clear satellite looks per pixel</th></tr></thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+                <p id="series-note"></p>
+              </div>
+              <details id="more-numbers">
+                <summary>All the comparison numbers</summary>
+                <h3>Do independent maps agree about tree cover?</h3>
+                <p id="crosscheck-headline"></p>
+                <div class="table-scroll">
+                  <table id="crosscheck-table">
+                    <thead><tr><th>Method</th><th>Period</th><th class="num">Tree or canopy share</th><th></th></tr></thead>
+                    <tbody></tbody>
+                  </table>
+                </div>
+                <p id="crosscheck-note"></p>
+              </details>
+            </section>
+
+            <p id="report-credits"></p>
+          </section>
+        </main>
+        <div id="loading" role="status">Loading Elmina data&hellip;</div>
+      </div>
+
+      <footer id="honesty-bar" class="honesty">
+        <p id="honesty-text" class="honesty-text" data-required="honesty">
+          Example sites, not Sime Darby Property's list. Scores are previews until the ML model is connected.
+        </p>
+        <button type="button" id="open-limits" class="link-button" data-action="limits">Limits of this data</button>
+        <button type="button" id="open-credits" class="link-button" data-action="credits">Data credits</button>
+      </footer>
     </div>
-    <ul id="status" aria-label="Data status">
-      <li id="chip-simulated" class="chip chip-warn" data-required="honesty">Example sites (simulated)</li>
-      <li id="chip-scores" class="chip" data-required="honesty">Scores: loading</li>
-      <li id="chip-mode" class="chip chip-quiet">Data: loading</li>
-    </ul>
-    <nav id="view-tabs" aria-label="Views">
-      <button type="button" data-view="prioritise" aria-pressed="true">Plant first</button>
-      <button type="button" data-view="report" aria-pressed="false">Before and after</button>
-    </nav>
-  </header>
-
-  <div id="notices" role="status" aria-live="polite"></div>
-
-  <div id="fatal" hidden role="alert">
-    <h2>The data service is not reachable</h2>
-    <p id="fatal-reason"></p>
-    <p>Start it from the project folder, then retry:</p>
-    <pre>uvicorn backend.api.main:app --port 8000</pre>
-    <button type="button" id="fatal-retry">Retry</button>
   </div>
-
-  <main id="main">
-    <!-- ========== Plant first: the map is the screen ========== -->
-    <section id="view-prioritise" aria-label="Plant first">
-      <div id="map" role="application" aria-label="Map of example planting sites. The five highest priority sites are marked 1 to 5."></div>
-      <div id="loading" role="status">Loading Elmina data&hellip;</div>
-
-      <div id="left-stack">
-        <section class="sheet" id="sheet-matters" aria-labelledby="h-matters">
-          <div class="sheet-head">
-            <h2 id="h-matters">What matters most?</h2>
-            <button type="button" class="sheet-toggle" aria-expanded="true" aria-controls="matters-body" title="Collapse">&minus;</button>
-          </div>
-          <div class="sheet-body" id="matters-body">
-            <form id="weights-form" onsubmit="return false">
-              <div class="weight-row">
-                <label for="w-cooling">Heat relief</label>
-                <span class="hint" id="hint-cooling">Favours hot, bare areas</span>
-                <input id="w-cooling" type="range" min="0" max="100" step="1" data-key="cooling" aria-describedby="hint-cooling">
-                <output id="o-cooling" for="w-cooling"></output>
-              </div>
-              <div class="weight-row">
-                <label for="w-connectivity">Links green areas</label>
-                <span class="hint" id="hint-connectivity">Closes gaps in the green corridor</span>
-                <input id="w-connectivity" type="range" min="0" max="100" step="1" data-key="connectivity" aria-describedby="hint-connectivity">
-                <output id="o-connectivity" for="w-connectivity"></output>
-              </div>
-              <div class="weight-row">
-                <label for="w-shade">Shade for walkers</label>
-                <span class="hint" id="hint-shade">Adds shade along footpaths</span>
-                <input id="w-shade" type="range" min="0" max="100" step="1" data-key="shade" aria-describedby="hint-shade">
-                <output id="o-shade" for="w-shade"></output>
-              </div>
-              <div class="form-foot">
-                <button type="button" id="weights-reset" class="link-button">Reset</button>
-                <p id="weights-note" role="status">The list and map update as you move these.</p>
-              </div>
-            </form>
-          </div>
-        </section>
-
-        <section class="sheet" id="sheet-top" aria-labelledby="h-top">
-          <div class="sheet-head">
-            <h2 id="h-top">Top sites</h2>
-            <span id="count" class="muted"></span>
-            <button type="button" class="sheet-toggle" aria-expanded="true" aria-controls="top-body" title="Collapse">&minus;</button>
-          </div>
-          <div class="sheet-body" id="top-body">
-            <div id="filters" role="group" aria-label="Filter sites">
-              <label class="pill"><input type="radio" name="origin" value="all" checked><span>All</span></label>
-              <label class="pill"><input type="radio" name="origin" value="open_land"><span>Open land</span></label>
-              <label class="pill"><input type="radio" name="origin" value="corridor_edge"><span>Corridor edge</span></label>
-            </div>
-            <input id="search" type="search" placeholder="Find a site, e.g. ELM-3672" aria-label="Find a site by name">
-            <ol id="top-list"></ol>
-            <p id="no-match" hidden>No sites match these filters. <button type="button" id="clear-filters" class="link-button">Clear filters</button></p>
-            <div class="list-foot">
-              <button type="button" id="see-all" class="link-button"></button>
-              <button type="button" id="download-csv" class="link-button">Download list</button>
-            </div>
-          </div>
-        </section>
-      </div>
-
-      <div id="right-stack">
-        <section class="sheet" id="sheet-card" hidden aria-labelledby="h-card">
-          <div class="sheet-head">
-            <h2 id="h-card">Site card</h2>
-            <button type="button" id="card-close" class="sheet-toggle" title="Close the site card" aria-label="Close the site card">&times;</button>
-          </div>
-          <div class="sheet-body" id="card-body"></div>
-        </section>
-        <fieldset id="layer-toggles" class="sheet">
-          <legend>Map layers</legend>
-          <label><input type="checkbox" data-layer="sites" checked> Example sites</label>
-          <label><input type="checkbox" data-layer="corridor" checked> Green corridor (approximate)</label>
-          <label><input type="checkbox" data-layer="basemap" checked> Map detail</label>
-          <label><input type="checkbox" data-layer="ndvi"> Greenness (satellite)</label>
-          <label><input type="checkbox" data-layer="lst"> Ground heat (satellite)</label>
-          <label class="quiet"><input type="checkbox" data-layer="tiles"> Street map (needs internet)</label>
-        </fieldset>
-      </div>
-
-      <div id="legend" aria-label="Legend"></div>
-      <div id="coach" role="note">
-        <span>Click a site to see why it ranks here</span>
-        <button type="button" id="coach-dismiss" aria-label="Dismiss this hint">&times;</button>
-      </div>
-    </section>
-
-    <!-- ========== Before and after ========== -->
-    <section id="view-report" hidden aria-label="Before and after">
-      <div id="report-wrap">
-        <h2 id="report-headline"></h2>
-        <p id="report-period" class="muted"></p>
-        <fieldset id="metric-toggle">
-          <legend>Show</legend>
-          <label><input type="radio" name="metric" value="ndvi" checked> Greenness</label>
-          <label><input type="radio" name="metric" value="lst"> Ground heat</label>
-        </fieldset>
-        <div id="report-maps">
-          <figure><figcaption id="cap-baseline"></figcaption><div id="map-baseline" class="report-map"></div></figure>
-          <figure><figcaption id="cap-latest"></figcaption><div id="map-latest" class="report-map"></div></figure>
-        </div>
-        <div id="report-legend"></div>
-        <p id="report-missing" hidden class="notice">Map layers for this view are not in the current data set.</p>
-
-        <div id="cards">
-          <article id="card-canopy"></article>
-          <article id="card-lst"></article>
-          <article id="card-sure"></article>
-        </div>
-
-        <details id="more-numbers">
-          <summary>Year by year and all the comparison numbers</summary>
-          <h3>Year by year</h3>
-          <table id="series-table">
-            <thead><tr><th>Year (Oct to Sep)</th><th>Tree-cover estimate (low to high)</th><th>Ground heat</th><th>Clear satellite looks per pixel</th></tr></thead>
-            <tbody></tbody>
-          </table>
-          <p id="series-note" class="muted"></p>
-          <h3>Do independent maps agree about tree cover?</h3>
-          <p id="crosscheck-headline"></p>
-          <table id="crosscheck-table">
-            <thead><tr><th>Method</th><th>Period</th><th>Tree or canopy share</th><th></th></tr></thead>
-            <tbody></tbody>
-          </table>
-          <p id="crosscheck-note" class="muted"></p>
-        </details>
-      </div>
-    </section>
-  </main>
-
-  <footer id="honesty-bar">
-    <p id="honesty-text" data-required="honesty">
-      Example sites, not Sime Darby Property's list. Scores are previews until the ML model is connected.
-    </p>
-    <button type="button" id="open-limits" class="link-button">Limits of this data</button>
-    <button type="button" id="open-credits" class="link-button">Data credits</button>
-  </footer>
 
   <dialog id="dlg-limits" aria-labelledby="dlg-limits-title">
     <h2 id="dlg-limits-title">Limits of this data</h2>
     <ul id="caveats" data-required="honesty"></ul>
-    <form method="dialog"><button type="submit">Close</button></form>
+    <form method="dialog"><button type="submit" class="btn btn-secondary">Close</button></form>
   </dialog>
   <dialog id="dlg-credits" aria-labelledby="dlg-credits-title">
     <h2 id="dlg-credits-title">Data credits</h2>
     <p id="attribution" data-required="honesty"></p>
     <p id="built-note" class="muted"></p>
-    <form method="dialog"><button type="submit">Close</button></form>
+    <form method="dialog"><button type="submit" class="btn btn-secondary">Close</button></form>
   </dialog>
 
   <script src="vendor/leaflet/leaflet.js"></script>

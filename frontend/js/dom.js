@@ -33,3 +33,18 @@ export function clear(node) {
 
 export const $ = (selector, root = document) => root.querySelector(selector);
 export const $$ = (selector, root = document) => [...root.querySelectorAll(selector)];
+
+const SVG_NS = "http://www.w3.org/2000/svg";
+
+/** An icon from the sprite at the top of index.html: icon("x", 14) draws #i-x. Built with createElementNS, never from a string. */
+export function icon(name, size = 14) {
+  const svg = document.createElementNS(SVG_NS, "svg");
+  svg.setAttribute("class", "ic");
+  svg.setAttribute("width", String(size));
+  svg.setAttribute("height", String(size));
+  svg.setAttribute("aria-hidden", "true");
+  const use = document.createElementNS(SVG_NS, "use");
+  use.setAttribute("href", `#i-${name}`);
+  svg.append(use);
+  return svg;
+}
