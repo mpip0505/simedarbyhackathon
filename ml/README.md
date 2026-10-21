@@ -64,6 +64,27 @@ the rest are plausible, not guaranteed, and the report says which ones and why (
 shade score turns out to hinge entirely on where `unshaded_cap_m` happens to land). Use this for the
 "how sure are we" slide; use `ml.validation` for the one-at-a-time sensitivity breakdown.
 
+### Is there a future / forecast dashboard?
+
+Not a forecast — deliberately. The backend's yearly series is five historical points with noise
+bigger than the signal (one year's canopy band already spans 6.6-21.9%); fitting a trend through
+that and presenting it as a prediction would be the overclaiming this whole project refuses to do
+elsewhere. Instead:
+
+```bash
+python -m ml.scenario                 # top 50 ranked sites, 25-year horizon
+python -m ml.scenario --k 20 --years 15
+```
+
+A **scenario**, clearly labelled as one: if the top K ranked sites are planted, what their average
+canopy could plausibly look like over time, under three named growth-speed assumptions (fast/
+default/slow - not fitted, not cited, swap them for real horticultural input). The one number that
+*is* measured rather than assumed: the ceiling is today's actual canopy inside Elmina's existing
+OSM-mapped parks (15.1% on the current build) using the same NDVI >= 0.6 definition as everywhere
+else - not an invented "mature forest" number. Deliberately silent on temperature and carbon: this
+project has no calibrated relationship to translate canopy into either, and inventing one would
+repeat the mistake the scenario framing exists to avoid. Report: `ml/reports/scenario.md`.
+
 ### Comparing judgement calls
 
 The decay scales and the gap-fill discount inside each score are judgement calls, not weights, so
@@ -89,7 +110,8 @@ trying to reach into the API from here.
 | `tests/test_scoring_model.py` | output contract, transform behaviour, and the sign of every term |
 | `shortlist.py` | spread-out top-N for the pitch, separate from the scored/ranked file |
 | `uncertainty.py` | Monte Carlo over weights + judgement constants: a range per site, not one number |
-| `reports/` | generated; regenerate with `ml.validation` / `ml.shortlist` / `ml.uncertainty` |
+| `scenario.py` | planting-impact scenario (not a forecast) — see "Is there a future / forecast dashboard?" below |
+| `reports/` | generated; regenerate with `ml.validation` / `ml.shortlist` / `ml.uncertainty` / `ml.scenario` |
 
 ## The model in six lines
 

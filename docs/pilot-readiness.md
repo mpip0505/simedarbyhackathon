@@ -1,8 +1,12 @@
-# From prototype to pilot: what Sime Darby Property would need
+# From method pilot to township-wide rollout: what Sime Darby Property would need
 
 Written for: the pitch writers, and anyone from Sime Darby Property who asks "could we use this?".
-Honest short answer: **this is a screening tool.** It ranks where to look first and shows the method working on real
-Elmina data. It is not yet something to base a climate disclosure or a planting contract on.
+Honest short answer: **this is a screening tool, piloted on real Elmina data.** There are two different things that
+word "pilot" could mean here, and they are at very different stages:
+- **Pilot of the method** — done. The pipeline, corridor model and scoring ran end to end on real satellite imagery
+  and real map data for a real township, not a toy example.
+- **Pilot of real planting** — not yet. That needs Sime Darby Property's actual site list and some field validation,
+  both scoped below. Until then it is not something to base a climate disclosure or a planting contract on.
 
 ## What exists today
 - A repeatable pipeline: free Sentinel-2 and Landsat imagery in Google Earth Engine, OpenStreetMap paths/roads/parks,
@@ -20,7 +24,7 @@ Elmina data. It is not yet something to base a climate disclosure or a planting 
 - Not validated against ground truth: nobody on the team has field plots, a tree inventory or LiDAR.
 - Temperature is for ranking, not quoting (Landsat thermal is about 100 m native; about 18% of the area is gap-filled).
 
-## What a pilot would need, and what each changes in the backend
+## What piloting real planting would need, and what each changes in the backend
 | Need | Why it matters | Backend change |
 |---|---|---|
 | **Their real planting-site list** (polygons or points, ideally with species and ERT flag) | The whole value is ranking *their* remaining sites, not our simulated ones | `--sites-file`: score a supplied list with the same features instead of generating cells; keep their IDs; drop the "simulated" label |
@@ -33,11 +37,11 @@ Elmina data. It is not yet something to base a climate disclosure or a planting 
 | **Planting realities we do not model** | Soil, species suitability, irrigation, land ownership, construction schedule (some "brownfield" in OSM may be about to be built on), cost per site | Extra layers and a feasibility filter before ranking; a site-status field they maintain |
 
 ## What we would honestly say to the judges
-1. We built a working, tested pipeline on real free data, and we know exactly where it is weak.
+1. We piloted the method end to end on real free data for a real township, and we know exactly where it is weak.
 2. The ranking is useful for *where to look first*; the before/after view is a demonstration, not a measurement of
    growth (the change we detect is smaller than year-to-year noise).
-3. The pilot is small and concrete: their site list plus one afternoon of field plots turns a screening tool into
-   something they can test against their own records.
+3. Piloting real planting is small and concrete from here: their site list plus one afternoon of field plots turns
+   a screening tool into something they can test against their own records.
 
 ## Questions only Sime Darby Property can answer
 - Is there a site list or planting schedule (polygons, species, status) that could be shared for a pilot?

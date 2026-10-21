@@ -132,6 +132,19 @@ score. That's the kind of thing a single deterministic number hides and a distri
   are under-mapped, so `built_up_frac_250m` is a lower bound there and those sites' cooling scores
   are, if anything, too low.
 
+## Is there a prediction for the future?
+
+No, deliberately not — see [judge-qa.md Q18a](judge-qa.md) for the short version. The yearly series
+has only five historical points with more noise than signal, so fitting a trend and calling it a
+forecast would undercut the honesty this whole write-up is built on. `python -m ml.scenario`
+produces something narrower and defensible instead: a labelled **scenario** — if the top-ranked
+sites are planted, a plausible canopy trajectory for that planted set, under a named growth-speed
+assumption we did not fit to anything (no field data exists), anchored to one real measurement
+(canopy already inside Elmina's existing parks, ~15% today, same NDVI definition as everywhere
+else). It stays scoped to canopy percentage; it does not translate into temperature or carbon,
+because this project has no calibrated relationship to do that honestly. Report:
+[`ml/reports/scenario.md`](../ml/reports/scenario.md).
+
 ## Reproducing it
 
 ```bash
@@ -140,7 +153,8 @@ python -m backend.validate_scores backend/data/cache/scores.geojson      # must 
 python -m ml.validation                   # regenerates ml/reports/validation.{json,md}
 python -m ml.uncertainty                  # regenerates ml/reports/uncertainty.{json,md} + sites.csv
 python -m ml.shortlist                    # a spread-out top 20 for the pitch slide
-python -m pytest ml/tests -q              # 34 tests on the model contract and the sign of every term
+python -m ml.scenario                     # a labelled planting scenario, not a forecast
+python -m pytest ml/tests -q              # 45 tests on the model contract and the sign of every term
 ```
 
 Scores are stamped with the backend's `data_version`. If the backend rebuilds its data,

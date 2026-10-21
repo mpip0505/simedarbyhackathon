@@ -103,6 +103,13 @@ site needs its own validation, and commercial use changes the Earth Engine licen
 Sime Darby Property's real site list, one set of field plots or a LiDAR/drone sample to calibrate the canopy proxy, the
 official corridor polygon, and a scheduled seasonal re-run. Details in [pilot-readiness.md](pilot-readiness.md).
 
+**16a. Wait — is this itself a pilot, or not?**
+Both answers are true, for two different things. We **did** pilot the method: the pipeline, corridor model and
+scoring ran end to end on real satellite imagery and real OpenStreetMap data for a real township, City of Elmina —
+not a toy example. We have **not** piloted real planting: the 564 candidate sites are simulated, not Sime Darby
+Property's list, so nothing has been planted or tested against their own records yet. *Do not say* "we piloted tree
+planting in Elmina" — say "we piloted the method in Elmina; piloting real planting is the next, concrete step."
+
 **17. You say 5% of the trees are planted. Is that right?**
 We do not use that figure. The developer's own pages conflict: one infographic says 10,266 trees planted (from a 2022
 survey) while text on the same page says over 41,000. We would ask Sime Darby Property for the current count before
@@ -119,6 +126,17 @@ three, connectivity is weighted down because the corridor it depends on is appro
 live in the app (`/weights`, re-ranks via `?w_cooling=`), and the pitch deck's shortlist spreads the same top sites
 across 10 neighbourhoods instead of one corridor-edge strip, for one point of average score. Full write-up:
 [ml-model.md](ml-model.md).
+
+**18a. Do you predict future canopy or temperature?**
+No, deliberately. Our yearly series is five historical points with more year-to-year noise than
+signal (one year's canopy band alone spans 6.6% to 21.9%), so fitting a trend through it and calling
+it a forecast would be a worse version of the overclaiming we refuse to do elsewhere. What we show
+instead is a labelled **scenario**: if the top-ranked sites are planted, a plausible canopy
+trajectory for *that planted set* under a named, swappable growth-speed assumption (not fitted, not
+cited) — anchored to one real measurement, what canopy already looks like inside Elmina's existing
+parks today (about 15%, using the same NDVI definition as everywhere else). It does not translate
+into a temperature or carbon number; we have no calibrated relationship to do that honestly. See
+`ml/reports/scenario.md`. *Do not say:* "we predict X% canopy by 2030."
 
 **19. What happens if the demo breaks?**
 The demo runs offline from committed data, with no live Earth Engine or internet call. The API checks its own data at
@@ -154,4 +172,5 @@ number was less certain than we first thought, which we then put on the screen.
 
 ## Phrases to avoid
 "Accurate", "validated" (without saying against what), "defensible", "reportable evidence", "our recommended sites",
-"canopy increased", "10,266 trees planted (5%)", "KL's heat islands doubled", "carbon sequestered".
+"canopy increased", "10,266 trees planted (5%)", "KL's heat islands doubled", "carbon sequestered",
+"we predict/forecast X% canopy by [year]" (say "scenario", not "forecast" — see Q18a).

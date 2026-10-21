@@ -11,9 +11,12 @@ web map (Frontend) are built by teammates against the API and data contract desc
 write-up live in [`ml/`](ml/) and [docs/ml-model.md](docs/ml-model.md) — see [For the ML teammate](#for-the-ml-teammate)
 below for the rest of the trail.
 
-> **Status: working prototype, screening-grade.** It ranks where to look first. It is **not** a tree count, a carbon
-> figure or disclosure-grade evidence. The candidate sites are **simulated** (we do not have Sime Darby Property's
-> real planting list). Read [Limitations](#limitations-read-this-before-quoting-any-number) before quoting any number.
+> **Status: pilot of the method on real Elmina data** — not yet a pilot of real planting. The pipeline, corridor and
+> scoring run end to end on real satellite and map data for a real township; that is what has been piloted. It ranks
+> where to look first. It is **not** a tree count, a carbon figure or disclosure-grade evidence. The candidate sites
+> are **simulated** (we do not have Sime Darby Property's real planting list) — piloting *real planting* needs that
+> list plus field plots, both scoped in [pilot-readiness.md](docs/pilot-readiness.md). Read
+> [Limitations](#limitations-read-this-before-quoting-any-number) before quoting any number.
 
 ## Contents
 [Quick start](#quick-start) · [How it works](#how-it-works) · [API](#api) · [Rebuilding the data](#rebuilding-the-data) ·
@@ -120,9 +123,11 @@ Builds are deterministic: a full rebuild from a fresh download reproduced the co
   constants at once, reporting a score and rank range per site, not one deterministic number. Reports:
   [`ml/reports/`](ml/reports/).
 - **Pitch tools:** `python -m ml.shortlist` produces a spread-out top-20 (capped per 250 m block) for a slide that
-  reads as "a few priority areas", separate from the live-ranked map. Plain-language write-up for judges/slides:
-  [docs/ml-model.md](docs/ml-model.md).
-- 34 tests: `python -m pytest ml/tests -q`.
+  reads as "a few priority areas", separate from the live-ranked map. `python -m ml.scenario` produces a labelled
+  planting-impact **scenario** (explicitly not a forecast — the yearly series is too thin and noisy to fit a trend
+  through honestly), anchored to canopy measured today inside Elmina's own parks. Plain-language write-up for
+  judges/slides: [docs/ml-model.md](docs/ml-model.md).
+- 45 tests: `python -m pytest ml/tests -q`.
 - Split train/test by `block_id` (neighbouring cells are correlated). Site IDs are stable across rebuilds.
 - **There are no ground-truth labels.** Validation can only check consistency, not that the ranking is right.
 
