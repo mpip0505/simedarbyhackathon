@@ -43,3 +43,6 @@ No ground truth (tree inventory, LiDAR or field plots) and no real Sime Darby si
 - 22 Oct 2026, after Batch 1 (impact reach): Impact moves from about 13 to 15 up to about **16 to 18 of 25**. The tool now states what the top sites reach, de-duplicated
   (for example, the first 50 sites are within 50 m of about 5,400 m of footpath with no tree cover, 8% of the township's, and within 250 m of 349 of 968 mapped homes),
   and the pilot-readiness doc lists what a real pilot would measure. It is still reach, not outcome, because there is no ground truth. Total estimate about 63 to 70.
+- 22 Oct 2026, after Batch 2 (commercial case): Commercial moves from about 4 to 5 up to about **6 to 7 of 10**. `docs/commercial-case.md` names the users, other uses, cost drivers,
+  the Earth Engine licensing point and labelled hypotheses, and lists exactly what is Elmina-specific in the code (so another township is a day or two of work, not a rebuild from scratch).
+  It stays a hypothesis because nothing has been run on a second township and we do not know the buyer's budget or current process. Not built: the township kit (the audit showed it is not a small change).
