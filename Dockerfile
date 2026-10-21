@@ -8,6 +8,7 @@ COPY backend/requirements-serve.txt backend/requirements-serve.txt
 RUN pip install --no-cache-dir -r backend/requirements-serve.txt
 COPY backend backend
 COPY frontend frontend
+COPY ml/reports ml/reports
 RUN useradd --create-home app && chown -R app /app
 USER app
 EXPOSE 8000

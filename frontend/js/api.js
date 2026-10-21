@@ -31,6 +31,7 @@ export class ApiError extends Error {
 }
 
 export const apiUrl = (path) => BASE + path;
+export const appPageUrl = (path, base = BASE) => path + (base ? `?api=${encodeURIComponent(base)}` : "");
 const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
 
 async function once(path, timeoutMs) {
@@ -93,4 +94,6 @@ export const api = {
   impact: () => getOptional("/ml/impact"),
   tradeoff: () => getOptional("/ml/tradeoff"),
   reachSets: () => getOptional("/ml/reach-sets"),
+  conflicts: () => getOptional("/screening/conflicts"),
+  openData: () => getOptional("/screening/open-data"),
 };

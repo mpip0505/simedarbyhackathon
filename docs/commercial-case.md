@@ -11,6 +11,8 @@ published method for doing it at planting-site scale in a cloudy tropical townsh
 free data. The value multiplies because the same pipeline and the same screens can be re-run for another township or another question, **after a defined amount of adaptation work (below)**.
 
 ## Who it is for (hypothesis, to be confirmed with Sime Darby Property mentors)
+**Proposed first customer: Sime Darby Property's City of Elmina landscape operations team**, with its sustainability team as reporting partner. Offer a bounded pilot: real sites and GIS, a sampled field inspection, comparison with the current shortlisting process, and records of time, feasibility, route shade and survival. This is a prospect, not a paying customer or agreed pilot; a named contact, budget owner and interview are still missing.
+
 | Role | What they do today (assumed) | What the tool changes | What we do not know |
 |---|---|---|---|
 | Landscape and planting team | choose planting sites by site knowledge and schedule | an explained, ranked shortlist with adjustable priorities; GIS and print exports | how sites are chosen now, and how long it takes |
@@ -48,7 +50,7 @@ OpenStreetMap fetch and the cloud-masked composites are the same. The free map-d
 ## The licensing point, stated openly
 Our Google Earth Engine registration is **noncommercial**, and says no payment is received for the work. A paid pilot or internal commercial use by a company changes that:
 Google's current commercial terms would need to be checked and a commercial plan taken, **or** the imagery step moved to an open-data pipeline (Sentinel-2 and Landsat are both
-free to download from their providers). Moving off Earth Engine would mean rewriting `backend/gee/` and re-checking the results; we have not done it and do not know how long it would take beyond "days, not hours".
+free to download from their providers). Replacing the full satellite method would require rewriting `backend/gee/` and re-checking results; that replacement is not built. A reduced **OSM-only fallback is now runnable** (`python -m backend.open_data`, `/app/open-data.html`): it constructs candidates and ranks footpath/park proximity without any Earth Engine artifact or credential. It has no heat or actual-shade measurement. See [assessment-response.md](assessment-response.md) for its method, hashes, downloads and the remaining licensing distinction.
 
 ## Business-model hypotheses, and what would test them
 | Hypothesis | Test |

@@ -25,8 +25,10 @@ STEPS = {
     "crosscheck": ("backend.gee.crosscheck", "canopy cross-check vs WorldCover and Dynamic World (Earth Engine)"),
     "overlays": ("backend.overlays", "map overlay images from rasters"),
     "sites": ("backend.sites.generate", "generate simulated candidate sites"),
+    "conflicts": ("backend.conflicts", "screen mapped conflicts for field review"),
+    "open_data": ("backend.open_data", "build independent OSM-only candidate list"),
 }
-ORDER = ["osm_download", "osm_layers", "corridor", "gee_export", "series", "sensitivity", "crosscheck", "overlays", "sites"]
+ORDER = ["osm_download", "osm_layers", "corridor", "gee_export", "series", "sensitivity", "crosscheck", "overlays", "sites", "conflicts", "open_data"]
 
 
 def plan_steps(skip_gee: bool = False, offline: bool = False) -> list:

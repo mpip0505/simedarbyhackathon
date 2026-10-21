@@ -1,5 +1,7 @@
 # PRD: Elmina Canopy Prioritiser
 
+Current implementation addendum (22 October 2026): [assessment-response.md](docs/assessment-response.md) documents resident shade-exposure scenarios, mapped conflict screening and the independent OSM-only fallback. It supplements the historical requirements/status below. Team/registration details and real field/usability results were explicitly excluded from this implementation.
+
 Written for: the whole team (Backend, ML, Frontend and design, pitch writers) and mentors. It says what we are building,
 for whom, what "done" means and what we will not claim. Detail lives in the linked docs; this file points to them
 instead of repeating them.

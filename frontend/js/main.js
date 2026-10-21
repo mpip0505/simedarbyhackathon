@@ -1,7 +1,7 @@
 // Entry point: loads the data from the API and connects the map, panels, sliders, site card and report view.
 // Until a slider moves, the list shows the ranking the API served (the ML model's, once it is merged).
 // Moving a slider re-ranks in the browser with the same formula as the API (js/weights.js, tested against Python).
-import { api, ApiError, ignoredApiParam } from "./api.js";
+import { api, ApiError, ignoredApiParam, appPageUrl } from "./api.js";
 import { el, clear, $, $$ } from "./dom.js";
 import { createStore } from "./state.js";
 import { KEYS, retotal, topChange } from "./weights.js";
@@ -27,6 +27,8 @@ import { startTour } from "./tour.js";
 import { createPlan, planRows } from "./plan.js";
 import { renderPlanPanel } from "./plan-ui.js";
 import { renderPilot } from "./pilot-ui.js";
+import { createExposure } from "./exposure.js";
+import { conflictFor } from "./screening.js";
 import { steadiness, steadySummary, shortlistRows, shortlistNote } from "./ml-logic.js";
 
 const OSM_NAMES = ["open_land", "parks", "buildings", "roads", "paths"];
@@ -35,7 +37,7 @@ const BADGES = 5;           // sites marked 1 to 5 on the map
 const OUTLINED = 10;        // sites with a dark outline
 const DEFAULT_NOTE = "The list and map update as you move these.";
 const VIEW_NAMES = { prioritise: "Plant first", report: "Before and after", pilot: "Pilot plan" };
-const store = createStore({ selectedId: null, filter: "all", query: "", usingServer: true, expanded: false, listMode: "ranked" });
+const store = createStore({ selectedId: null, filter: "all", query: "", usingServer: true, expanded: false, listMode: "ranked", conflictsOnly: false });
 let started = false;
 
 // ---------- header, notices, dialogs ----------
@@ -83,6 +85,7 @@ function openDialog(id) {
 }
 
 function showFatal(error) {
+  $("[data-open-data]").href = appPageUrl("open-data.html");
   const reason = error instanceof ApiError && error.status === 0
     ? "The page could not reach the API. It may not be running."
     : `The API answered with a problem: ${error.message}`;
@@ -180,9 +183,11 @@ async function boot() {
       "The ?api= address in the link was ignored: only a localhost address or this site's own address is accepted."));
   }
 
-  const optional = await Promise.all([api.spine(), api.pathShade(), api.overlays(), api.uncertainty(), api.shortlist(), api.impact(), api.tradeoff(), api.reachSets(), ...OSM_NAMES.map((n) => api.osm(n))]
+  const optional = await Promise.all([api.spine(), api.pathShade(), api.overlays(), api.uncertainty(), api.shortlist(), api.impact(), api.tradeoff(), api.reachSets(), api.conflicts(), ...OSM_NAMES.map((n) => api.osm(n))]
     .map((p) => p.catch(() => null)));
-  const [spine, pathShade, overlays, uncertainty, shortlist, impact, tradeoff, reachSets, ...osmList] = optional;
+  const [spine, pathShade, overlays, uncertainty, shortlist, impact, tradeoff, reachSets, conflicts, ...osmList] = optional;
+  $("#conflict-only").disabled = conflicts?.stale !== false;
+  $("#conflict-filter-note").textContent = conflicts?.stale === false ? "Map triggers only; field checks still needed." : "Current mapped conflict screen unavailable.";
   const osm = Object.fromEntries(OSM_NAMES.map((n, i) => [n, osmList[i]]));
   if (!osmList.some(Boolean)) $("#notices").append(el("div", { class: "notice" }, "No OpenStreetMap basemap in this data set; showing the sites only."));
 
@@ -254,7 +259,8 @@ async function boot() {
     const { filter, query, listMode } = store.get();
     const q = query.trim().toLowerCase();
     const pool = listMode === "shortlist" && hasShortlist ? shortlistRows(shortlist, new Map(ranked.map((f) => [f.properties.site_id, f]))) : ranked;
-    return pool.filter((f) => (filter === "all" || f.properties.origin === filter) && (!q || f.properties.site_id.toLowerCase().includes(q)));
+    return pool.filter((f) => (filter === "all" || f.properties.origin === filter) && (!q || f.properties.site_id.toLowerCase().includes(q))
+      && (!store.get().conflictsOnly || conflictFor(conflicts, f.properties.site_id).state === "review"));
   }
 
   function renderLegend([min, max]) {
@@ -274,7 +280,7 @@ async function boot() {
     const feature = selectedId ? byId.get(selectedId) : null;
     $("#sheet-card").hidden = !feature;
     $(".map-box").classList.toggle("has-card", Boolean(feature));
-    if (feature) renderCard($("#card-body"), feature, { weights, ctx, total: byId.size, placeholder, steady: steadyOf(selectedId), custom: !store.get().usingServer, plan });
+    if (feature) renderCard($("#card-body"), feature, { weights, ctx, total: byId.size, placeholder, steady: steadyOf(selectedId), custom: !store.get().usingServer, plan, conflict: conflictFor(conflicts, selectedId) });
   }
 
   /** The part of the map the card leaves free, in map pixels: to its right as a side panel, above it when it spans the map (phones). */
@@ -381,8 +387,10 @@ async function boot() {
   for (const r of filterRadios) r.addEventListener("change", () => { store.set({ filter: r.value }); showFilter(r.value); refresh(); });
   for (const r of $$('input[name="list-mode"]')) r.addEventListener("change", () => { store.set({ listMode: r.value, expanded: false }); refresh(); });
   $("#search").addEventListener("input", (e) => { store.set({ query: e.target.value }); refresh(); });
+  $("#conflict-only").addEventListener("change", (e) => { store.set({ conflictsOnly: e.target.checked }); refresh(); });
   $("#clear-filters").addEventListener("click", () => {
-    store.set({ filter: "all", query: "" });
+    store.set({ filter: "all", query: "", conflictsOnly: false });
+    $("#conflict-only").checked = false;
     showFilter("all");
     $("#search").value = "";
     refresh();
@@ -390,7 +398,7 @@ async function boot() {
   $("#see-all").addEventListener("click", () => { store.set({ expanded: !store.get().expanded }); refresh(); });
   actions.download = () => download("elmina-ranked-sites.csv", toCsv(rankedRows(currentRanked())));
   actions.geojson = () => download("elmina-ranked-sites.geojson",
-    JSON.stringify(toGeoJson(currentRanked(), { scoreSource: meta.score_source, dataVersion: meta.data_version ?? null, plan })), "application/geo+json");
+    JSON.stringify(toGeoJson(currentRanked(), { scoreSource: meta.score_source, dataVersion: meta.data_version ?? null, plan, conflicts })), "application/geo+json");
   actions.brief = () => {
     const s = store.get();
     renderBrief($("#print-brief"), currentRanked(), { ctx, steadyOf, meta, weights: s.weights, custom: !s.usingServer, planRows: planRows(plan.list(), byId) });
@@ -413,8 +421,10 @@ async function boot() {
   });
   plan.subscribe(() => markPlan(list, plan.ids()));
   const pilot = renderPilot($("#pilot-root"), {
+    exposure: createExposure(storage),
+    conflicts: () => conflicts,
     plan, byId: () => byId, ranked: () => currentRanked(), onSelect: async (id) => { await showView("prioritise"); select(id, "list"); }, download,
-    reachSets: () => (reachSets?.stale === true ? null : reachSets), today: () => new Date().toISOString().slice(0, 10), backToMap: () => showView("prioritise"),
+    reachSets: () => (reachSets?.stale === false ? reachSets : null), today: () => new Date().toISOString().slice(0, 10), backToMap: () => showView("prioritise"),
   });
 
   const start = parseHash(location.hash);              // a shared link: weights and site in the address

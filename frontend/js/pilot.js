@@ -87,7 +87,7 @@ export function blocksOf(ids, byId) {
  * Returns null when the data is missing. Reach, not benefit.
  */
 export function unionReach(reachSets, ids) {
-  if (!reachSets?.sites) return null;
+  if (!reachSets?.sites || reachSets.stale === true || reachSets.stale === null || ids.some((id) => !reachSets.sites[id])) return null;
   const path = new Set(), homes = new Set(), gaps = new Set();
   for (const id of ids) {
     const s = reachSets.sites[id];

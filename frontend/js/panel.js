@@ -5,6 +5,7 @@ import { SCORE_LABELS, contributions, driverNotes, siteHeadline } from "./driver
 import { fmt, fmtC, fmtMetres, fmtPct } from "./scale.js";
 import { canSpeak, siteSpeech } from "./speech.js";
 import { planControls } from "./plan-ui.js";
+import { conflictBlock } from "./screening-ui.js";
 
 const ORDER = ["cooling", "connectivity", "shade"]; // the order used in the brief
 
@@ -30,7 +31,7 @@ const measure = (label, value) => el("tr", {}, el("td", {}, label), el("td", {},
  * options: { weights, ctx, total, placeholder, steady, custom } where total is the number of sites, placeholder is true unless scores
  * are from ML, steady is ml-logic.steadiness() for this site (or null) and custom is true once a slider has moved.
  */
-export function renderCard(body, feature, { weights, ctx, total, placeholder, steady = null, custom = false, plan = null }) {
+export function renderCard(body, feature, { weights, ctx, total, placeholder, steady = null, custom = false, plan = null, conflict = null }) {
   clear(body);
   const p = feature.properties;
   const parts = contributions(p, weights);
@@ -55,6 +56,7 @@ export function renderCard(body, feature, { weights, ctx, total, placeholder, st
     plan ? planControls(plan, p.site_id) : null);
 
   const right = el("div", { class: "card-col" },
+    conflict ? conflictBlock(conflict) : null,
     el("h3", {}, "Why it ranks here"),
     el("ul", { class: "card-list" }, notes.map((n) => el("li", {}, n))),
     warnings.map((w) => el("p", { class: "notice" }, w)),

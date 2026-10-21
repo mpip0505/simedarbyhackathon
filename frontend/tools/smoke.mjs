@@ -635,6 +635,42 @@ try {
     await evaluate(`${clear}.click()`);
     assert.match(await evaluate(`document.querySelector('#card-plan').innerText`), /No sites yet/);
   });
+  await check("mapped conflict filter opens a flagged card without changing field checks or scores", async () => {
+    const before = await rows();
+    const mapped = await (await fetch(BASE + "/screening/conflicts")).json();
+    const flaggedCount = Object.values(mapped.sites).filter((s) => s.state === "review").length;
+    await evaluate(`document.querySelector('#conflict-only').click()`);
+    assert.match(await evaluate(`document.querySelector('#count').textContent`), new RegExp(`^${flaggedCount} of `));
+    await evaluate(`document.querySelector('${ROWS}').click()`);
+    assert.equal(await evaluate(`document.querySelector('#card-body [data-map-conflict]').dataset.mapConflict`), "review");
+    assert.match(await evaluate(`document.querySelector('#card-body').innerText`), /not an approval or legal setback check/);
+    await evaluate(`document.querySelector('#card-close').click(); document.querySelector('#conflict-only').click()`);
+    assert.deepEqual(await rows(), before);
+  });
+  await check("resident exposure uses explicit inputs, exports its assumptions, and remembers them on reload", async () => {
+    await evaluate(`document.querySelector('#view-tabs button[data-view="pilot"]').click()`);
+    await evaluate(`[...document.querySelectorAll('#pilot-root button')].find(b => b.textContent.trim() === 'Add the first five ranked sites').click()`);
+    assert.equal(await evaluate(`document.querySelector('[data-exposure-result]').dataset.exposureResult`), "needs-inputs");
+    const values = { residentsPerBuilding: "3", walkersPct: "25", minutesPerDay: "10", baselineShadePct: "20", targetShadePct: "60", horizon: "Year 5", basis: "Synthetic browser-test assumptions" };
+    for (const [key, value] of Object.entries(values)) await evaluate(`(() => { const e = document.querySelector('[data-key="exposure:${key}"]'); e.value = ${JSON.stringify(value)}; e.dispatchEvent(new Event('change', { bubbles: true })); })()`);
+    assert.equal(await evaluate(`document.querySelector('[data-exposure-result]').dataset.exposureResult`), "ready");
+    assert.match(await evaluate(`document.querySelector('[data-exposure-result]').textContent`), /unshaded person-minutes per day.*Year 5/);
+    await evaluate(`window.__exposureBlob = null; const create = URL.createObjectURL.bind(URL); URL.createObjectURL = (b) => { window.__exposureBlob = b; return create(b); }; [...document.querySelectorAll('#pilot-root button')].find(b => b.textContent === 'Download exposure scenario (CSV)').click()`);
+    const csv = await evaluate(`window.__exposureBlob.text()`);
+    assert.match(csv, /Synthetic browser-test assumptions/);
+    assert.match(csv, /not a measured benefit/);
+    assert.match(csv, /baseline_person_minutes_per_day/);
+    await evaluate(`document.querySelector('.pp-exposure').scrollIntoView({block:'center'})`);
+    await shot("pilot-exposure");
+    await open(`${BASE}/app/`);
+    await waitFor(`document.querySelector('#loading').hidden`, "exposure reload");
+    await evaluate(`document.querySelector('#view-tabs button[data-view="pilot"]').click()`);
+    assert.equal(await evaluate(`document.querySelector('[data-key="exposure:horizon"]').value`), "Year 5");
+    assert.equal(await evaluate(`document.querySelector('[data-exposure-result]').dataset.exposureResult`), "ready");
+    await evaluate(`document.querySelector('#view-tabs button[data-view="prioritise"]').click()`);
+    const clear = `[...document.querySelector('#card-plan').querySelectorAll('button')].find(b => /^Clear the plan|^Click again/.test(b.textContent))`;
+    await evaluate(`${clear}.click()`); await evaluate(`${clear}.click()`);
+  });
   await check("the trade-off card compares five ways of choosing, as a trade-off with no winner", async () => {
     const card = `document.querySelector('#card-tradeoff')`;
     assert.equal(await evaluate(`${card}.hidden`), false, "the card should show with scores from the scoring model");
@@ -770,6 +806,73 @@ try {
   });
   await shot("5-narrow");
 
+  await check("OSM-only page renders and exports its separate method, map and source provenance", async () => {
+    const osmReport = await (await fetch(BASE + "/screening/open-data")).json();
+    await open(`${BASE}/app/open-data.html`, 1440, 900);
+    await waitFor(`document.querySelector('#fallback-root table') && !document.querySelector('#fallback-map').hidden`, "OSM-only fallback");
+    assert.match(await evaluate(`document.querySelector('#fallback-status').textContent`), new RegExp(`${osmReport.features.length} simulated candidates.*OSM-only.*Input hashes match`));
+    assert.equal(await evaluate(`document.querySelectorAll('#fallback-root tbody tr').length`), 10);
+    await evaluate(`window.__fallbackBlobs = []; const make = URL.createObjectURL.bind(URL); URL.createObjectURL = (b) => { window.__fallbackBlobs.push(b); return make(b); }; [...document.querySelectorAll('#fallback-root button')].forEach(b => b.click())`);
+    const csv = await evaluate(`window.__fallbackBlobs[0].text()`);
+    const geo = JSON.parse(await evaluate(`window.__fallbackBlobs[1].text()`));
+    assert.match(csv, /osm-only/); assert.match(csv, /input_hashes/);
+    assert.equal(geo.features.length, osmReport.features.length); assert.equal(geo.source_mode, "osm-only");
+    assert.equal(geo.stale, false);
+    assert.equal(geo.features[0].properties.score_cooling, undefined);
+    await assertCleanText("OSM-only fallback");
+    if (axeSource) {
+      await evaluate(axeSource);
+      const violations = await evaluate(`axe.run(document, { runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa'] } }).then(r => r.violations.map(v => v.id + ': ' + v.help))`);
+      assert.deepEqual(violations, []);
+    }
+    await shot("osm-only-desktop");
+    await open(`${BASE}/app/open-data.html`, 390, 844);
+    await waitFor(`document.querySelector('#fallback-root table')`, "narrow OSM-only fallback");
+    assert.ok(await evaluate(`document.documentElement.scrollWidth <= 400`), "fallback overflows the mobile viewport");
+    await shot("osm-only-mobile");
+  });
+  await check("missing optional reports stay unknown and the configured API survives navigation to the independent fallback", async () => {
+    let blockCore = false;
+    const requests = [];
+    const proxy = http.createServer(async (req, res) => {
+      requests.push(req.url);
+      if (["/screening/conflicts", "/ml/reach-sets"].includes(req.url)) {
+        res.writeHead(404, { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" });
+        res.end(JSON.stringify({ detail: "Optional report missing" })); return;
+      }
+      if (blockCore && ["/meta", "/sites", "/summary", "/weights"].includes(req.url)) {
+        res.writeHead(503, { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" });
+        res.end(JSON.stringify({ detail: "Satellite cache unavailable" })); return;
+      }
+      try {
+        const upstream = await fetch(BASE + req.url);
+        let body = Buffer.from(await upstream.arrayBuffer());
+        if (req.url === "/screening/open-data") {
+          const report = JSON.parse(body.toString()); report.stale = null; body = Buffer.from(JSON.stringify(report));
+        }
+        res.writeHead(upstream.status, { "Content-Type": upstream.headers.get("content-type") || "application/json", "Access-Control-Allow-Origin": "*" });
+        res.end(body);
+      } catch { res.writeHead(502); res.end(); }
+    });
+    await new Promise((resolve) => proxy.listen(0, "127.0.0.1", resolve));
+    const proxyBase = `http://127.0.0.1:${proxy.address().port}`;
+    try {
+      await open(`${BASE}/app/?api=${encodeURIComponent(proxyBase)}`);
+      await waitFor(`document.querySelector('#loading').hidden && document.querySelectorAll('${ROWS}').length > 0`, "app without optional screening reports");
+      assert.equal(await evaluate(`document.querySelector('#conflict-only').disabled`), true);
+      await evaluate(`document.querySelector('#view-tabs button[data-view="pilot"]').click()`);
+      await evaluate(`[...document.querySelectorAll('#pilot-root button')].find(b => b.textContent === 'Add the first five ranked sites')?.click()`);
+      assert.equal(await evaluate(`document.querySelector('[data-exposure-result]').dataset.exposureResult`), "no-reach");
+      assert.equal(await evaluate(`document.querySelector('#pilot-root [data-map-conflict]').dataset.mapConflict`), "unknown");
+      assert.equal(await evaluate(`new URL(document.querySelector('#pilot-root a').href).searchParams.get('api')`), proxyBase);
+      blockCore = true; requests.length = 0;
+      await evaluate(`document.querySelector('#pilot-root a').click()`);
+      await waitFor(`document.querySelector('#fallback-root table')`, "fallback without core satellite endpoints");
+      assert.match(await evaluate(`document.querySelector('#fallback-status').textContent`), /Source files are unavailable.*archived list/);
+      assert.equal(await evaluate(`new URL(document.querySelector('[data-back-to-app]').href).searchParams.get('api')`), proxyBase);
+      assert.ok(!requests.some((p) => ["/meta", "/sites", "/summary", "/weights"].includes(p)), "fallback requested a core satellite endpoint");
+    } finally { proxy.close(); }
+  });
   await check("when the API cannot be reached the page explains how to start it", async () => {
     await open(`${BASE}/app/?api=http://127.0.0.1:9`);
     await waitFor(`document.querySelector('#fatal') && !document.querySelector('#fatal').hidden`, "the error message", 30000);

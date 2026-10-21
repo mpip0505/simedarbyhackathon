@@ -12,6 +12,8 @@ A Sime Darby Property **landscape or sustainability planning officer** (hypothes
 **Stage B: Verify (Pilot plan, steps 1 and 2).** For each shortlisted site, record five field-feasibility checks that start as Not checked, give it a status and an inspection batch, download a blind field sheet, and **import the completed sheet back**. The app compares each observation with the model's proxy (agree or differ), asks the planner to keep or reject the site, requires a reason for a rejection and offers next-ranked replacements.
 **Stage C: Implement and learn (Pilot plan, steps 3 and 4).** Group approved sites into planting phases, enter your own capacity and costs, see the unique reach of the shortlist, download a work schedule, and, once a person marks a site Planted, record each tree with its species, owner and follow-up inspections. The survival report counts only inspected trees.
 
+Assessment additions: site cards and step 1 show mapped conflict triggers separately from field checks; Plant first can filter to those triggers. Step 3 offers a resident exposure scenario from explicit assumptions and unique building reach, with an export. Pilot plan links to a separate OSM-only candidate map/list that needs no Earth Engine artifact to rebuild. These are screening/scenario tools, not field outcomes; see [assessment-response.md](../assessment-response.md).
+
 | # | Step | In the app today | Where |
 |---|---|---|---|
 | 1 | **Explore** | the township map with the five highest-priority example sites marked 1 to 5, filters for open land and corridor edge | Plant first |

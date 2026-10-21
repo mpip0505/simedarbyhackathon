@@ -97,7 +97,7 @@ def test_build_plan_orders_and_skips():
     assert plan_steps() == ORDER
     assert "gee_export" not in plan_steps(skip_gee=True) and "osm_download" in plan_steps(skip_gee=True)
     off = plan_steps(offline=True)
-    assert off == ["corridor", "overlays", "sites"]
+    assert off == ["corridor", "overlays", "sites", "conflicts", "open_data"]
 
 
 def test_year_windows_are_consecutive_oct_to_sep():

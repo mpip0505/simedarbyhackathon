@@ -724,3 +724,19 @@ dialog form[method="dialog"] { display: flex; justify-content: flex-end; margin:
 #view-pilot .page-title p { max-width: 70ch; }
 #view-pilot .plan-table tbody th { font-family: var(--font-sans); font-size: 13px; white-space: normal; }
 #view-pilot .pp-grid { margin-top: 6px; }
+.pp-exposure { display: flex; flex-direction: column; gap: 12px; padding: 16px; border: 1px solid var(--border-strong); border-radius: var(--r-3); }
+.pp-conflicts { padding: 10px; border: 1px solid var(--border-strong); border-radius: var(--r-2); font-size: 12px; overflow-wrap: anywhere; }
+.pp-conflicts p { margin: 0 0 6px; }
+.pp-conflicts ul { margin: 4px 0 8px; padding-left: 18px; }
+.pp-conflicts[data-map-conflict="review"] { background: var(--warn-bg); border-color: var(--warn-line); }
+.conflict-filter { display: flex; align-items: center; gap: 8px; padding: 8px 0; font-size: 12px; }
+.open-data-page { width: 100%; min-width: 0; max-width: 1180px; margin: 0 auto; padding: 24px; }
+.open-data-page h1 { font-size: 28px; line-height: 1.2; margin: 16px 0; }
+.open-data-page .card { margin: 16px 0; }
+.open-data-page .plan-table td, .open-data-page .plan-table th { white-space: normal; }
+.open-data-page #fallback-map { height: 400px; border: 1px solid var(--border); border-radius: var(--r-3); }
+@media (max-width: 600px) {
+  .pp-two { grid-template-columns: minmax(0, 1fr); }
+  .pp-check-grid { grid-template-columns: minmax(0, 1fr); }
+  .open-data-page { padding: 12px; }
+}

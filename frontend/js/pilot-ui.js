@@ -12,6 +12,10 @@ import {
 import { compareObservation, readFieldSheet, summariseImport } from "./observations.js";
 import { SCHEDULE_COLUMNS, STEP_NAMES, blocksOf, inspectionPlan, nextStep, plantingPlan, suggestAlternatives, unionReach, workSchedule } from "./pilot.js";
 import { STATE_LABEL, TREE_COLUMNS, maintenanceSchedule, survivalReport, treeRows } from "./trees.js";
+import { exposurePanel } from "./exposure-ui.js";
+import { conflictFor, conflictRows } from "./screening.js";
+import { conflictBlock } from "./screening-ui.js";
+import { appPageUrl } from "./api.js";
 
 const LEAD = "Turn a shortlist into a work package: check the ground, inspect, decide, plan the work, then record what was planted. Everything here is your own record, saved on this device only. Nothing is inspected, approved or planted by this tool.";
 
@@ -57,6 +61,7 @@ export function renderPilot(root, ctx) {
       el("div", { class: "page-head" }, el("div", { class: "page-title" }, el("h1", {}, "Pilot plan"), el("p", {}, LEAD)),
         el("ul", { class: "chips", "aria-label": "About the pilot plan" }, el("li", { class: "chip chip-warn" }, "Your entries, not verified"), el("li", { class: "chip chip-quiet" }, "Saved on this device only"))),
       guide(step),
+      el("p", { class: "small-note" }, el("a", { href: appPageUrl("open-data.html") }, "Open the OSM-only fallback"), ": a separate screening list that runs without Earth Engine, using mapped open land, paths and parks."),
       sectionShortlist(entries, byId),
       sectionInspect(entries, byId, settings),
       sectionWork(entries, byId, settings),
@@ -105,6 +110,7 @@ export function renderPilot(root, ctx) {
         field("Responsible team", input(e.team, key("team"), `Responsible team for ${e.id}`, (v) => plan.setTeam(e.id, v, "pilot"), { max: 40, placeholder: "optional" })),
         field("Note", input(e.note, key("note"), `Note for ${e.id}`, (v) => plan.setNote(e.id, v, "pilot"), { max: NOTE_MAX, placeholder: "for example: check access" }))),
       checksBlock(e, key),
+      conflictBlock(conflictFor(ctx.conflicts?.(), e.id)),
       showReason ? field(e.status === "rejected" ? "Reason for rejecting" : "What the problem is", input(e.reason, key("reason"), `Reason for ${e.id}`, (v) => plan.setReason(e.id, v, "pilot"), { max: NOTE_MAX, placeholder: "for example: no access road" })) : null,
       observationBlock(e, f),
       warns.length ? el("ul", { class: "pp-warn" }, warns.map((w) => el("li", {}, w))) : null,
@@ -256,7 +262,12 @@ export function renderPilot(root, ctx) {
         el("thead", {}, el("tr", {}, ["Sites", "Count", "250 m areas", "Footpath with little tree cover", "Mapped homes", "Corridor gap"].map((h, i) => el("th", { scope: "col", class: i > 0 ? "num" : null }, h)))),
         el("tbody", {}, reachRow("Everything in the plan", allIds), reachRow("Approved and planted", goIds)))),
       el("p", { class: "small-note" }, "Reach counts what lies near the sites, every footpath sample, home and gap once. It is not a benefit. The footpath figure is satellite greenness along mapped footpaths; mapped homes are the ones OpenStreetMap shows."),
+      ctx.exposure ? exposurePanel(ctx.exposure, unionReach(reach, entries.filter((e) => e.status !== "rejected").map((e) => e.id)), ctx.download) : null,
       el("div", { class: "plan-actions" },
+        el("button", { type: "button", class: "btn btn-secondary btn-sm", disabled: !entries.length, onclick: () => {
+          const rows = conflictRows(entries.map((e) => byId.get(e.id)).filter(Boolean), ctx.conflicts?.());
+          if (rows.length) ctx.download("elmina-plan-conflicts.csv", toCsv(rows, Object.keys(rows[0]).map((key) => ({ key, label: key }))));
+        } }, "Download mapped conflicts (CSV)"),
         el("button", { type: "button", class: "btn btn-secondary btn-sm", onclick: () => entries.length ? ctx.download("elmina-work-schedule.csv", toCsv(workSchedule(entries), SCHEDULE_COLUMNS)) : null }, "Download work schedule (CSV)"),
         el("button", { type: "button", class: "btn btn-secondary btn-sm", onclick: () => entries.length ? ctx.download("elmina-planting-plan.csv", toCsv(planRows(entries, byId), PLAN_COLUMNS)) : null }, "Download plan (CSV)")),
     ]);
@@ -324,6 +335,7 @@ export function renderPilot(root, ctx) {
   }
 
   plan.subscribe(() => { if (!root.closest("[hidden]")) redraw(); });
+  ctx.exposure?.subscribe(() => { if (!root.closest("[hidden]")) redraw(); });
   draw();
   return { redraw };
 }

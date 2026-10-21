@@ -220,6 +220,21 @@ def overlay_image(name: str) -> FileResponse:
 
 # ---- ML reports: evidence beside the ranking (404 when absent, e.g. on mock data) ----
 
+@app.get("/screening/conflicts")
+def screening_conflicts() -> dict:
+    report = store.load_conflicts()
+    if report is None:
+        raise HTTPException(status_code=404, detail="No mapped conflict screen in this data set")
+    return report
+
+
+@app.get("/screening/open-data")
+def screening_open_data() -> dict:
+    report = store.load_open_data()
+    if report is None:
+        raise HTTPException(status_code=404, detail="No OSM-only screening list has been built")
+    return report
+
 def _ml_or_404(report: Optional[dict], what: str) -> dict:
     if report is None:
         raise HTTPException(status_code=404, detail=f"No ML {what} report in this data set")

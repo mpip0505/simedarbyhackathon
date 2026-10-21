@@ -5,5 +5,7 @@
 frontend/node_modules
 backend/tests
 frontend/tests
-ml
+ml/**
+!ml/reports/
+!ml/reports/**
 docs

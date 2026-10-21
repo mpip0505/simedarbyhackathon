@@ -43,6 +43,8 @@ Planners drag three sliders and the list and map update at once. It is a screeni
 - *Screen:* `screens/01-plant-first.png` and `screens/02-site-card.png`.
 
 ## Slide 4: Innovation (Mechanism)
+Demo addition: mapped road/building/footpath triggers explain why a high-priority site still needs review. Thresholds are prototype choices; utilities, sight lines and species clearances remain field questions. See [assessment-response.md](../assessment-response.md).
+
 What is different from Tree Equity Score, i-Tree Landscape and Boston's Right Place, Right Tree ([prior-art.md](../prior-art.md)):
 1. **Site scale (30 m cells)**, not census areas.
 2. **A cloud-aware tropical pipeline from free data.**
@@ -61,6 +63,8 @@ Free satellite and map data to ranked sites, in five steps:
 One command rebuilds everything in about 4 minutes and reproduced the committed data exactly.
 
 ## Slide 6: Impact (Mechanism)
+Optional live calculation: **resident shade exposure scenario** in Pilot plan step 3. Show the assumptions, current/scenario unshaded person-minutes per day and the horizon. Never present it as a measured benefit.
+
 **Reach, not outcome** ([impact_reach.md](../../ml/reports/impact_reach.md)). With the default ML ranking on the simulated sites, the first 50 sites are:
 - within 50 m of about **5,400 m of footpath where the satellite sees little tree cover** (8% of the township's 65,860 m; 58% of what any site can reach);
 - within 250 m of **349 of 968 mapped homes** (36%);
@@ -69,6 +73,8 @@ Say plainly: this counts what lies near the sites. It does not show cooling, hea
 Co-benefit for People: shade where people walk, near homes. *Screen:* `screens/05-reach.png`.
 
 ## Slide 7: Feasibility (Enabler)
+Demo addition: the OSM-only fallback generates its own candidates without Earth Engine, using footpath/park proximity. It has no heat or actual-shade measurement. Proposed first customer: Sime Darby Property's Elmina landscape operations team; no pilot commitment claimed. Full satellite-workflow licensing remains unresolved.
+
 - **Built and running**: 292 backend and ML tests, 157 frontend tests, a 39-check browser test including an accessibility scan and a hostile-data security test.
 - **Free data**; hosting on a free tier works for a demo (`render.yaml`); exports for the planning team: ranked CSV, GIS map file and a printable brief (`screens/06-brief.png`).
 - **What we need from Sime Darby Property:** the real site list, the official corridor outline, the current tree count, and a few hours of fieldwork.

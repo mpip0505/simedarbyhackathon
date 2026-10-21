@@ -88,6 +88,7 @@
         <p>Start it from the project folder, then retry:</p>
         <pre>uvicorn backend.api.main:app --port 8000</pre>
         <button type="button" id="fatal-retry" class="btn btn-primary">Retry</button>
+        <p><a href="open-data.html" data-open-data>Open the OSM-only fallback</a></p>
       </div>
 
       <div id="stage">
@@ -226,6 +227,8 @@
                       <input id="search" type="search" placeholder="Find a site, e.g. ELM-3672" aria-label="Find a site by name">
                     </div>
                     <div class="list-window">
+                      <label class="conflict-filter"><input type="checkbox" id="conflict-only" aria-describedby="conflict-filter-note"> Show mapped conflicts only</label>
+                      <p id="conflict-filter-note" class="small-note"></p>
                       <ol id="top-list" class="site-list"></ol>
                       <p id="no-match" hidden>No sites match these filters. <button type="button" id="clear-filters" class="link-button">Clear filters</button></p>
                     </div>

@@ -1,5 +1,13 @@
 # Data contract (Backend -> ML -> Frontend)
 
+## Optional screening additions (22 October 2026)
+
+- `GET /screening/conflicts`: per-site mapped road/building/path triggers, `data_version`, OSM `input_hashes`, `thresholds_m`, `note` and `stale` (`false`: inputs match, `true`: changed, `null`: uncheckable). Missing/malformed reports return 404. These do not modify score/rank or human field checks.
+- `GET /screening/open-data`: independent OSM-only FeatureCollection. Per-feature properties include simulated `OSM-` site ID, rank, proximity scores/distances and mapped triggers. Collection carries its own version, method, source hashes, attribution, caveats and `stale`. No normal sites/summary/scores required. Missing/malformed artifact returns 404.
+- Browser exposure scenarios require explicitly current `/ml/reach-sets`, complete site coverage and all assumptions. No new writes/API storage are introduced.
+
+Definitions, build commands and limitations: [assessment-response.md](assessment-response.md).
+
 Source of truth in code: `backend/schema.py`. Coordinates are EPSG:4326 (lon, lat).
 Status: **draft v0.1 from Backend. ML and Frontend, please push back now, not on day 9.**
 

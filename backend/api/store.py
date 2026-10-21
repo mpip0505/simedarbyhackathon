@@ -22,6 +22,7 @@ from typing import Optional
 from backend import validate_scores
 from backend.api import scoring
 from backend.config import CACHE_DIR, DEFAULT_WEIGHTS, ML_REPORTS_DIR, MOCK_DIR
+from backend.provenance import inputs_stale
 
 log = logging.getLogger("backend.store")
 
@@ -214,6 +215,32 @@ def load_spine() -> Optional[dict]:
 def load_paths_shade() -> Optional[dict]:
     """Footpath pieces labelled by relative greenness (thirds), for a map layer. Satellite proxy, not a shade survey."""
     return _optional(data_dir() / "paths_shade.geojson")
+
+
+def load_conflicts() -> Optional[dict]:
+    if data_mode() != "cache":
+        return None
+    report = _optional(CACHE_DIR / "conflicts.json")
+    if not isinstance(report, dict) or not isinstance(report.get("sites"), dict):
+        return None
+    current, version = _load("sites.geojson").get("data_version"), report.get("data_version")
+    sources = inputs_stale(CACHE_DIR / "osm", report.get("input_hashes", {}))
+    if sources is True or (current and version and version != current):
+        report["stale"] = True
+    elif not current or not version:
+        report["stale"] = None
+    else:
+        report["stale"] = sources
+    return report
+
+
+def load_open_data() -> Optional[dict]:
+    # Independent of data_dir(): no normal sites, summary, corridor or scores required.
+    report = _optional(CACHE_DIR / "open_data_sites.geojson")
+    if not isinstance(report, dict) or report.get("source_mode") != "osm-only" or not isinstance(report.get("features"), list):
+        return None
+    report["stale"] = inputs_stale(CACHE_DIR / "osm", report.get("input_hashes", {}))
+    return report
 
 
 def load_crosscheck() -> Optional[dict]:

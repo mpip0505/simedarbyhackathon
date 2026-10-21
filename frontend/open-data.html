@@ -1,0 +1,24 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>OSM-only screening · Elmina Canopy Prioritiser</title>
+  <link rel="icon" href="data:,">
+  <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
+  <link rel="stylesheet" href="css/app.css">
+</head>
+<body>
+  <main class="open-data-page">
+    <a href="./" data-back-to-app>Back to Canopy Prioritiser</a>
+    <h1>Open-data fallback</h1>
+    <p>City of Elmina · OpenStreetMap-only screening · Example sites (simulated)</p>
+    <div id="fallback-status" class="notice" role="status">Loading the OSM-only list…</div>
+    <div id="fallback-root"></div>
+    <div id="fallback-map" hidden role="region" aria-label="Map of simulated OSM-only candidates"></div>
+    <p class="small-note">Map data © OpenStreetMap contributors (ODbL). <a href="https://www.openstreetmap.org/copyright">Data licence and attribution</a></p>
+  </main>
+  <script src="vendor/leaflet/leaflet.js"></script>
+  <script type="module" src="js/open-data-main.js"></script>
+</body>
+</html>

@@ -18,6 +18,8 @@ repository (named in the last column) so it can be re-run. **The short answer: w
 | **Automated tests** | 292 backend and ML tests, 157 frontend unit tests, and a 39-check browser test that includes an accessibility scan and a hostile-data security test | `backend/tests`, `ml/tests`, `frontend/tests`, `frontend/tools/smoke.mjs` |
 
 ## What we did not do
+The [assessment response](assessment-response.md) documents the mapped conflict screen, resident exposure scenario and runnable OSM-only fallback. Their geometry/arithmetic and operation are software checks; they add no ground observations or measured planting benefit.
+
 - **No ground truth.** No tree inventory, LiDAR, drone survey or field plots. Nothing above shows the ranking is correct; it shows it is consistent and stable.
 - **No real planting-site list.** The 564 sites are simulated 30 m cells on open land, and every screen says so.
 - **No measured benefit.** The reach numbers count what lies near the sites; they are not cooling, health, survival or carbon results.

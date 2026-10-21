@@ -26,6 +26,8 @@ below for the rest of the trail.
 [Limitations](#limitations-read-this-before-quoting-any-number) · [Data credits](#data-credits)
 
 ## Quick start
+New: **resident shade-exposure scenarios**, **mapped conflict screening**, and an **OSM-only fallback**. See [methods and demo sequence](docs/assessment-response.md). The fallback opens at `/app/open-data.html`; its candidate rebuild needs no Earth Engine data or credentials.
+
 Needs Python 3.12. The demo runs **offline**: no Earth Engine login and no internet.
 ```bash
 pip install -r backend/requirements.txt
@@ -90,6 +92,12 @@ All endpoints are `GET`. Errors are small JSON bodies with a `request_id` (also 
 Field-by-field contract: [docs/data-contract.md](docs/data-contract.md).
 
 ## Rebuilding the data
+The additions can be rebuilt separately:
+```bash
+python -m backend.conflicts   # existing site geometries + cached OSM; preserves scores
+python -m backend.open_data   # ONLY cached OSM; constructs a separate candidate list
+```
+
 ```bash
 python -m backend.build_cache --offline    # corridor, overlays, sites from cached OSM + rasters (no network)
 python -m backend.build_cache --skip-gee   # also re-downloads OpenStreetMap
