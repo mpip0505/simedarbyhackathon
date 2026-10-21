@@ -17,6 +17,10 @@ Docs UI: http://localhost:8000/docs. CORS is open for GET.
 | `GET /sites/{site_id}` | One Feature, or 404 |
 | `GET /summary` | Before/after: `baseline`, `latest`, `delta_canopy_pct_points`, `delta_mean_lst_c`, `caveats` |
 | `GET /layers/corridor` | Corridor polygon FeatureCollection (`approximate: true` unless official) |
+| `GET /layers/corridor/spine` | The dashed connector lines between parks (approximate). 404 in mock mode. |
+| `GET /layers/osm/{name}` | Cached OpenStreetMap layer for an offline basemap: `buildings`, `roads`, `paths`, `parks` or `open_land` (any other name is 404). 404 in mock mode. |
+| `GET /summary/crosscheck` | Our canopy proxy against ESA WorldCover and Dynamic World at the threshold in use: `rows` (window, reference, `reference_tree_pct`, `ours_canopy_pct`, precision, recall, f1), `mean_f1_by_threshold`, `caveat`. 404 in mock mode. |
+| `GET /` and `GET /app/` | Redirect to, and serve, the bundled barebones web app (`frontend/`), see [frontend.md](frontend.md) |
 | `GET /meta` | `data_mode` (`mock` or `cache`), `site_count`, `corridor_approximate`, `score_source` (`mock`, `placeholder` or `ml`), `data_version`, `scores_data_version`, `scores_stale` (true when ML scores were computed on different data; null if unknown), `scores_error` (set when `scores.geojson` was rejected and placeholders are served; a generic message, the reasons are in the server log or from `python -m backend.validate_scores`), `sources_built`, `generated_at`, `attribution`, `caveats` |
 | `GET /summary/series` | Yearly canopy (with `canopy_pct_low` / `canopy_pct_high` band) and mean temperature points. 404 in mock mode. |
 | `GET /layers/overlays` | Before/after map images: `url`, `bounds` as `[[south, west], [north, east]]`, shared colour range, unit. 404 in mock mode. |

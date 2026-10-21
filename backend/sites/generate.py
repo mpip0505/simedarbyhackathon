@@ -191,6 +191,10 @@ def build_sites(layers: dict, rasters: dict) -> gpd.GeoDataFrame:
             n_pts, n_cov = len(idx), int(p_covered[idx].sum())
         else:
             n_pts = n_cov = 0
+        # share of the nearby path with canopy, from the 10 m sample points; the uncovered LENGTH is that share applied
+        # to the exact path length, so it can never exceed path_length_within_50m (counting points x 10 m could)
+        canopy_frac = n_cov / n_pts if n_pts else None
+        uncovered = 0.0 if near_len == 0 else (near_len * (1 - canopy_frac) if canopy_frac is not None else None)
         disc = ctr.buffer(max(CONTEXT_RADII_M))
         bi = b_tree.query(disc, predicate="intersects")
         b_area = sum(bld.iloc[i].intersection(disc).area for i in bi)
@@ -205,8 +209,8 @@ def build_sites(layers: dict, rasters: dict) -> gpd.GeoDataFrame:
             "lst_valid_frac": _rnd(v, 2),
             "dist_to_path_m": _rnd(ctr.distance(path_union) if path_union is not None else 9999.0, 1),
             "path_length_within_50m": _rnd(near_len, 1),
-            "uncovered_path_length_50m": _rnd((n_pts - n_cov) * SPINE_STEP_M, 1),
-            "path_canopy_frac_50m": _rnd(n_cov / n_pts, 2) if n_pts else None,
+            "uncovered_path_length_50m": _rnd(uncovered, 1),
+            "path_canopy_frac_50m": _rnd(canopy_frac, 2),
             "corridor_gap_flag": bool(gap_geom is not None and ctr.distance(gap_geom) <= GAP_FLAG_DIST_M),
             "corridor_gap_dist_m": _rnd(ctr.distance(gap_geom) if gap_geom is not None else 9999.0, 1),
             "dist_to_corridor_spine_m": _rnd(ctr.distance(spine_union) if spine_union is not None else 9999.0, 1),

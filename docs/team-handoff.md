@@ -2,12 +2,7 @@
 
 Status: the backend runs end to end on real Elmina data. Everything below is from the cached files in
 `backend/data/cache/`, rebuilt by `python -m backend.build_cache` (a full rebuild from a fresh download takes about
-4 minutes and reproduced the committed data exactly). 164 backend tests pass.
-
-**ML has delivered** (`score_source: "ml"` in `/meta`). Section 4 below is the original brief, kept for reference;
-what was actually built, validated and written up is in [`ml/README.md`](../ml/README.md) and
-[ml-model.md](ml-model.md) (34 more tests: `python -m pytest ml/tests -q`). Nothing in section 3 changes for Frontend
-as a result — same fields, same shape, see the note there.
+4 minutes and reproduced the committed data exactly). 194 backend and 71 frontend tests pass.
 
 ## 1. Imagery go/no-go: GO
 Enough clear Sentinel-2 and Landsat 8/9 observations exist over City of Elmina for both periods, **using multi-date
@@ -23,6 +18,9 @@ uvicorn backend.api.main:app --port 8000        # http://localhost:8000/docs
 Works with no internet and no Earth Engine. Field list: `docs/data-contract.md`.
 
 ## 3. For Frontend
+A **working barebones interface already exists** in `frontend/` (open `http://localhost:8000/` after starting the API) and a
+wireframe for the designer: see [frontend.md](frontend.md). It covers everything below, so the real design can reuse its
+logic files and replace the look. Below is the API contract it is built on.
 - `GET /sites` returns the ranked GeoJSON (564 simulated sites; IDs are stable across rebuilds). Colour by `score_total`; the detail panel uses
   `score_cooling`, `score_connectivity`, `score_shade` plus `ndvi_mean`, `lst_c_mean`, `dist_to_path_m`,
   `corridor_gap_dist_m`.
@@ -31,13 +29,12 @@ Works with no internet and no Earth Engine. Field list: `docs/data-contract.md`.
 - **Before/after view:** `GET /summary` (two-year windows), `GET /summary/series` (yearly points with a low/high canopy
   band), `GET /layers/overlays` (image URLs, map bounds as `[[south, west], [north, east]]`, shared colour range so the
   two periods are comparable). Draw the overlays with Leaflet `L.imageOverlay(url, bounds)`.
-- `GET /layers/corridor` is the corridor polygon. It is **approximate**: label it that way on the map.
+- `GET /layers/corridor` is the corridor polygon and `GET /layers/corridor/spine` its dashed connectors. They are **approximate**: label them that way on the map.
+- Offline basemap: `GET /layers/osm/{buildings|roads|paths|parks|open_land}` returns the cached OpenStreetMap layers, so the map works without internet.
+- `GET /summary/crosscheck` gives the canopy comparison with two independent maps: show it next to any canopy number.
 - **Always show:** a "simulated sites" label, the `caveats` and `attribution` from `GET /meta`, and a badge when
   `score_source` is not `ml`.
-- Overlays, series and the corridor come from the cache folder. They do not exist in mock mode (404).
-- **Now that ML has delivered:** nothing above changes. `score_source` reads `ml` (so the non-`ml` badge should
-  already be hiding itself); `GET /weights` now returns 0.45 / 0.30 / 0.25 instead of the backend's 0.40 / 0.35 / 0.25
-  placeholder default, so sliders will visibly start one notch differently — that is correct, not a bug to chase.
+- Overlays, series, the corridor, the basemap layers and the cross-check come from the cache folder. They do not exist in mock mode (404), so the interface must cope with that.
 
 ## 4. For ML (original brief — see `ml/README.md` for what was actually delivered)
 Start with [data-dictionary.md](data-dictionary.md). It lists every feature with units, ranges and cautions.

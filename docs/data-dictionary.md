@@ -45,7 +45,7 @@ Tiny example of the format: `python -m backend.ml_io --example`.
 |---|---|---|
 | `dist_to_path_m` | 0.1 to 675 m | to the nearest OSM footway/path (OSM has no cycleways in Elmina) |
 | `path_length_within_50m` | 0 to 530 m | path length within 50 m of the cell |
-| `uncovered_path_length_50m` | 0 to 540 m | nearby path with NDVI < 0.6 beneath it (sampled every 10 m): walking route without canopy |
+| `uncovered_path_length_50m` | 0 to 530 m | walking route without canopy: the nearby path length times the share of 10 m sample points with NDVI < 0.6 beneath them. Never more than `path_length_within_50m`. |
 | `path_canopy_frac_50m` | 0 to 0.67, **blank if no path within 50 m** (403 sites) | share of nearby path that already has canopy. Blank means "no path nearby", not "no canopy". |
 
 ## Corridor (approximate corridor, see limits)

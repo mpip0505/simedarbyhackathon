@@ -1,0 +1,380 @@
+// Browser smoke test: drives a real (headless) Chrome or Edge through the app and checks what it does.
+// No dependencies: it talks to the browser over the DevTools protocol using Node's built-in WebSocket.
+//
+//   1. start the API:   uvicorn backend.api.main:app --port 8000
+//   2. run this:        node frontend/tools/smoke.mjs [baseUrl] [screenshotDir]
+//
+// Set CHROME_PATH if Chrome or Edge is installed somewhere unusual. Exit code 1 if any check fails.
+import { spawn } from "node:child_process";
+import http from "node:http";
+import { existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
+import assert from "node:assert/strict";
+
+const BASE = process.argv[2] || "http://127.0.0.1:8000";
+const SHOTS = process.argv[3] || join(tmpdir(), "elmina-ui-shots");
+const PORT = 9300 + Math.floor(Math.random() * 500);
+mkdirSync(SHOTS, { recursive: true });
+
+const CANDIDATES = [
+  process.env.CHROME_PATH,
+  "C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe",
+  "C:\\Program Files (x86)\\Google\\Chrome\\Application\\chrome.exe",
+  "C:\\Program Files (x86)\\Microsoft\\Edge\\Application\\msedge.exe",
+  "/Applications/Google Chrome.app/Contents/MacOS/Google Chrome",
+  "/usr/bin/google-chrome", "/usr/bin/chromium", "/usr/bin/chromium-browser",
+].filter(Boolean);
+const chromePath = CANDIDATES.find((p) => existsSync(p));
+if (!chromePath) { console.error("No Chrome or Edge found. Set CHROME_PATH."); process.exit(2); }
+
+const sleep = (ms) => new Promise((r) => setTimeout(r, ms));
+const profile = mkdtempSync(join(tmpdir(), "elmina-chrome-"));
+const chrome = spawn(chromePath, ["--headless=new", "--disable-gpu", "--hide-scrollbars", "--no-first-run",
+  `--remote-debugging-port=${PORT}`, `--user-data-dir=${profile}`, "--window-size=1440,900", "about:blank"], { stdio: "ignore" });
+
+async function connect() {
+  for (let i = 0; i < 60; i++) {
+    try {
+      const targets = await (await fetch(`http://127.0.0.1:${PORT}/json/list`)).json();
+      const page = targets.find((t) => t.type === "page");
+      if (page) return page.webSocketDebuggerUrl;
+    } catch { /* browser still starting */ }
+    await sleep(250);
+  }
+  throw new Error("browser did not start");
+}
+
+const problems = [];       // console errors and uncaught exceptions
+let nextId = 1;
+const pending = new Map();
+let socket;
+
+function send(method, params = {}) {
+  return new Promise((resolve, reject) => {
+    const id = nextId++;
+    pending.set(id, { resolve, reject });
+    socket.send(JSON.stringify({ id, method, params }));
+  });
+}
+
+async function evaluate(expression) {
+  const r = await send("Runtime.evaluate", { expression, returnByValue: true, awaitPromise: true });
+  if (r.exceptionDetails) throw new Error(`page script failed: ${r.exceptionDetails.exception?.description ?? r.exceptionDetails.text}`);
+  return r.result.value;
+}
+
+async function waitFor(expression, what, timeoutMs = 25000) {
+  const start = Date.now();
+  while (Date.now() - start < timeoutMs) {
+    try { if (await evaluate(expression)) return; } catch { /* page not ready yet */ }
+    await sleep(200);
+  }
+  throw new Error(`timed out waiting for ${what}`);
+}
+
+async function shot(name) {
+  const { data } = await send("Page.captureScreenshot", { format: "png" });
+  const file = join(SHOTS, `${name}.png`);
+  writeFileSync(file, Buffer.from(data, "base64"));
+  return file;
+}
+
+async function open(url, width = 1440, height = 900) {
+  await send("Emulation.setDeviceMetricsOverride", { width, height, deviceScaleFactor: 1, mobile: false });
+  await send("Page.navigate", { url });
+}
+
+// Text that means a rendering bug: arrays or null turned into strings, or missing numbers printed as words.
+const BAD_TEXT = /\[object |\bundefined\b|\bNaN\b|\bnull\b/;
+const assertCleanText = async (where) => {
+  const text = await evaluate(`document.body.innerText`);
+  const hit = text.match(BAD_TEXT);
+  assert.ok(!hit, `${where}: stray text "${hit?.[0]}" on screen`);
+};
+
+const ROWS = "#top-list .site-row";
+const rows = () => evaluate(`[...document.querySelectorAll('${ROWS}')].map(b => ['.rank', '.site-name', '.site-why', '.site-score'].map(s => b.querySelector(s).textContent.trim()))`);
+const setSlider = (key, value) => evaluate(`(() => { const i = document.querySelector('#w-${key}'); i.value = ${value}; i.dispatchEvent(new Event('input', { bubbles: true })); })()`);
+const DEFAULT_NOTE = "The list and map update as you move these.";
+const results = [];
+async function check(name, fn) {
+  try { await fn(); results.push([true, name]); console.log(`  ok   ${name}`); }
+  catch (error) { results.push([false, name]); console.log(`  FAIL ${name}\n       ${error.message.split("\n")[0]}`); }
+}
+
+try {
+  socket = new WebSocket(await connect());
+  await new Promise((resolve, reject) => { socket.onopen = resolve; socket.onerror = reject; });
+  socket.onmessage = (event) => {
+    const msg = JSON.parse(event.data);
+    if (msg.id && pending.has(msg.id)) {
+      const { resolve, reject } = pending.get(msg.id);
+      pending.delete(msg.id);
+      msg.error ? reject(new Error(msg.error.message)) : resolve(msg.result);
+    } else if (msg.method === "Runtime.exceptionThrown") {
+      problems.push(`exception: ${msg.params.exceptionDetails.exception?.description ?? msg.params.exceptionDetails.text}`);
+    } else if (msg.method === "Runtime.consoleAPICalled" && msg.params.type === "error") {
+      problems.push(`console.error: ${msg.params.args.map((a) => a.value ?? a.description).join(" ")}`);
+    } else if (msg.method === "Log.entryAdded" && msg.params.entry.level === "error") {
+      problems.push(`log: ${msg.params.entry.text} ${msg.params.entry.url ?? ""}`);
+    }
+  };
+  for (const domain of ["Page", "Runtime", "Log"]) await send(`${domain}.enable`);
+
+  console.log(`Browser: ${chromePath}\nApp:     ${BASE}/app/\nShots:   ${SHOTS}\n`);
+  await open(`${BASE}/app/`);
+  await waitFor(`document.querySelectorAll('${ROWS}').length > 0 && document.querySelector('#loading').hidden`, "the list to fill");
+  await sleep(800); // let map tiles and canvases draw
+
+  let initialTop;
+  await check("loads: headline, top sites, count, honesty labels, loading overlay gone", async () => {
+    const r = await rows();
+    initialTop = r[0];
+    assert.equal(r.length, 8, `expected the top 8, got ${r.length}`);
+    assert.equal(await evaluate(`document.querySelector('h1').textContent`), "Where to plant first in City of Elmina");
+    assert.match(await evaluate(`document.querySelector('#count').textContent`), /^\d+ in total$/);
+    assert.match(await evaluate(`document.querySelector('#chip-simulated').textContent`), /simulated/i);
+    assert.match(await evaluate(`document.querySelector('#chip-scores').textContent`), /Preview scores|ML model|mock/i);
+    assert.match(await evaluate(`document.querySelector('#honesty-text').textContent`), /not Sime Darby Property's list/);
+    assert.ok(r.every((row) => row[2].length > 3), "every row gives a short reason");
+    await assertCleanText("opening screen");
+  });
+  await check("map: drawing layers, legend, rank badges 1 to 5, first-visit hint", async () => {
+    assert.ok((await evaluate(`document.querySelectorAll('#map canvas').length`)) >= 3);
+    assert.equal(await evaluate(`document.querySelectorAll('#legend .swatches span').length`), 7);
+    assert.deepEqual(await evaluate(`[...document.querySelectorAll('.rank-badge')].map(b => b.textContent)`), ["1", "2", "3", "4", "5"]);
+    assert.equal(await evaluate(`document.querySelector('#coach').hidden`), false, "the hint should show on arrival");
+    // no badge may hide another: every pair of badge centres is at least 24 px apart
+    const gap = await evaluate(`(() => { const c = [...document.querySelectorAll('.rank-badge')].map(b => { const r = b.getBoundingClientRect(); return [r.left + r.width / 2, r.top + r.height / 2]; });
+      let min = Infinity; for (let i = 0; i < c.length; i++) for (let j = i + 1; j < c.length; j++) min = Math.min(min, Math.hypot(c[i][0] - c[j][0], c[i][1] - c[j][1])); return min; })()`);
+    assert.ok(gap >= 24, `two rank badges overlap (closest centres ${gap.toFixed(1)} px apart)`);
+  });
+  await shot("1-plant-first");
+
+  await check("Limits and Data credits open as sheets with the caveats and the attribution", async () => {
+    await evaluate(`document.querySelector('#open-limits').click()`);
+    await waitFor(`document.querySelector('#dlg-limits').open`, "the limits sheet");
+    assert.ok((await evaluate(`document.querySelectorAll('#caveats li').length`)) >= 5);
+    assert.match(await evaluate(`document.querySelector('#dlg-limits').innerText`), /SIMULATED|simulated/);
+    await evaluate(`document.querySelector('#dlg-limits').close()`);
+    await evaluate(`document.querySelector('#open-credits').click()`);
+    await waitFor(`document.querySelector('#dlg-credits').open`, "the credits sheet");
+    assert.match(await evaluate(`document.querySelector('#attribution').textContent`), /OpenStreetMap/);
+    await evaluate(`document.querySelector('#dlg-credits').close()`);
+  });
+
+  await check("clicking a site in the list opens the site card and hides the hint", async () => {
+    await evaluate(`document.querySelector('${ROWS}').click()`);
+    await waitFor(`!document.querySelector('#sheet-card').hidden`, "the site card");
+    const text = await evaluate(`document.querySelector('#sheet-card').innerText`);
+    assert.match(text, /#1 of \d+/);
+    assert.match(text, /Why it ranks here/);
+    for (const label of ["Heat relief", "Links green areas", "Shade for walkers", "Example site"]) assert.match(text, new RegExp(label));
+    assert.ok((await evaluate(`document.querySelector('.card-headline').textContent`)).endsWith("."), "a one-sentence reason");
+    assert.equal(await evaluate(`document.querySelector('${ROWS}').getAttribute('aria-current')`), "true");
+    assert.equal(await evaluate(`document.querySelector('.rank-badge.selected')?.textContent`), "1");
+    assert.equal(await evaluate(`document.querySelector('#coach').hidden`), true);
+    if (await evaluate(`document.querySelector('#chip-scores').textContent.includes('Preview')`)) assert.match(text, /Preview score/);
+    await assertCleanText("site card");
+  });
+  await shot("2-site-card");
+
+  await check("heat-relief-only weights re-rank the list and say how much changed", async () => {
+    await setSlider("cooling", 100); await setSlider("connectivity", 0); await setSlider("shade", 0);
+    await waitFor(`document.querySelector('#weights-note').textContent.includes('re-weighted')`, "re-ranking");
+    const note = await evaluate(`document.querySelector('#weights-note').textContent`);
+    assert.match(note, /(\d+ of the top 10 changed|The top 10 stayed the same)/);
+    const r = await rows();
+    const scores = r.map((row) => Number(row[3]));
+    assert.ok(scores.every((s, i) => i === 0 || s <= scores[i - 1]), "scores are not descending");
+    assert.ok(r.every((row) => /hot|bare/.test(row[2])), `with only heat relief the reasons should be about heat: ${r.map((x) => x[2])}`);
+    assert.equal(await evaluate(`document.querySelector('#o-cooling').textContent`), "100%");
+    assert.equal(await evaluate(`document.querySelectorAll('.rank-badge').length`), 5);
+  });
+  await check("all-zero weights are refused with a message and keep the previous ranking", async () => {
+    const before = (await rows())[0][1];
+    await setSlider("cooling", 0);
+    assert.match(await evaluate(`document.querySelector('#weights-note').textContent`), /at least one weight/);
+    assert.equal((await rows())[0][1], before);
+  });
+  await check("reset restores the API's ranking and the default note", async () => {
+    await evaluate(`document.querySelector('#weights-reset').click()`);
+    await waitFor(`document.querySelector('#weights-note').textContent === ${JSON.stringify(DEFAULT_NOTE)}`, "reset");
+    assert.deepEqual((await rows())[0], initialTop);
+  });
+  await check("filters, search and the empty state", async () => {
+    await evaluate(`document.querySelector('input[name="origin"][value="corridor_edge"]').click()`);
+    await waitFor(`/^\\d+ of \\d+$/.test(document.querySelector('#count').textContent)`, "the filtered count");
+    const [shown, total] = (await evaluate(`document.querySelector('#count').textContent`)).split(" of ").map(Number);
+    assert.ok(shown > 0 && shown < total, `filter left ${shown} of ${total}`);
+    await evaluate(`document.querySelector('input[name="origin"][value="all"]').click()`);
+    await evaluate(`(() => { const s = document.querySelector('#search'); s.value = 'ELM-37'; s.dispatchEvent(new Event('input', { bubbles: true })); })()`);
+    const found = await rows();
+    assert.ok(found.length > 0 && found.every((row) => row[1].toLowerCase().includes('elm-37')));
+    await evaluate(`(() => { const s = document.querySelector('#search'); s.value = 'zzzz'; s.dispatchEvent(new Event('input', { bubbles: true })); })()`);
+    assert.equal(await evaluate(`document.querySelector('#no-match').hidden`), false);
+    assert.match(await evaluate(`document.querySelector('#no-match').textContent`), /No sites match these filters/);
+    assert.equal((await rows()).length, 0);
+    await evaluate(`document.querySelector('#clear-filters').click()`);
+    assert.equal(await evaluate(`document.querySelector('#no-match').hidden`), true);
+    assert.match(await evaluate(`document.querySelector('#count').textContent`), /in total/);
+  });
+  await check("See all expands the list and Show the top 8 only collapses it", async () => {
+    await evaluate(`document.querySelector('#see-all').click()`);
+    assert.ok((await rows()).length > 100);
+    assert.match(await evaluate(`document.querySelector('#see-all').textContent`), /Show the top 8 only/);
+    await evaluate(`document.querySelector('#see-all').click()`);
+    assert.equal((await rows()).length, 8);
+  });
+  await check("sheets collapse and expand, and the site card can be closed", async () => {
+    await evaluate(`document.querySelector('#sheet-matters .sheet-toggle').click()`);
+    assert.equal(await evaluate(`document.querySelector('#matters-body').hidden`), true);
+    assert.equal(await evaluate(`document.querySelector('#sheet-matters .sheet-toggle').getAttribute('aria-expanded')`), "false");
+    await evaluate(`document.querySelector('#sheet-matters .sheet-toggle').click()`);
+    assert.equal(await evaluate(`document.querySelector('#matters-body').hidden`), false);
+    await evaluate(`document.querySelector('#card-close').click()`);
+    assert.equal(await evaluate(`document.querySelector('#sheet-card').hidden`), true);
+  });
+  await check("layer toggles add and remove layers", async () => {
+    await evaluate(`document.querySelector('input[data-layer="ndvi"]').click()`);
+    await waitFor(`document.querySelectorAll('#map img.leaflet-image-layer').length === 1`, "the greenness overlay");
+    await evaluate(`document.querySelector('input[data-layer="ndvi"]').click()`);
+    await waitFor(`document.querySelectorAll('#map img.leaflet-image-layer').length === 0`, "the overlay to be removed");
+  });
+
+  await check("Before and after: plain headline, maps, three cards, the full numbers underneath", async () => {
+    await evaluate(`document.querySelector('#view-tabs button[data-view="report"]').click()`);
+    await waitFor(`document.querySelector('#report-headline').textContent.length > 0`, "the report view");
+    await sleep(800);
+    assert.match(await evaluate(`document.querySelector('#report-headline').textContent`), /^Has tree cover changed\?/);
+    const canopy = await evaluate(`document.querySelector('#card-canopy').textContent`);
+    assert.match(canopy, /No detectable change/);
+    assert.match(canopy, /not a tree count/);
+    assert.match(await evaluate(`document.querySelector('#card-lst').textContent`), /Indicative only/);
+    const sure = await evaluate(`document.querySelector('#card-sure').textContent`);
+    assert.match(sure, /\d+% to \d+%/);
+    assert.match(sure, /Independent maps disagree/);
+    assert.equal(await evaluate(`document.querySelectorAll('#card-sure .bar-row').length`), 3);
+    assert.equal(await evaluate(`document.querySelectorAll('#series-table tbody tr').length`), 5);
+    assert.equal(await evaluate(`document.querySelectorAll('#crosscheck-table tbody tr').length`), 6);
+    assert.equal(await evaluate(`document.querySelectorAll('.report-map img.leaflet-image-layer').length`), 2);
+    assert.equal(await evaluate(`document.querySelector('#view-prioritise').hidden`), true);
+    assert.match(await evaluate(`document.querySelector('#cap-baseline').textContent`), /Earlier period/);
+    await assertCleanText("before and after view");
+  });
+  await shot("3-before-after-greenness");
+  await check("switching to ground heat swaps both overlays and says it is estimated", async () => {
+    await evaluate(`document.querySelector('input[name="metric"][value="lst"]').click()`);
+    await waitFor(`[...document.querySelectorAll('.report-map img.leaflet-image-layer')].every(i => i.src.includes('lst_'))`, "ground heat overlays");
+    assert.match(await evaluate(`document.querySelector('#report-legend').textContent`), /gap-filled|estimated/);
+    assert.match(await evaluate(`document.querySelector('#report-legend').textContent`), /Ground heat/);
+  });
+  await shot("4-before-after-ground-heat");
+  await check("back to Plant first keeps the map", async () => {
+    await evaluate(`document.querySelector('#view-tabs button[data-view="prioritise"]').click()`);
+    assert.equal(await evaluate(`document.querySelector('#view-report').hidden`), true);
+    assert.ok(await evaluate(`document.querySelector('#map canvas') !== null`));
+  });
+
+  // --- security: data from the API must never run as code ---------------------------------------------------
+  // A hostile API rewrites every site id into an HTML payload. The page is pointed at it (localhost is allowed by
+  // ?api=). If any text reached an HTML sink, the onerror handler would set window.__pwned.
+  const PAYLOAD = '<img src=x onerror="window.__pwned=1">';
+  const hostile = http.createServer(async (req, res) => {
+    try {
+      const upstream = await fetch(BASE + req.url);
+      let body = Buffer.from(await upstream.arrayBuffer());
+      if (req.url.startsWith("/sites") && upstream.ok) {
+        const fc = JSON.parse(body.toString("utf8"));
+        fc.features.forEach((f, i) => { f.properties.site_id = `${PAYLOAD}#${i}`; });
+        body = Buffer.from(JSON.stringify(fc));
+      }
+      res.writeHead(upstream.status, { "Content-Type": upstream.headers.get("content-type") ?? "application/json",
+        "Access-Control-Allow-Origin": "*" });
+      res.end(body);
+    } catch (error) { res.writeHead(502); res.end(String(error)); }
+  });
+  await new Promise((resolve) => hostile.listen(0, "127.0.0.1", resolve));
+  const hostilePort = hostile.address().port;
+
+  await check("hostile site ids are shown as plain text: no script runs in the list, site card, badges or map tooltip", async () => {
+    await open(`${BASE}/app/?api=http://127.0.0.1:${hostilePort}`);
+    await waitFor(`document.querySelectorAll('${ROWS}').length > 0 && document.querySelector('#loading').hidden`, "the list from the hostile API");
+    await sleep(800);
+    assert.ok((await rows())[0][1].includes("<img src=x"), "the payload should appear as literal text in the list");
+    assert.equal(await evaluate(`document.querySelectorAll('#top-list img, .rank-badge img, #legend img').length`), 0);
+    // pick the 8th site: it has no rank badge on top of it, so the hover reaches its polygon
+    await evaluate(`document.querySelectorAll('${ROWS}')[7].click()`);
+    await waitFor(`!document.querySelector('#sheet-card').hidden`, "the site card");
+    assert.ok((await evaluate(`document.querySelector('#card-body').textContent`)).includes("<img src=x"));
+    assert.equal(await evaluate(`document.querySelectorAll('#card-body img').length`), 0);
+    await sleep(1500); // let the pan to the selected site finish before zooming, or the zoom starts from a half-way centre
+    for (let i = 0; i < 3; i++) { await evaluate(`document.querySelector('.leaflet-control-zoom-in').click()`); await sleep(600); }
+    await sleep(1200);
+    const centre = await evaluate(`(() => { const r = document.querySelector('#map').getBoundingClientRect();
+      return { x: r.left + r.width / 2, y: r.top + r.height / 2 }; })()`);
+    await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: centre.x - 80, y: centre.y - 80, button: "none" });
+    await sleep(250);
+    for (const [dx, dy] of [[0, 0], [1, 1], [-1, 1], [1, -1], [-2, 0], [2, 0], [0, 3], [0, -3]]) {
+      await send("Input.dispatchMouseEvent", { type: "mouseMoved", x: centre.x + dx, y: centre.y + dy, button: "none" });
+      await sleep(250);
+      if (await evaluate(`document.querySelector('.leaflet-tooltip') !== null`)) break;
+    }
+    await waitFor(`document.querySelector('.leaflet-tooltip') !== null`, "a map tooltip to open");
+    const tip = await evaluate(`document.querySelector('.leaflet-tooltip').textContent`);
+    assert.ok(tip.includes("<img src=x"), `the tooltip should show the markup as text, got: ${tip}`);
+    assert.equal(await evaluate(`document.querySelectorAll('.leaflet-tooltip img').length`), 0, "markup became a real element");
+    await sleep(500);
+    assert.equal(await evaluate(`window.__pwned === undefined`), true, "the injected script ran");
+  });
+  hostile.close();
+  await shot("5a-hostile-api");
+
+  await check("an ?api= address on someone else's server is ignored, with a visible notice", async () => {
+    await open(`${BASE}/app/?api=https://evil.example`);
+    await waitFor(`document.querySelectorAll('${ROWS}').length > 0`, "the page to load from its own API");
+    const notice = await evaluate(`document.querySelector('#notices').textContent`);
+    assert.match(notice, /\?api= address in the link was ignored/);
+    assert.equal(await evaluate(`document.querySelector('#fatal').hidden`), true);
+  });
+
+  await check("a narrow screen stacks the sheets under the map without breaking, and the hint can be dismissed", async () => {
+    await open(`${BASE}/app/`, 390, 844);
+    await waitFor(`document.querySelectorAll('${ROWS}').length > 0`, "the list on a narrow screen");
+    await sleep(600);
+    assert.ok((await evaluate(`document.documentElement.scrollWidth`)) <= 400, "page scrolls sideways on a phone");
+    assert.equal(await evaluate(`document.querySelector('#coach').hidden`), false);
+    await evaluate(`document.querySelector('#coach-dismiss').click()`);
+    assert.equal(await evaluate(`document.querySelector('#coach').hidden`), true);
+  });
+  await shot("5-narrow");
+
+  await check("when the API cannot be reached the page explains how to start it", async () => {
+    await open(`${BASE}/app/?api=http://127.0.0.1:9`);
+    await waitFor(`document.querySelector('#fatal') && !document.querySelector('#fatal').hidden`, "the error message", 30000);
+    const text = await evaluate(`document.querySelector('#fatal').textContent`);
+    assert.match(text, /could not reach the API/);
+    assert.match(text, /uvicorn backend\.api\.main:app/);
+    assert.equal(await evaluate(`document.querySelector('#main').hidden`), true);
+    assert.equal(await evaluate(`document.querySelector('#loading').hidden`), true);
+  });
+  await shot("6-api-down");
+
+  await check("no console errors or uncaught exceptions in the whole run (the unreachable-API case is expected)", async () => {
+    const unexpected = problems.filter((p) => !/127\.0\.0\.1:9|Failed to load resource|ERR_|net::/i.test(p));
+    assert.deepEqual(unexpected, []);
+  });
+} catch (error) {
+  console.error(`\nsmoke test could not run: ${error.stack || error.message}`);
+  results.push([false, "setup"]);
+} finally {
+  try { socket?.close(); } catch { /* already closed */ }
+  chrome.kill();
+  await sleep(500);
+  try { rmSync(profile, { recursive: true, force: true }); } catch { /* browser may still hold a file */ }
+}
+
+const failed = results.filter(([ok]) => !ok).length;
+console.log(`\n${results.length - failed} of ${results.length} checks passed. Screenshots: ${SHOTS}`);
+process.exit(failed ? 1 : 0);

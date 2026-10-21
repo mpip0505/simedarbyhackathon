@@ -196,6 +196,39 @@ def _optional(path: Path):
         return None
 
 
+OSM_LAYERS = ("buildings", "roads", "paths", "parks", "open_land")  # whitelist for the offline basemap
+
+
+def load_osm_layer(name: str) -> Optional[dict]:
+    """A cached OpenStreetMap layer for the offline basemap; None if the name is not whitelisted or absent."""
+    if name not in OSM_LAYERS:
+        return None
+    return _optional(data_dir() / "osm" / f"{name}.geojson")
+
+
+def load_spine() -> Optional[dict]:
+    return _optional(data_dir() / "corridor_spine.geojson")
+
+
+def load_crosscheck() -> Optional[dict]:
+    """The independent canopy cross-check, trimmed to the threshold in use: one row per window and reference map."""
+    raw = _optional(data_dir() / "crosscheck.json")
+    if raw is None:
+        return None
+    t = str(raw.get("canopy_ndvi_threshold_in_use"))
+    rows = []
+    for window, refs in raw.get("results", {}).items():
+        for ref, by_threshold in refs.items():
+            m = by_threshold.get(t)
+            if m:
+                rows.append({"window": window, "reference": ref, "reference_tree_pct": m["reference_tree_pct"],
+                             "ours_canopy_pct": m["ours_canopy_pct"], "precision": m["precision"],
+                             "recall": m["recall"], "f1": m["f1"]})
+    return {"ndvi_threshold": raw.get("canopy_ndvi_threshold_in_use"), "rows": rows,
+            "mean_f1_by_threshold": raw.get("threshold_comparison", {}).get("mean_f1_by_threshold"),
+            "caveat": raw.get("caveat")}
+
+
 def load_series() -> Optional[dict]:
     return _optional(data_dir() / "series.json")
 

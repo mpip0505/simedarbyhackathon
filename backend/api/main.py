@@ -7,11 +7,13 @@ import logging
 import time
 import uuid
 from contextlib import asynccontextmanager
+from pathlib import Path
 from typing import Optional
 
 from fastapi import FastAPI, HTTPException, Query, Request
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, JSONResponse, RedirectResponse
+from fastapi.staticfiles import StaticFiles
 
 from backend import logging_config
 from backend.api import scoring, selfcheck, store
@@ -163,6 +165,33 @@ def corridor() -> dict:
     return store.load_corridor()
 
 
+@app.get("/layers/corridor/spine")
+def corridor_spine() -> dict:
+    """The dashed connector lines between parks (approximate, like the corridor itself)."""
+    spine = store.load_spine()
+    if spine is None:
+        raise HTTPException(status_code=404, detail="No corridor spine in this data set (mock data has none)")
+    return spine
+
+
+@app.get("/layers/osm/{name}")
+def osm_layer(name: str) -> dict:
+    """Cached OpenStreetMap layer for an offline basemap: buildings, roads, paths, parks or open_land."""
+    layer = store.load_osm_layer(name)
+    if layer is None:
+        raise HTTPException(status_code=404, detail=f"No such OSM layer: {name}")
+    return layer
+
+
+@app.get("/summary/crosscheck")
+def summary_crosscheck() -> dict:
+    """Our canopy proxy against ESA WorldCover and Dynamic World (both satellite maps, not field truth)."""
+    result = store.load_crosscheck()
+    if result is None:
+        raise HTTPException(status_code=404, detail="No cross-check in this data set (mock data has none)")
+    return result
+
+
 @app.get("/layers/overlays")
 def overlays() -> dict:
     """Before/after map images: url, map bounds ([[south, west], [north, east]]), colour range, unit."""
@@ -178,3 +207,17 @@ def overlay_image(name: str) -> FileResponse:
     if path is None or not path.exists():
         raise HTTPException(status_code=404, detail=f"Unknown overlay: {name}")
     return FileResponse(path, media_type="image/png")
+
+
+# ---- the bundled barebones web app (frontend/), served from the same process ----
+FRONTEND_DIR = Path(__file__).resolve().parents[2] / "frontend"
+
+
+@app.get("/", include_in_schema=False)
+def root():
+    """Send visitors to the web app when it is present, otherwise to the API docs."""
+    return RedirectResponse("/app/" if FRONTEND_DIR.is_dir() else "/docs")
+
+
+if FRONTEND_DIR.is_dir():
+    app.mount("/app", StaticFiles(directory=FRONTEND_DIR, html=True), name="app")
