@@ -127,6 +127,33 @@ def test_path_under_full_canopy_counts_as_covered(synthetic):
     assert len(near) and (near["uncovered_path_length_50m"] == 0).all() and (near["path_canopy_frac_50m"] == 1).all()
 
 
+def test_uncovered_path_never_exceeds_the_path_length(synthetic):
+    layers, rasters = synthetic
+    for ndvi_value in (0.3, 0.55, 0.8):                       # no canopy, partly, fully covered
+        rasters["ndvi_latest"] = raster(np.full((200, 200), ndvi_value))
+        sites = g.build_sites(layers, rasters)
+        assert (sites["uncovered_path_length_50m"].dropna() <= sites["path_length_within_50m"] + 1e-9).all()
+
+
+def test_uncovered_path_is_the_path_length_times_the_uncovered_share(synthetic):
+    layers, rasters = synthetic
+    bare = g.build_sites(layers, rasters).query("path_length_within_50m > 0")      # path at NDVI 0.3 is all uncovered
+    assert len(bare) and (bare["uncovered_path_length_50m"] == bare["path_length_within_50m"]).all()
+    rasters["ndvi_latest"] = raster(np.full((200, 200), 0.8))
+    shaded = g.build_sites(layers, rasters).query("path_length_within_50m > 0")
+    assert (shaded["uncovered_path_length_50m"] == 0).all() and (shaded["path_canopy_frac_50m"] == 1).all()
+
+
+def test_real_sites_have_consistent_path_features():
+    """Guards the committed data: a site can never have more uncovered path than path (this once reported 490 of 469 m)."""
+    import pandas as pd
+    from backend.config import CACHE_DIR
+    df = pd.read_csv(CACHE_DIR / "site_features.csv")
+    assert (df["uncovered_path_length_50m"].dropna() <= df["path_length_within_50m"] + 1e-6).all()
+    assert (df.loc[df["path_length_within_50m"] == 0, "uncovered_path_length_50m"] == 0).all()
+    assert df["path_canopy_frac_50m"].dropna().between(0, 1).all()
+
+
 def test_build_sites_is_deterministic(synthetic):
     layers, rasters = synthetic
     a, b = g.build_sites(layers, rasters), g.build_sites(layers, rasters)

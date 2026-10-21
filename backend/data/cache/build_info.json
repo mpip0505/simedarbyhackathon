@@ -1,5 +1,5 @@
 {
- "generated_at": "2026-10-20T16:55:45+00:00",
+ "generated_at": "2026-10-21T02:18:37+00:00",
  "sources_built": {
   "osm": "2026-10-20T16:47:42+00:00",
   "satellite": "2026-10-20T16:47:42+00:00"
@@ -17,15 +17,15 @@
  "steps": [
   {
    "step": "corridor",
-   "seconds": 6.7
+   "seconds": 7.5
   },
   {
    "step": "overlays",
-   "seconds": 1.6
+   "seconds": 1.4
   },
   {
    "step": "sites",
-   "seconds": 26.9
+   "seconds": 37.5
   }
  ]
 }
