@@ -22,6 +22,8 @@ import { renderStrip } from "./strip.js";
 import { renderScenario } from "./scenario.js";
 import { renderImpact } from "./impact.js";
 import { renderTradeoff } from "./tradeoff.js";
+import { buildHash, parseHash } from "./hash.js";
+import { startTour } from "./tour.js";
 import { steadiness, steadySummary, shortlistRows, shortlistNote } from "./ml-logic.js";
 
 const OSM_NAMES = ["open_land", "parks", "buildings", "roads", "paths"];
@@ -127,6 +129,17 @@ const actions = {
   limits: () => openDialog("#dlg-limits"),
   credits: () => openDialog("#dlg-credits"),
   geojson: () => {},
+  tour: () => {},
+  contrast: () => {},
+  share: async () => {
+    const say = (text) => { const note = el("div", { class: "notice" }, text); $("#notices").append(note); setTimeout(() => note.remove(), 5000); };
+    try {
+      await navigator.clipboard.writeText(location.href);
+      say("Link copied. It keeps your slider settings and the selected site.");
+    } catch {
+      say("Copy the address from the browser's address bar: it already holds your slider settings and the selected site.");
+    }
+  },
   brief: () => {},
   download: () => {},                       // these need the loaded data, so boot() fills them in
   sites: () => {},
@@ -134,6 +147,15 @@ const actions = {
 };
 const scrollBehavior = () => (matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth");
 document.addEventListener("click", (e) => actions[e.target.closest?.("[data-action]")?.dataset.action]?.());
+
+// High-contrast mode: a toggle in the sidebar, remembered in this browser only.
+function setContrast(on) {
+  document.documentElement.dataset.contrast = on ? "high" : "normal";
+  $("#contrast-toggle").setAttribute("aria-pressed", String(on));
+  try { localStorage.setItem("elmina-contrast", on ? "high" : "normal"); } catch { /* the setting just will not be remembered */ }
+}
+actions.contrast = () => setContrast(document.documentElement.dataset.contrast !== "high");
+try { setContrast(localStorage.getItem("elmina-contrast") === "high"); } catch { setContrast(false); }
 
 // ---------- the app ----------
 
@@ -275,6 +297,13 @@ async function boot() {
     $("#sheet-card").scrollIntoView({ block: "nearest", behavior: scrollBehavior() });
   }
 
+  const syncHash = () => {
+    try {
+      const s = store.get();
+      history.replaceState(null, "", buildHash({ weights: s.weights, defaults, site: s.selectedId }) || location.pathname + location.search);
+    } catch { /* the address bar is a convenience, not needed */ }
+  };
+
   function refresh({ announce = false } = {}) {
     const s = store.get();
     const ranked = currentRanked();
@@ -308,6 +337,7 @@ async function boot() {
       note.textContent = `${changed === 0 ? `The top ${n} stayed the same.` : `${changed} of the top ${n} changed.`} Scores re-weighted in your browser, same formula as the API.`;
     }
     lastRanked = ranked;
+    syncHash();
   }
 
   function select(id, source) {
@@ -366,7 +396,13 @@ async function boot() {
     else if (!$("#sheet-card").hidden) closeCard();
   });
 
+  const start = parseHash(location.hash);              // a shared link: weights and site in the address
+  if (start.weights) {
+    sliders.set(start.weights);
+    store.set({ weights: start.weights, usingServer: KEYS.every((k) => start.weights[k] === defaults[k]) });
+  }
   refresh();
+  if (start.site && byId.has(start.site)) select(start.site, "list");
   $("#loading").hidden = true;
 
   // ----- tabs -----
@@ -402,6 +438,10 @@ async function boot() {
     await showView("prioritise");
     $("#sheet-top").scrollIntoView({ block: "start", behavior: scrollBehavior() });
     $("#search").focus({ preventScroll: true });
+  };
+  actions.tour = async () => {
+    await showView("prioritise");
+    startTour($('[data-action="tour"]'));
   };
   actions.layers = async () => {
     await showView("prioritise");

@@ -3,8 +3,18 @@
 import { el, clear, append } from "./dom.js";
 import { SCORE_LABELS, contributions, driverNotes, siteHeadline } from "./drivers.js";
 import { fmt, fmtC, fmtMetres, fmtPct } from "./scale.js";
+import { canSpeak, siteSpeech } from "./speech.js";
 
 const ORDER = ["cooling", "connectivity", "shade"]; // the order used in the brief
+
+/** Speak the text with the browser's own voice; pressing the button again while it speaks stops it. */
+function speak(text) {
+  const synth = window.speechSynthesis;
+  if (synth.speaking) { synth.cancel(); return; }
+  const utterance = new SpeechSynthesisUtterance(text);
+  utterance.lang = "en-GB";
+  synth.speak(utterance);
+}
 
 function scoreRow(key, value) {
   return el("div", { class: "score-row" },
@@ -33,6 +43,7 @@ export function renderCard(body, feature, { weights, ctx, total, placeholder, st
       el("span", { class: "chip" }, p.origin === "corridor_edge" ? "Corridor edge" : "Open land"),
       placeholder ? el("span", { class: "chip chip-warn chip-nodot" }, "Preview score") : null),
     el("p", { class: "card-headline" }, siteHeadline(p, ctx)),
+    canSpeak() ? el("button", { type: "button", class: "btn btn-secondary btn-sm card-speak", onclick: () => speak(siteSpeech(p, siteHeadline(p, ctx), total)) }, "Read aloud") : null,
     el("div", { class: "card-total" }, el("strong", {}, fmt(p.score_total)),
       el("span", {}, `${placeholder ? "Preview score" : "Score"}, out of 100 · ranked #${p.rank} of ${total}`)),
     el("div", { class: "score-rows" }, ORDER.map((k) => scoreRow(k, p[`score_${k}`]))),

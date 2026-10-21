@@ -56,6 +56,9 @@
         <button type="button" class="nav-item" data-action="geojson"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-map"></use></svg><span>Map file for GIS</span></button>
         <button type="button" class="nav-item" data-action="brief"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-file"></use></svg><span>Print planting brief</span></button>
         <button type="button" class="nav-item" data-action="credits"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-book"></use></svg><span>Data credits</span></button>
+        <button type="button" class="nav-item" data-action="share"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-file"></use></svg><span>Copy link to this view</span></button>
+        <button type="button" class="nav-item" data-action="tour"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-map"></use></svg><span>Take the tour</span></button>
+        <button type="button" class="nav-item" id="contrast-toggle" data-action="contrast" aria-pressed="false"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-layers"></use></svg><span>High contrast</span></button>
       </div>
       <section class="side-status" aria-label="Data status">
         <h2>Data status</h2>
@@ -324,6 +327,17 @@
   </div>
 
   <section id="print-brief" aria-hidden="true"></section>
+
+  <div id="tour" role="dialog" aria-modal="false" aria-labelledby="tour-title" hidden>
+    <p id="tour-count" class="tour-count"></p>
+    <h2 id="tour-title"></h2>
+    <p id="tour-text"></p>
+    <div class="tour-buttons">
+      <button type="button" id="tour-back" class="btn btn-secondary btn-sm">Back</button>
+      <button type="button" id="tour-next" class="btn btn-primary btn-sm">Next</button>
+      <button type="button" id="tour-close" class="btn btn-ghost btn-sm">Close</button>
+    </div>
+  </div>
 
   <dialog id="dlg-limits" aria-labelledby="dlg-limits-title">
     <h2 id="dlg-limits-title">Limits of this data</h2>

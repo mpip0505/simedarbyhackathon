@@ -166,6 +166,7 @@ backend's config placeholder (0.40 / 0.35 / 0.25), so sliders should start from 
 - **Accessibility:** skip link, keyboard-operable map list and site card, visible focus, high-contrast (forced-colors) support, reduced motion respected,
   colour-blind-safe ramp. The smoke test runs **axe-core (WCAG 2.2 A and AA rules)** on both views and finds no violations. That is an automated scan,
   which catches only part of the problems: say "axe-clean, keyboard-tested", not "WCAG compliant", until someone has also tested with a screen reader.
+- **Easier to use:** a 7-step guided tour ("Take the tour"), **Read aloud** on the site card (the browser's own voice, nothing sent anywhere), a **high-contrast** mode, and **Copy link to this view** (slider weights and the selected site are kept in the address, validated when a link is opened).
 - **Hosting a live demo:** `Dockerfile` and `render.yaml` serve the app and API from the committed data using only `backend/requirements-serve.txt`
   (FastAPI, Uvicorn, Pydantic). Locally: `docker build -t elmina-canopy .` then `docker run --rm -p 8000:8000 elmina-canopy`. On Render: New, Blueprint, pick this repo.
   The free plan sleeps when idle (first load can take about a minute), so open the link before presenting and keep the recorded video as a fallback.
@@ -198,8 +199,8 @@ backend's config placeholder (0.40 / 0.35 / 0.25), so sliders should start from 
 ## Testing and CI
 ```bash
 python -m pytest backend/tests -q          # 201 tests, no Earth Engine or network needed
-node --test "frontend/tests/*.test.mjs"    # 97 frontend unit tests (Node 22, no dependencies)
-node frontend/tools/smoke.mjs              # real Chrome/Edge drives the web app, 29 checks (API must be running)
+node --test "frontend/tests/*.test.mjs"    # 110 frontend unit tests (Node 22, no dependencies)
+node frontend/tools/smoke.mjs              # real Chrome/Edge drives the web app, 37 checks (API must be running)
 (cd frontend && npm install)                # once, to switch on the axe-core accessibility scan inside the smoke test
 python -m backend.api.selfcheck            # deep check of the committed data
 python -m backend.scripts.qa_plot          # draws docs/qa-map.png: sites, corridor, parks, paths, buildings

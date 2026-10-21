@@ -634,3 +634,25 @@ dialog form[method="dialog"] { display: flex; justify-content: flex-end; margin:
 .pl-mid { border-top: 3px dashed #c9972c; }
 .pl-green { border-top: 2px dotted #2f7d32; }
 @media (max-width: 900px) { .path-legend { display: none; } }
+
+/* ---------- guided tour ---------- */
+.tour-focus { outline: 3px solid var(--focus); outline-offset: 3px; border-radius: var(--r-3); }
+#tour { position: fixed; z-index: 2000; right: 24px; bottom: 56px; width: 340px; max-width: calc(100vw - 32px); padding: 16px; background: #fff; border: 1px solid var(--border-strong); border-radius: var(--r-3); box-shadow: var(--shadow-pop); }
+#tour h2 { margin: 2px 0 6px; font-size: 15px; line-height: 22px; font-weight: 600; }
+#tour p { margin: 0; font-size: 13px; line-height: 20px; color: var(--text-2); }
+#tour .tour-count { font-size: 12px; line-height: 16px; color: var(--text-muted); }
+.tour-buttons { display: flex; gap: 8px; margin-top: 12px; }
+.tour-buttons .btn-ghost { margin-left: auto; }
+@media (max-width: 640px) { #tour { right: 16px; left: 16px; width: auto; bottom: 16px; } }
+@media print { #tour { display: none !important; } }
+
+/* ---------- high-contrast mode (the toggle in the sidebar; remembered in the browser) ---------- */
+:root[data-contrast="high"] {
+  --text: #000; --text-2: #000; --text-muted: #1a1a1a; --ink: #000;
+  --border: #000; --border-strong: #000; --border-input: #000; --border-search: #000;
+  --accent: #8a2a00; --accent-fill: #8a2a00; --accent-hover: #5e1c00; --accent-tint: #fff; --accent-line: #000; --focus: #0044cc;
+  --hover: #e6e6e6; --selected: #d9d9d9;
+}
+:root[data-contrast="high"] .chip { border-color: #000; }
+:root[data-contrast="high"] :focus-visible { outline-width: 3px; }
+.card-speak { align-self: flex-start; }

@@ -409,6 +409,65 @@ try {
     await evaluate(`${box}.click()`);
     assert.equal(await evaluate(`document.querySelector('#path-legend').hidden`), true);
   });
+  await check("the guided tour walks through the screen, outlines each part, and closes with Escape", async () => {
+    await evaluate(`document.querySelector('[data-action="tour"]').click()`);
+    await sleep(500);
+    assert.equal(await evaluate(`document.querySelector('#tour').hidden`), false, "the tour card should open");
+    assert.match(await evaluate(`document.querySelector('#tour-count').textContent`), /^Step 1 of \d+$/);
+    assert.equal(await evaluate(`document.querySelectorAll('.tour-focus').length`), 1);
+    await evaluate(`document.querySelector('#tour-next').click()`);
+    assert.match(await evaluate(`document.querySelector('#tour-count').textContent`), /^Step 2 of/);
+    await send("Input.dispatchKeyEvent", { type: "keyDown", key: "Escape", code: "Escape", windowsVirtualKeyCode: 27 });
+    await send("Input.dispatchKeyEvent", { type: "keyUp", key: "Escape", code: "Escape", windowsVirtualKeyCode: 27 });
+    assert.equal(await evaluate(`document.querySelector('#tour').hidden`), true, "Escape should close the tour");
+    assert.equal(await evaluate(`document.querySelectorAll('.tour-focus').length`), 0);
+  });
+  await check("high contrast switches on and off and is announced to assistive technology", async () => {
+    const btn = `document.querySelector('#contrast-toggle')`;
+    await evaluate(`${btn}.click()`);
+    assert.equal(await evaluate(`document.documentElement.dataset.contrast`), "high");
+    assert.equal(await evaluate(`${btn}.getAttribute('aria-pressed')`), "true");
+    await evaluate(`${btn}.click()`);
+    assert.equal(await evaluate(`document.documentElement.dataset.contrast`), "normal");
+  });
+  await check("the address keeps slider weights and the selected site, and a shared link restores them", async () => {
+    await setSlider("cooling", 100);
+    await setSlider("connectivity", 0);
+    await setSlider("shade", 0);
+    await sleep(200);
+    const hash = await evaluate(`location.hash`);
+    assert.match(hash, /^#w=100,0,0/);
+    const id = await evaluate(`document.querySelector('${ROWS} .site-name').textContent.trim()`);
+    await evaluate(`document.querySelector('${ROWS}').click()`);
+    await sleep(300);
+    assert.match(await evaluate(`location.hash`), new RegExp(`site=${id}`));
+    const full = await evaluate(`location.href`);
+    await send("Page.navigate", { url: "about:blank" });
+    await send("Page.navigate", { url: full });
+    await waitFor(`document.querySelectorAll('${ROWS}').length > 0 && document.querySelector('#loading').hidden`, "the shared link to load");
+    await sleep(500);
+    assert.equal(await evaluate(`document.querySelector('#w-cooling').value`), "100");
+    assert.equal(await evaluate(`document.querySelector('#w-shade').value`), "0");
+    assert.equal(await evaluate(`document.querySelector('#sheet-card').hidden`), false, "the shared site should open its card");
+    assert.match(await evaluate(`document.querySelector('#card-body').innerText`), new RegExp(id));
+    await evaluate(`document.querySelector('#weights-reset').click()`);   // leave the page at the default weights for what follows
+  });
+  await check("a mangled shared link is ignored without breaking the page", async () => {
+    await send("Page.navigate", { url: "about:blank" });                       // a hash-only change would not reload the page
+    await send("Page.navigate", { url: `${BASE}/app/#w=999,x&site=%3Cimg%20src=x%3E` });
+    await waitFor(`document.querySelectorAll('${ROWS}').length > 0 && document.querySelector('#loading').hidden`, "the page to load with a bad hash");
+    assert.equal(await evaluate(`document.querySelector('#w-cooling').value`), "45");
+    assert.equal(await evaluate(`document.querySelector('#sheet-card').hidden`), true);
+  });
+  await check("Read aloud on the site card speaks the site, the rank and the scores", async () => {
+    await evaluate(`window.__spoken = []; speechSynthesis.speak = (u) => { window.__spoken.push(u.text); }; speechSynthesis.cancel = () => {};`);
+    await evaluate(`document.querySelector('${ROWS}').click()`);
+    await sleep(300);
+    await evaluate(`document.querySelector('.card-speak').click()`);
+    const said = await evaluate(`window.__spoken[0] || ''`);
+    assert.match(said, /an example site, simulated\. Ranked \d+ of \d+\./);
+    assert.match(said, /heat relief \d+, links green areas \d+, shade for walkers \d+/);
+  });
   await check("the trade-off card compares five ways of choosing, as a trade-off with no winner", async () => {
     const card = `document.querySelector('#card-tradeoff')`;
     assert.equal(await evaluate(`${card}.hidden`), false, "the card should show with scores from the scoring model");
