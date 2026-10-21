@@ -44,6 +44,7 @@
       <nav id="view-tabs" class="side-nav" aria-label="Views">
         <button type="button" class="nav-item" data-view="prioritise" aria-current="page"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-map"></use></svg><span>Plant first</span></button>
         <button type="button" class="nav-item" data-view="report"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-columns"></use></svg><span>Before and after</span></button>
+        <button type="button" class="nav-item" data-view="pilot"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-table"></use></svg><span>Pilot plan</span></button>
       </nav>
       <div class="side-nav" role="group" aria-label="Shortcuts">
         <button type="button" class="nav-item" data-action="sites"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-table"></use></svg><span>Sites</span></button>
@@ -241,6 +242,11 @@
             <article class="card" id="card-plan"></article>
             <article class="card" id="card-impact" hidden></article>
             <article class="card" id="card-tradeoff" hidden></article>
+          </section>
+
+          <!-- ========== Pilot plan ========== -->
+          <section id="view-pilot" class="page" hidden aria-label="Pilot plan">
+            <div id="pilot-root"></div>
           </section>
 
           <!-- ========== Before and after ========== -->

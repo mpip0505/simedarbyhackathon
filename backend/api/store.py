@@ -325,6 +325,11 @@ def load_impact() -> Optional[dict]:
     return _ml_report("impact_reach.json")
 
 
+def load_reach_sets() -> Optional[dict]:
+    """For every site, which footpath samples, homes and corridor-gap samples it reaches, so a browser can take the union for any shortlist."""
+    return _ml_report("reach_sets.json")
+
+
 def load_tradeoff() -> Optional[dict]:
     """The first 20 and 50 sites chosen five ways, with what each reaches. A trade-off, not a league table."""
     return _ml_report("tradeoff.json")

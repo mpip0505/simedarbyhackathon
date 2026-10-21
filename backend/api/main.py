@@ -250,6 +250,12 @@ def ml_impact() -> dict:
     return _ml_or_404(store.load_impact(), "impact")
 
 
+@app.get("/ml/reach-sets")
+def ml_reach_sets() -> dict:
+    """Per-site index lists of what each site reaches; the browser unions them for the planner's own shortlist."""
+    return _ml_or_404(store.load_reach_sets(), "reach-sets")
+
+
 @app.get("/ml/tradeoff")
 def ml_tradeoff() -> dict:
     """What the first 20 and 50 sites reach when chosen by heat only, canopy gap only, both, our default weights, or spread out."""

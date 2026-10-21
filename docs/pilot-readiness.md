@@ -62,3 +62,7 @@ No targets are set here, because nothing in our data supports a number; the deve
 - Is there any tree inventory, LiDAR or drone survey of Elmina?
 - Which disclosure or internal report would use these numbers, and what level of evidence does it require?
 - Where must the data and the service live (their cloud, ours, on-premise)?
+
+## What the app now supports for a pilot (and what it still needs)
+The **Pilot plan** view lets a planner run the loop with their own entries: shortlist, five field checks per site, inspection batches, a blind field sheet out and the completed sheet back (compared with the model, then keep or reject with a reason and next-ranked replacements), phases from the planner's own capacity and costs, the unique reach of the shortlist, a work schedule, tree records and recorded survival among inspected trees.
+What it deliberately does not do: inspect, verify or approve anything; share records between people (browser storage on one device); keep an audit trail; manage logins; recommend species; or estimate costs from assumed local rates. A real pilot would add shared, audited storage first, then the developer's own site list and species guidance. A protocol for a first usability test is in [usability-test-protocol.md](usability-test-protocol.md); no results exist yet.

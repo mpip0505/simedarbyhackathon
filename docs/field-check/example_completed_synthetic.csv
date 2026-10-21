@@ -1,0 +1,5 @@
+site_id,lat,lon,shade_on_path,canopy_class,path_in_use,photo_id,notes,observer,date
+ELM-3693-11692,3.167589,101.499268,none,sparse,yes,,"SYNTHETIC EXAMPLE, not a real observation",synthetic,2026-10-24
+ELM-3695-11692,3.167591,101.499807,full,dense,no,,"SYNTHETIC EXAMPLE, not a real observation",synthetic,2026-10-24
+ELM-3716-11696,3.168694,101.505463,partial,sparse,yes,,"SYNTHETIC EXAMPLE, not a real observation",synthetic,2026-10-24
+ELM-3716-11698,3.169236,101.505461,none,none,no,,"SYNTHETIC EXAMPLE, not a real observation",synthetic,2026-10-24

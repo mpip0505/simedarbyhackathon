@@ -55,3 +55,16 @@ test("the only internet address in the scripts is the optional street-map tile s
   const allowed = [...urls].filter((u) => !/tile\.openstreetmap\.org|127\.0\.0\.1|localhost|www\.w3\.org/.test(u));
   assert.deepEqual(allowed, []);
 });
+
+test("the pilot plan keeps its honesty wording: the planner's own entries, never an approval, unknown stays unknown", () => {
+  const all = shipped.map(([, t]) => t).join("\n");
+  assert.match(all, /Nothing is inspected, approved or planted by this tool/);
+  assert.match(all, /All five checks OK \(not an approval\)/);
+  assert.match(all, /Not checked/);
+  assert.match(all, /No field data: no planted trees have been recorded/);
+  assert.match(all, /is never counted as surviving|not counted as surviving/);
+  assert.match(all, /one visit's comparison, not validation/);
+  assert.match(all, /A 30 m site is not assumed to be one tree/);
+  assert.match(all, /Nothing is assumed: with a field left empty, the answer says Not set/);
+  assert.match(all, /Reach counts what lies near the sites[\s\S]*It is not a benefit/);
+});

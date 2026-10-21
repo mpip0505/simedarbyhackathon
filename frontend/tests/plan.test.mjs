@@ -15,10 +15,12 @@ test("adding, changing, noting and removing a site", () => {
   const plan = createPlan(fakeStorage());
   assert.equal(plan.add("ELM-1"), true);
   assert.equal(plan.add("ELM-1"), false, "no repeats");
-  assert.deepEqual(plan.get("ELM-1"), { id: "ELM-1", status: "proposed", note: "" });
+  assert.equal(plan.get("ELM-1").status, "proposed");
+  assert.equal(plan.get("ELM-1").note, "");
   plan.setStatus("ELM-1", "needs-inspection");
   plan.setNote("ELM-1", "  near the car park  ");
-  assert.deepEqual(plan.get("ELM-1"), { id: "ELM-1", status: "needs-inspection", note: "near the car park" });
+  assert.equal(plan.get("ELM-1").status, "needs-inspection");
+  assert.equal(plan.get("ELM-1").note, "near the car park");
   plan.setStatus("ELM-1", "teleported");
   assert.equal(plan.get("ELM-1").status, "needs-inspection", "unknown statuses are refused");
   plan.remove("ELM-1");
@@ -30,7 +32,7 @@ test("the plan is remembered through the storage it was given", () => {
   const a = createPlan(storage);
   a.add("ELM-2"); a.setStatus("ELM-2", "approved"); a.setNote("ELM-2", "ok");
   const b = createPlan(storage);
-  assert.deepEqual(b.list(), [{ id: "ELM-2", status: "approved", note: "ok" }]);
+  assert.deepEqual(b.list().map((x) => [x.id, x.status, x.note]), [["ELM-2", "approved", "ok"]]);
 });
 
 test("corrupt or hostile storage is ignored or cleaned, never trusted", () => {
@@ -88,7 +90,7 @@ test("the plan file has the current rank, place and a plain note, in plan order,
   assert.equal(rows[0].status, "Needs inspection");
   assert.match(String(rows[0].lat), /^3\.0001/);
   const csv = toCsv(rows, PLAN_COLUMNS);
-  assert.match(csv.split("\r\n")[0], /^site_id,status,note,current_rank,current_score,origin,lat,lon,source,about_this_file$/);
+  assert.match(csv.split("\r\n")[0], /^site_id,status,note,reason,inspection_batch,planting_phase,team,field_feasibility,checks_not_ok,field_observation,current_rank,current_score,origin,lat,lon,source,about_this_file$/);
   assert.match(csv, /not inspected or verified/);
 });
 

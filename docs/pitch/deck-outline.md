@@ -69,7 +69,7 @@ Say plainly: this counts what lies near the sites. It does not show cooling, hea
 Co-benefit for People: shade where people walk, near homes. *Screen:* `screens/05-reach.png`.
 
 ## Slide 7: Feasibility (Enabler)
-- **Built and running**: 284 backend and ML tests, 121 frontend tests, a 38-check browser test including an accessibility scan and a hostile-data security test.
+- **Built and running**: 292 backend and ML tests, 157 frontend tests, a 39-check browser test including an accessibility scan and a hostile-data security test.
 - **Free data**; hosting on a free tier works for a demo (`render.yaml`); exports for the planning team: ranked CSV, GIS map file and a printable brief (`screens/06-brief.png`).
 - **What we need from Sime Darby Property:** the real site list, the official corridor outline, the current tree count, and a few hours of fieldwork.
 - **Honest risks:** simulated sites; no ground truth; OpenStreetMap under-maps some areas; the Earth Engine registration is noncommercial, so a paid pilot needs a commercial plan or an open-data pipeline ([commercial-case.md](../commercial-case.md)).
@@ -77,7 +77,7 @@ Co-benefit for People: shade where people walk, near homes. *Screen:* `screens/0
 **User flow for a slide (see [user-flow.md](user-flow.md)):** Explore, Understand, Prioritise, Evaluate, Plan, Export, Field-verify, Implement. The first six are in the app; the last two are the pilot.
 
 ## Slide 8: Implementation (Enabler)
-1. **Now:** working prototype on simulated sites.
+1. **Now:** working prototype on simulated sites, with a Pilot plan: field checks that start Not checked, a blind field sheet out and the completed sheet back, keep or reject with next-ranked replacements, phases from your own numbers, tree records and recorded survival (the planner's own entries, saved on one device).
 2. **Weeks 1 to 2:** load the real site list and the official corridor outline and rebuild (supported by the code).
 3. **One afternoon:** walk the blind field sheet for 30 sites (`python -m backend.scripts.field_sheet`) and run the check (`import_field_checks`), the first real test of the ranking ([evidence-summary.md](../evidence-summary.md)).
 4. **Plant a season** using the shortlist; count survival at 6, 12 and 24 months, including after any maintenance guarantee ends, and re-run the footpath and corridor reach on new imagery.

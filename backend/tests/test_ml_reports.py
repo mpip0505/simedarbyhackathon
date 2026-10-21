@@ -26,7 +26,7 @@ def reports(tmp_path, monkeypatch):
 
 
 def test_missing_reports_are_404(reports):
-    for name in ("uncertainty", "shortlist", "scenario", "impact", "tradeoff"):
+    for name in ("uncertainty", "shortlist", "scenario", "impact", "tradeoff", "reach-sets"):
         assert client.get(f"/ml/{name}").status_code == 404
 
 
@@ -72,7 +72,7 @@ def test_mock_mode_serves_no_ml_reports(reports, monkeypatch):
 def test_committed_reports_match_the_committed_data():
     """The reports in ml/reports were computed on the data the API serves (else re-run the ML scripts)."""
     store._parsed.clear()
-    for name in ("uncertainty", "shortlist", "scenario", "impact", "tradeoff"):
+    for name in ("uncertainty", "shortlist", "scenario", "impact", "tradeoff", "reach-sets"):
         r = client.get(f"/ml/{name}")
         assert r.status_code == 200 and r.json()["stale"] is False, name
     sites = {f["properties"]["site_id"] for f in client.get("/sites").json()["features"]}

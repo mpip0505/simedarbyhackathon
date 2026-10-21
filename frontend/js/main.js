@@ -26,6 +26,7 @@ import { buildHash, parseHash } from "./hash.js";
 import { startTour } from "./tour.js";
 import { createPlan, planRows } from "./plan.js";
 import { renderPlanPanel } from "./plan-ui.js";
+import { renderPilot } from "./pilot-ui.js";
 import { steadiness, steadySummary, shortlistRows, shortlistNote } from "./ml-logic.js";
 
 const OSM_NAMES = ["open_land", "parks", "buildings", "roads", "paths"];
@@ -33,7 +34,7 @@ const LIST_LIMIT = 5;       // rows shown before "See all"
 const BADGES = 5;           // sites marked 1 to 5 on the map
 const OUTLINED = 10;        // sites with a dark outline
 const DEFAULT_NOTE = "The list and map update as you move these.";
-const VIEW_NAMES = { prioritise: "Plant first", report: "Before and after" };
+const VIEW_NAMES = { prioritise: "Plant first", report: "Before and after", pilot: "Pilot plan" };
 const store = createStore({ selectedId: null, filter: "all", query: "", usingServer: true, expanded: false, listMode: "ranked" });
 let started = false;
 
@@ -179,9 +180,9 @@ async function boot() {
       "The ?api= address in the link was ignored: only a localhost address or this site's own address is accepted."));
   }
 
-  const optional = await Promise.all([api.spine(), api.pathShade(), api.overlays(), api.uncertainty(), api.shortlist(), api.impact(), api.tradeoff(), ...OSM_NAMES.map((n) => api.osm(n))]
+  const optional = await Promise.all([api.spine(), api.pathShade(), api.overlays(), api.uncertainty(), api.shortlist(), api.impact(), api.tradeoff(), api.reachSets(), ...OSM_NAMES.map((n) => api.osm(n))]
     .map((p) => p.catch(() => null)));
-  const [spine, pathShade, overlays, uncertainty, shortlist, impact, tradeoff, ...osmList] = optional;
+  const [spine, pathShade, overlays, uncertainty, shortlist, impact, tradeoff, reachSets, ...osmList] = optional;
   const osm = Object.fromEntries(OSM_NAMES.map((n, i) => [n, osmList[i]]));
   if (!osmList.some(Boolean)) $("#notices").append(el("div", { class: "notice" }, "No OpenStreetMap basemap in this data set; showing the sites only."));
 
@@ -408,8 +409,14 @@ async function boot() {
   planPanel = renderPlanPanel($("#card-plan"), plan, {
     byId: () => byId, onSelect: (id) => select(id, "list"),
     topIds: () => visibleRows(currentRanked()).slice(0, 5).map((f) => f.properties.site_id), download,
+    openPilot: () => showView("pilot"),
   });
   plan.subscribe(() => markPlan(list, plan.ids()));
+  const pilot = renderPilot($("#pilot-root"), {
+    plan, byId: () => byId, ranked: () => currentRanked(), onSelect: async (id) => { await showView("prioritise"); select(id, "list"); }, download,
+    reachSets: () => (reachSets?.stale === true ? null : reachSets), today: () => new Date().toISOString().slice(0, 10), backToMap: () => showView("prioritise"),
+  });
+
   const start = parseHash(location.hash);              // a shared link: weights and site in the address
   if (start.weights) {
     sliders.set(start.weights);
@@ -429,9 +436,11 @@ async function boot() {
     $("#crumb-view").textContent = VIEW_NAMES[name];
     $("#view-prioritise").hidden = name !== "prioritise";
     $("#view-report").hidden = name !== "report";
+    $("#view-pilot").hidden = name !== "pilot";
     if (name !== currentView) $("#main").scrollTop = 0;
     currentView = name;
     if (name === "prioritise") { map.invalidateSize(); return; }
+    if (name === "pilot") { pilot.redraw(); return; }
     if (!report) {
       try {
         const [summary, series, crosscheck, scenario] = await Promise.all([api.summary(), api.series(), api.crosscheck(), api.scenario().catch(() => null)]);

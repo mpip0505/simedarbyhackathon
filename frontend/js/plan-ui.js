@@ -3,7 +3,7 @@
 import { el, clear } from "./dom.js";
 import { renderStrip } from "./strip.js";
 import { toCsv } from "./csv.js";
-import { FIELD_SHEET_COLUMNS, NOTE_MAX, PLAN_CAVEAT, PLAN_COLUMNS, STATUSES, fieldSheetRows, planRows, planTiles } from "./plan.js";
+import { FIELD_SHEET_COLUMNS, NOTE_MAX, PLAN_CAVEAT, PLAN_COLUMNS, STATUSES, feasibility, fieldSheetRows, planRows, planTiles } from "./plan.js";
 
 const statusSelect = (value, label, onChange) => {
   const select = el("select", { class: "select", "aria-label": label, onchange: (e) => onChange(e.target.value) },
@@ -20,7 +20,7 @@ export function planControls(plan, siteId) {
     box.append(el("h3", {}, "Planting plan"));
     if (!plan.has(siteId)) {
       const add = el("button", { type: "button", class: "btn btn-secondary btn-sm", onclick: () => { plan.add(siteId, "card"); draw("status"); } }, "Add to planting plan");
-      box.append(add, el("p", { class: "small-note" }, "Your own shortlist, saved on this device only."));
+      box.append(add, el("p", { class: "small-note" }, "Your own shortlist, saved on this device only. Field checks, inspection batches and tree records are in the Pilot plan."));
       if (focusAfter === "add") add.focus({ preventScroll: true });
       return;
     }
@@ -30,7 +30,7 @@ export function planControls(plan, siteId) {
       onchange: (e) => plan.setNote(siteId, e.target.value, "card") });
     const remove = el("button", { type: "button", class: "btn btn-ghost btn-sm", onclick: () => { plan.remove(siteId, "card"); draw("add"); } }, "Remove from plan");
     box.append(el("label", { class: "plan-field" }, el("span", {}, "Status"), status), el("label", { class: "plan-field" }, el("span", {}, "Note"), note), remove,
-      el("p", { class: "small-note" }, "A status only records what you set. This tool has not inspected the site."));
+      el("p", { class: "small-note" }, `Field checks: ${feasibility(entry).label}. Record them in the Pilot plan. A status only records what you set; this tool has not inspected the site.`));
     if (focusAfter === "status") status.focus({ preventScroll: true });
   }
   draw();
@@ -41,7 +41,7 @@ export function planControls(plan, siteId) {
  * The panel under the map. options: { byId() -> Map of site id to feature as currently ranked, onSelect(id), topIds() -> ids to add in one go, download(filename, text, type) }.
  * Returns { redraw() } so the app can refresh the current ranks after a re-rank.
  */
-export function renderPlanPanel(card, plan, { byId, onSelect, topIds, download }) {
+export function renderPlanPanel(card, plan, { byId, onSelect, topIds, download, openPilot }) {
   const tiles = el("div", { class: "stats", "aria-label": "The planting plan at a glance" });
   const body = el("div", { class: "plan-body" });
   let clearArmed = null;
@@ -86,6 +86,7 @@ export function renderPlanPanel(card, plan, { byId, onSelect, topIds, download }
     download("elmina-field-sheet.csv", toCsv(rows, FIELD_SHEET_COLUMNS.map((c) => ({ key: c, label: c }))));
     say.textContent = `Field sheet made for ${rows.length} site${rows.length === 1 ? "" : "s"}: place only, no rank or score.`;
   } }, "Download field sheet (CSV)");
+  const pilotBtn = el("button", { type: "button", class: "btn btn-primary btn-sm", onclick: openPilot }, "Open the pilot plan");
   const clearBtn = el("button", { type: "button", class: "btn btn-ghost btn-sm", onclick: () => {
     if (!plan.list().length) return;
     if (clearArmed) { clearTimeout(clearArmed); clearArmed = null; clearBtn.textContent = "Clear the plan"; plan.clear("panel-rows"); say.textContent = "The plan is cleared."; return; }
@@ -98,7 +99,7 @@ export function renderPlanPanel(card, plan, { byId, onSelect, topIds, download }
       el("p", { class: "card-sub" }, "Pick sites, mark what needs inspecting, and keep your own notes")),
     el("div", { class: "card-chips" }, el("span", { class: "chip chip-warn" }, "Your notes, not verified"), el("span", { class: "chip chip-quiet" }, "Saved on this device only")),
     tiles, body,
-    el("div", { class: "plan-actions" }, addTop, dlPlan, dlSheet, clearBtn), say,
+    el("div", { class: "plan-actions" }, pilotBtn, addTop, dlPlan, dlSheet, clearBtn), say,
     el("p", { class: "caption" }, PLAN_CAVEAT));
 
   plan.subscribe((source) => {

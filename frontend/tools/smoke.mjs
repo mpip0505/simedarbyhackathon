@@ -511,6 +511,130 @@ try {
     await evaluate(`${clear}.click()`);
     assert.match(await evaluate(`${planCard}.innerText`), /No sites yet/);
   });
+  await check("the pilot plan: shortlist, field checks, batches, field sheet out and answers back, keep or reject, replacements, phases, reach, trees and survival", async () => {
+    const root = `document.querySelector('#pilot-root')`;
+    const setVal = (key, value) => evaluate(`(() => { const e = ${root}.querySelector('[data-key="${key}"]'); if (!e) throw new Error('no control ${key}'); e.value = ${JSON.stringify(value)}; e.dispatchEvent(new Event('change', { bubbles: true })); })()`);
+    const clickText = (text, scope = root) => evaluate(`(() => { const b = [...${scope}.querySelectorAll('button, label.btn')].find(x => x.textContent.trim() === ${JSON.stringify(text)}); if (!b) throw new Error('no button ${text}'); b.click(); })()`);
+    const text = () => evaluate(`${root}.innerText`);
+    const ids = () => evaluate(`[...${root}.querySelectorAll('.pp-site .pp-id')].map(b => b.textContent.trim())`);
+    const inSite = (id, label) => evaluate(`(() => { const art = [...${root}.querySelectorAll('.pp-site')].find(x => x.querySelector('.pp-id').textContent.trim() === '${id}'); [...art.querySelectorAll('button')].find(x => x.textContent === ${JSON.stringify(label)}).click(); })()`);
+    await evaluate(`window.__blobs = []; const make = URL.createObjectURL.bind(URL); URL.createObjectURL = (b) => { window.__blobs.push(b); return make(b); };`);
+    const blobText = (i) => evaluate(`window.__blobs[${i}].text()`);
+    const HEAD = "site_id,lat,lon,shade_on_path,canopy_class,path_in_use,photo_id,notes,observer,date";
+    const importCsv = async (csv) => {
+      await evaluate(`(() => { const dt = new DataTransfer(); dt.items.add(new File([${JSON.stringify(csv)}], 'done.csv', { type: 'text/csv' })); const i = document.querySelector('#pilot-import-file'); i.files = dt.files; i.dispatchEvent(new Event('change', { bubbles: true })); })()`);
+      await sleep(400);
+    };
+
+    await evaluate(`document.querySelector('#view-tabs button[data-view="pilot"]').click()`);
+    await sleep(300);
+    assert.equal(await evaluate(`document.querySelector('#view-pilot').hidden`), false);
+    assert.match(await text(), /Pilot plan[\s\S]*Your entries, not verified[\s\S]*Saved on this device only/);
+    assert.match(await text(), /Next: Add sites to the plan/);
+    assert.match(await evaluate(`${root}.querySelector('.pp-steps [aria-current="step"]').innerText`), /Shortlist and decide/);
+
+    // 1 shortlist: field feasibility is separate from priority and starts unknown
+    await clickText("Add the first five ranked sites");
+    const [a, b, c] = await ids();
+    assert.equal((await ids()).length, 5);
+    assert.match(await text(), new RegExp(`${a}[\\s\\S]*Priority: rank #1, score[\\s\\S]*Field feasibility: Not checked`));
+    await setVal(`site:${a}:check-access`, "ok");
+    assert.match(await text(), /Field feasibility: 1 of 5 checks OK/);
+    await setVal(`site:${a}:check-utilities`, "issue");
+    assert.match(await text(), /Field feasibility: Problem found \(1\)/);
+    assert.match(await text(), /What the problem is/);
+    await setVal(`site:${a}:check-utilities`, "unknown");
+
+    // 2 inspect: batches, workload from the planner's own numbers, a blind field sheet
+    for (const id of [a, b, c]) await setVal(`site:${id}:status`, "needs-inspection");
+    await setVal(`site:${a}:batch`, "Week 1");
+    await setVal(`site:${b}:batch`, "Week 1");
+    assert.match(await text(), /Week 1\s+2\s+Not set/);
+    await setVal("set:inspectionsPerDay", "2");
+    await setVal("set:costPerInspection", "50");
+    await setVal("set:unit", "RM");
+    assert.match(await text(), /Week 1\s+2\s+1/);
+    assert.match(await text(), /Inspection cost for 3 sites: RM 150 \(your numbers\)/);
+    await clickText("Download field sheet (all)");
+    const sheet = await blobText(0);
+    assert.ok(sheet.startsWith(HEAD), "the field sheet header");
+    assert.ok(sheet.includes(a) && sheet.includes(b) && sheet.includes(c));
+    assert.doesNotMatch(sheet, /rank|score/i);
+
+    // a bad file is refused whole
+    await importCsv(`${HEAD}\r\n${a},3,101,none,sparse,yes,,,,\r\nNOT-A-SITE,3,101,none,sparse,yes,,,,\r\n${b},3,101,maybe,sparse,yes,,,,`);
+    assert.match(await text(), /This file was not imported\. Nothing in your plan changed\./);
+    assert.match(await text(), /unknown site NOT-A-SITE/);
+    assert.match(await text(), /shade_on_path 'maybe' must be one of none, partial, full/);
+    assert.equal(await evaluate(`${root}.querySelectorAll('.pp-obs').length`), 0);
+
+    // a good file: two observations, one blank row left out and not guessed
+    await importCsv(`${HEAD}\r\n${a},3,101,none,sparse,yes,P1,"open, no trees",Aisha,2026-10-24\r\n${b},3,101,full,dense,no,,,,\r\n${c},3,101,,sparse,yes,,,,`);
+    assert.match(await text(), /Imported 2 observations: \d+ agree with the model, \d+ differ\./);
+    assert.match(await text(), new RegExp(`Left out because an answer was blank \\(still Needs inspection\\): ${c}`));
+    assert.equal(await evaluate(`${root}.querySelectorAll('.pp-obs').length`), 2);
+    assert.match(await text(), /one visit's comparison, not validation/);
+    assert.equal(await evaluate(`${root}.querySelector('[data-key="site:${c}:status"]').value`), "needs-inspection");
+    assert.equal(await evaluate(`${root}.querySelector('[data-key="site:${a}:status"]').value`), "inspected");
+
+    // 3 review: keep one, reject one; a rejection asks for a reason and offers next-ranked alternatives
+    await inSite(a, "Keep the site");
+    await inSite(b, "Reject the site");
+    assert.equal(await evaluate(`${root}.querySelector('[data-key="site:${b}:status"]').value`), "rejected");
+    assert.match(await text(), /Add a reason for rejecting this site/);
+    await setVal(`site:${b}:reason`, "no access road");
+    assert.match(await text(), /Next-ranked alternatives/);
+    const before = (await ids()).length;
+    await evaluate(`[...${root}.querySelectorAll('.pp-alt-list button')][0].click()`);
+    assert.equal((await ids()).length, before + 1, "the replacement joins the plan");
+    assert.match(await text(), /Planner's decision: keep the site\./);
+
+    // 4 plan the work: approving with unresolved checks is allowed but flagged; phases, own numbers, unique reach, work schedule
+    await setVal(`site:${a}:status`, "approved");
+    assert.match(await text(), /Approved with checks not yet OK/);
+    await setVal(`site:${a}:phase`, "1");
+    await setVal("set:treesPerSite", "3");
+    await setVal("set:costPerTree", "10");
+    assert.match(await text(), /Phase 1\s+1\s+3\s+RM 30/);
+    assert.doesNotMatch(await text(), /Reach data not loaded/);
+    assert.match(await text(), /Everything in the plan[\s\S]*\d+ m \(\d/);
+    await clickText("Download work schedule (CSV)");
+    const schedule = await blobText(1);
+    assert.ok(schedule.startsWith("site_id,inspection_batch,planting_phase,team,status,next_action,checks_not_ok,reason"), "the schedule header");
+    assert.match(schedule, new RegExp(`${b},.*Rejected.*Replace with the next-ranked alternative.*no access road`));
+
+    // 5 plant and maintain: only a Planted site can have a tree; survival counts only inspected trees
+    assert.match(await text(), /No field data: no planted trees have been recorded\./);
+    await setVal(`site:${a}:status`, "planted");
+    await setVal("tree:new:species", "Shorea leprosula");
+    await setVal("tree:new:date", "2025-11-15");
+    await setVal("tree:new:next", "2026-01-15");
+    await evaluate(`${root}.querySelector('.pp-treeform button[type="submit"]').click()`);
+    assert.match(await text(), /No field data on survival yet: 1 planted tree recorded, none inspected\./);
+    assert.match(await text(), /T1 · Shorea leprosula[\s\S]*Overdue: 2026-01-15/);
+    await setVal("tree:T1:obs-date", "2026-02-10");
+    await setVal("tree:T1:obs-cond", "alive-good");
+    await evaluate(`${root}.querySelector('.pp-obsform button[type="submit"]').click()`);
+    assert.match(await text(), /Recorded survival among inspected trees: 1 of 1 \(100%\)/);
+    await clickText("Download tree register (CSV)");
+    assert.match(await blobText(2), /T1,.*Shorea leprosula,2025-11-15/);
+
+    // remembered after a reload
+    await send("Page.navigate", { url: "about:blank" });
+    await send("Page.navigate", { url: `${BASE}/app/` });
+    await waitFor(`document.querySelectorAll('${ROWS}').length > 0 && document.querySelector('#loading').hidden`, "the page to reload");
+    await evaluate(`document.querySelector('#view-tabs button[data-view="pilot"]').click()`);
+    await sleep(500);
+    assert.match(await text(), /Recorded survival among inspected trees: 1 of 1/);
+    assert.equal((await ids()).length, before + 1);
+
+    // clean up so later checks start from an empty plan
+    await evaluate(`document.querySelector('#view-tabs button[data-view="prioritise"]').click()`);
+    const clear = `[...document.querySelector('#card-plan').querySelectorAll('button')].find(b => /^Clear the plan|^Click again/.test(b.textContent))`;
+    await evaluate(`${clear}.click()`);
+    await evaluate(`${clear}.click()`);
+    assert.match(await evaluate(`document.querySelector('#card-plan').innerText`), /No sites yet/);
+  });
   await check("the trade-off card compares five ways of choosing, as a trade-off with no winner", async () => {
     const card = `document.querySelector('#card-tradeoff')`;
     assert.equal(await evaluate(`${card}.hidden`), false, "the card should show with scores from the scoring model");
@@ -549,13 +673,22 @@ try {
     const scan = () => evaluate(`axe.run(document, { runOnly: { type: "tag", values: ["wcag2a", "wcag2aa", "wcag21a", "wcag21aa", "wcag22aa"] } })
       .then(r => r.violations.map(v => v.id + ": " + v.help + " (" + v.nodes.length + " nodes, e.g. " + v.nodes[0].target.join(" ") + "; " + v.nodes[0].any.map(a => a.message).join(" / ").slice(0, 200) + ")"))`);
     const found = [];
-    for (const view of ["prioritise", "report"]) {
+    for (const view of ["prioritise", "report", "pilot"]) {
       await evaluate(`document.querySelector('#view-tabs button[data-view="${view}"]').click()`);
+      if (view === "pilot") {
+        // scan the busy version of the workspace: five sites, one needing inspection, every details block open
+        await evaluate(`[...document.querySelectorAll('#pilot-root button')].find(b => b.textContent.trim() === 'Add the first five ranked sites')?.click()`);
+        await evaluate(`(() => { const s = document.querySelector('#pilot-root select[data-key$=":status"]'); s.value = 'needs-inspection'; s.dispatchEvent(new Event('change', { bubbles: true })); })()`);
+        await evaluate(`document.querySelectorAll('#pilot-root details').forEach(d => { d.open = true; })`);
+      }
       await evaluate(`document.querySelector('#main').scrollTop = 0; (document.querySelector('#map') || document.body).scrollIntoView({ block: 'center' })`);   // badges near the map's lower edge sit under the footer until scrolled into view
       await sleep(600);
       found.push(...(await scan()).map((v) => `${view}: ${v}`));
     }
     await evaluate(`document.querySelector('#view-tabs button[data-view="prioritise"]').click()`);
+    const clearPlan = `[...document.querySelector('#card-plan').querySelectorAll('button')].find(b => /^Clear the plan|^Click again/.test(b.textContent))`;
+    await evaluate(`${clearPlan}.click()`);
+    await evaluate(`${clearPlan}.click()`);
     assert.deepEqual(found, [], found.join("\n"));
   });
 

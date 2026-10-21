@@ -677,3 +677,50 @@ dialog form[method="dialog"] { display: flex; justify-content: flex-end; margin:
 .plan-table .input { min-width: 180px; }
 .plan-mark { margin-left: 6px; padding: 0 6px; font: 500 11px/16px var(--font-sans); border: 1px solid var(--border-strong); border-radius: 999px; background: var(--accent-tint); color: var(--text-2); }
 .brief-table + h2 { margin-top: 14pt; }
+
+/* ---------- Pilot plan workspace ---------- */
+#view-pilot .pp-section { display: flex; flex-direction: column; gap: 12px; margin-top: 16px; }
+.pp-h { display: flex; align-items: center; gap: 10px; margin: 0; font-size: 16px; line-height: 24px; font-weight: 600; }
+.pp-n { display: inline-grid; place-items: center; min-width: 24px; height: 24px; border-radius: 999px; background: var(--accent-fill); color: #fff; font-size: 12px; font-weight: 600; }
+.pp-guide { display: flex; flex-direction: column; gap: 10px; margin-top: 4px; }
+.pp-steps { display: flex; flex-wrap: wrap; gap: 8px; margin: 0; padding: 0; list-style: none; }
+.pp-steps li { display: inline-flex; align-items: center; gap: 8px; padding: 4px 12px 4px 4px; border: 1px solid var(--border-strong); border-radius: 999px; font-size: 13px; color: var(--text-muted); }
+.pp-steps li .pp-n { background: var(--stone-300, #d4d4d0); color: var(--text); }
+.pp-steps li.is-done .pp-n { background: var(--ok-dot, #5c9e1e); color: #fff; }
+.pp-steps li.is-now { border-color: var(--accent-fill); color: var(--text); font-weight: 500; }
+.pp-steps li.is-now .pp-n { background: var(--accent-fill); color: #fff; }
+.pp-next { margin: 0; font-size: 13px; line-height: 20px; }
+.pp-help, .pp-caption { margin: 0; font-size: 12px; line-height: 18px; color: var(--text-muted); }
+.pp-site, .pp-tree { display: flex; flex-direction: column; gap: 10px; padding: 12px; border: 1px solid var(--border); border-radius: var(--r-3); background: #fff; }
+.pp-site-head { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 12px; }
+.pp-id { font: 600 13px/20px var(--font-mono); }
+.pp-prio { font-size: 12px; color: var(--text-2); }
+.pp-feas { font-size: 12px; }
+.pp-feas-issue { background: var(--bad-bg); border-color: var(--bad-line); color: var(--bad); }
+.pp-feas-all-ok { background: var(--ok-bg); border-color: var(--ok-line); color: var(--ok); }
+.pp-feas-partial { background: var(--warn-bg); border-color: var(--warn-line); color: var(--warn); }
+.pp-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
+.pp-field { display: flex; flex-direction: column; gap: 4px; font-size: 12px; color: var(--text-muted); min-width: 0; }
+.pp-field .select, .pp-field .input { width: 100%; font-size: 13px; color: var(--text); }
+.pp-checks summary { cursor: pointer; font-size: 13px; font-weight: 500; padding: 4px 0; }
+.pp-check-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 10px; margin: 8px 0; }
+.pp-obs { padding: 8px 10px; border-radius: var(--r-2); border: 1px solid var(--border-strong); font-size: 13px; }
+.pp-obs p { margin: 0 0 4px; }
+.pp-obs-agree { background: var(--ok-bg); border-color: var(--ok-line); }
+.pp-obs-differ { background: var(--warn-bg); border-color: var(--warn-line); }
+.pp-warn { margin: 0; padding-left: 18px; font-size: 12px; line-height: 18px; color: var(--warn); }
+.pp-alts, .pp-alt-list { font-size: 13px; }
+.pp-alt-list { margin: 4px 0 0; padding-left: 18px; display: flex; flex-direction: column; gap: 6px; }
+.pp-site-foot { display: flex; justify-content: flex-end; }
+.pp-two { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; }
+.pp-two h3, #view-pilot h3 { margin: 0 0 6px; font-size: 13px; line-height: 20px; font-weight: 600; }
+.pp-result { margin: 0; font-size: 13px; font-weight: 500; }
+.pp-problems { margin: 6px 0 0; padding-left: 18px; font-size: 12px; line-height: 18px; color: var(--bad); }
+.pp-trees { display: flex; flex-direction: column; gap: 10px; }
+.pp-tree-overdue { border-color: var(--bad-line); }
+.pp-treeform, .pp-obsform { display: flex; flex-direction: column; gap: 10px; }
+.pp-obsform { flex-direction: row; flex-wrap: wrap; align-items: flex-end; }
+.pp-obsform .pp-field { flex: 1 1 150px; }
+#view-pilot .page-title p { max-width: 70ch; }
+#view-pilot .plan-table tbody th { font-family: var(--font-sans); font-size: 13px; white-space: normal; }
+#view-pilot .pp-grid { margin-top: 6px; }
