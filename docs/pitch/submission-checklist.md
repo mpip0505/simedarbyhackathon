@@ -1,0 +1,28 @@
+# Submission checklist
+
+Written for: the team leader. Deadline: **23 October 2026, 11:59 PM**. Incomplete submissions will not be considered (submission template). Official rules and scoring:
+https://www.simedarbyproperty.com/universityhackathon/ . Tick each box only after you have opened the thing yourself.
+
+## Before anything
+- [ ] The team is registered (registration closed 21 October): leader appointed, 3 to 5 members, at least one who codes, **one track chosen (Planet)**, and every member has accepted the team invitation.
+- [ ] Contact details and university filled in on the Team Information slide.
+
+## The four components
+| Component | Required | What to submit | Done |
+|---|---|---|---|
+| Pitch deck | yes | the official template, **10 main slides at most**, appendix allowed; content in [deck-outline.md](deck-outline.md) | [ ] |
+| Video or demo link | yes | a video of 5 minutes or less ([video-script.md](video-script.md)) **or** a live demo link; best: both, with the link tested in a private window | [ ] |
+| Prototype or code link | yes | https://github.com/mpip0505/simedarbyhackathon (open it logged out; check the latest commit is there and the README renders) | [ ] |
+| Supporting documents | optional | links to `docs/prior-art.md`, `docs/evidence-summary.md`, `docs/commercial-case.md`, `docs/pilot-readiness.md`, `docs/judge-qa.md` in the repository | [ ] |
+
+## Final checks on the content
+- [ ] No slide uses a word from the "avoid" list in the deck outline; the simulated sites are called simulated everywhere.
+- [ ] Every number on a slide matches `ml/reports/impact_reach.md`, `ml/reports/uncertainty.md` and `backend/data/cache/crosscheck.json` for the committed data version.
+- [ ] The "Why your team should win" text is 100 words or fewer (the draft is 98).
+- [ ] The deck is also exported to PDF and opens on another computer.
+- [ ] If you have a live link: `node frontend/tools/smoke.mjs https://YOUR-LINK` passes (it drives a real browser and takes any address; it has only been run against localhost so far, so watch for surprises), and the first page load was tested cold.
+- [ ] The repository has no secrets: search for tokens and your Google Cloud project ID before sharing (the push scans did not find any).
+
+## After submitting
+- [ ] Keep a screenshot of the confirmation. Judging runs 24 to 28 October and the Top 10 are announced on 28 October; the mentoring sprint is 2 to 6 November, final submission 11 November, Top 10 pitch day 14 November, final presentation 3 December.
+- [ ] Ask the mentors for the real site list, the official corridor outline, the current tree count, and a few hours of fieldwork (see [pilot-readiness.md](../pilot-readiness.md)).
