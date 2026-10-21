@@ -48,6 +48,22 @@ score trade-off made explicit (currently: 6 blocks -> 10 blocks, largest block's
 for 1.0 point of average `score_total`). Use this for "where to start" slides; use the live map
 (`scores.geojson` via the API) for the actual ranking.
 
+### How much does the ranking depend on our judgement calls?
+
+```bash
+python -m ml.uncertainty                 # 2000 draws -> reports/uncertainty.{md,json,sites.csv}
+python -m ml.uncertainty --draws 500      # faster
+```
+
+Draws many plausible weight sets *and* distance/length constants at once (not one at a time, like
+`ml.validation`'s sensitivity section), rescoring every site under each, then reports per site: a
+score range, a rank range, and the share of draws it stays in the top 20. Current headline: the
+single default ranking's median across 2000 draws agrees at **Spearman 0.999**, rank 1 is in the
+top 20 100% of the time, but **13 of the default top 20** clear the "robust" bar (>= 80% of draws) -
+the rest are plausible, not guaranteed, and the report says which ones and why (one site's good
+shade score turns out to hinge entirely on where `unshaded_cap_m` happens to land). Use this for the
+"how sure are we" slide; use `ml.validation` for the one-at-a-time sensitivity breakdown.
+
 ### Comparing judgement calls
 
 The decay scales and the gap-fill discount inside each score are judgement calls, not weights, so
@@ -72,7 +88,8 @@ trying to reach into the API from here.
 | `validation.py` | eight consistency and stability checks, rendered to `reports/validation.md` |
 | `tests/test_scoring_model.py` | output contract, transform behaviour, and the sign of every term |
 | `shortlist.py` | spread-out top-N for the pitch, separate from the scored/ranked file |
-| `reports/` | generated; regenerate with `python -m ml.validation` / `python -m ml.shortlist` |
+| `uncertainty.py` | Monte Carlo over weights + judgement constants: a range per site, not one number |
+| `reports/` | generated; regenerate with `ml.validation` / `ml.shortlist` / `ml.uncertainty` |
 
 ## The model in six lines
 
