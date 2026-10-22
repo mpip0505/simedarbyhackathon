@@ -45,7 +45,7 @@ curl localhost:8000/health/deep                                       # checks e
 4. **Candidate sites.** 30 m grid cells on open land and non-park corridor land, minus buildings and roads, labelled
    `simulated` (564 sites). Each carries about 30 measured features (see the [data dictionary](data-dictionary.md)):
    temperature, vegetation, surroundings, unshaded nearby walking routes, corridor distances, a reliability flag.
-5. **Scores.** The ML teammate delivers `scores.geojson` (**done** — `score_source: "ml"`). Before delivery, and for
+5. **Scores.** The ML teammate delivers `scores.geojson` (**done**: `score_source: "ml"`). Before delivery, and for
    any site ML did not score, the API serves a clearly labelled **placeholder** instead; it is never presented as the model.
 6. **API.** Ranked sites, one site's detail, a before/after summary, yearly series, map overlays, health checks.
 
@@ -96,9 +96,9 @@ Builds are deterministic: a full rebuild from a fresh download reproduced the co
 ## The scoring model (`ml/`)
 **Status: delivered.** The brief was [docs/data-dictionary.md](data-dictionary.md) and
 [docs/ml-developer-prompt.md](ml-developer-prompt.md); the delivered model, validation and write-up live in
-[`ml/`](../ml/) — start there (`ml/README.md`) to rerun or extend it. Summary:
+[`ml/`](../ml/), start there (`ml/README.md`) to rerun or extend it. Summary:
 
-- **Scoring code:** [`ml/scoring_model.py`](../ml/scoring_model.py) — three 0-100 scores (cooling, connectivity, shade)
+- **Scoring code:** [`ml/scoring_model.py`](../ml/scoring_model.py), three 0-100 scores (cooling, connectivity, shade)
   from eight named, transparent inputs; no fitted parameters (there are no labels to fit to).
 - **Delivery:** `python -m ml.run_scoring` writes `weights.json` then `scores.geojson` via the interface below;
   `python -m backend.validate_scores backend/data/cache/scores.geojson` confirms it.
@@ -108,7 +108,7 @@ Builds are deterministic: a full rebuild from a fresh download reproduced the co
   # compute score_cooling, score_connectivity, score_shade, score_total (0-100) and rank (1 = plant first)
   write_scores(df_scores)  # validates, stamps the data version, writes backend/data/cache/scores.geojson
   ```
-- **Validation (no ground truth, so "consistent and stable", never "correct"):** `python -m ml.validation` —
+- **Validation (no ground truth, so "consistent and stable", never "correct"):** `python -m ml.validation`,
   direction check, weight-stability under random and slider-realistic draws, leave-one-input-out, spatial block
   hold-out, reliability of gap-filled temperature, shortlist concentration, redundant-feature check.
   `python -m ml.uncertainty` goes further: a 2000-draw Monte Carlo over the weights *and* the model's judgement
@@ -116,7 +116,7 @@ Builds are deterministic: a full rebuild from a fresh download reproduced the co
   [`ml/reports/`](../ml/reports/).
 - **Pitch tools:** `python -m ml.shortlist` produces a spread-out top-20 (capped per 250 m block) for a slide that
   reads as "a few priority areas", separate from the live-ranked map. `python -m ml.scenario` produces a labelled
-  planting-impact **scenario** (explicitly not a forecast — the yearly series is too thin and noisy to fit a trend
+  planting-impact **scenario** (explicitly not a forecast, the yearly series is too thin and noisy to fit a trend
   through honestly), anchored to canopy measured today inside Elmina's own parks. Plain-language write-up for
   judges/slides: [docs/ml-model.md](ml-model.md).
 - Tests: `python -m pytest ml/tests -q`.
@@ -146,7 +146,7 @@ Canopy dashboard system in `css/app.css`, and it can be replaced without touchin
   forecast" (`/ml/scenario`). Re-run `python -m ml.uncertainty`, `ml.shortlist` and `ml.scenario` after a data rebuild.
 - Always show the "simulated sites" label, the caveats and attribution from `/meta`, and a badge when `score_source` is not `ml`.
 
-**Nothing to change now that ML has delivered** — the API contract is identical whether `score_source` is
+**Nothing to change now that ML has delivered**: the API contract is identical whether `score_source` is
 `placeholder` or `ml` (same fields, same types, always pre-sorted by `rank`); only the values and `score_source`
 change. The one visible difference: `/weights` now returns the ML default (0.45 / 0.30 / 0.25) instead of the
 backend's config placeholder (0.40 / 0.35 / 0.25), so sliders should start from a slightly different position.

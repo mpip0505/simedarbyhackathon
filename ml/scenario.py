@@ -126,7 +126,7 @@ def to_markdown(r: dict) -> str:
         "| " + " | ".join(str(row[c]) for c in ["year", "do_nothing", *r["trajectories"]]) + " |\n"
         for row in rows)
     return "".join([
-        "# Planting-impact scenario — NOT a forecast\n",
+        "# Planting-impact scenario, NOT a forecast\n",
         f"Data version `{r['data_version']}`. Regenerate with `python -m ml.scenario --k {r['k']} "
         f"--years {r['years'][-1]}`.\n",
         "\n> **This is a scenario, not a prediction.** It shows what a plausible outcome could look "
@@ -135,15 +135,15 @@ def to_markdown(r: dict) -> str:
         "noisier than its signal. Change the assumption, change the chart. It is also scoped to the "
         "*planted set's own average canopy*, not a township-wide figure, and it makes no claim about "
         "temperature or carbon - those need relationships this project has not measured.\n",
-        f"\n## The one measured input\nCeiling = **{r['ceiling_pct']}%** canopy (NDVI >= 0.6) — "
+        f"\n## The one measured input\nCeiling = **{r['ceiling_pct']}%** canopy (NDVI >= 0.6), "
         f"{r['ceiling_source']}. Notably modest: even Elmina's existing green space is mostly lawn "
         "and young landscaping, not closed tree canopy, which is itself worth saying rather than "
         "hiding behind a rosier assumption.\n",
         "\n## The one assumed input\nYears to close 90% of the gap to that ceiling: "
         + ", ".join(f"**{v:g} ({k})**" for k, v in r["growth_scenarios_years_to_90pct"].items())
-        + ". Not fitted, not cited — a named, swappable assumption. Replace with real nursery/"
+        + ". Not fitted, not cited, a named, swappable assumption. Replace with real nursery/"
         "arborist input before using this for anything beyond an illustrative pitch chart.\n",
-        f"\n## Top {r['k']} ranked sites, planted vs doing nothing — average canopy % over time\n",
+        f"\n## Top {r['k']} ranked sites, planted vs doing nothing, average canopy % over time\n",
         f"Today's average across the top {r['k']} sites: **{r['start_pct']}%**.\n\n",
         table,
         f"\nAt year {r['years'][-1]}: " + ", ".join(

@@ -3,9 +3,9 @@
 Written for: the pitch writers, and anyone from Sime Darby Property who asks "could we use this?".
 Honest short answer: **this is a screening tool, piloted on real Elmina data.** There are two different things that
 word "pilot" could mean here, and they are at very different stages:
-- **Pilot of the method** — done. The pipeline, corridor model and scoring ran end to end on real satellite imagery
+- **Pilot of the method**: done. The pipeline, corridor model and scoring ran end to end on real satellite imagery
   and real map data for a real township, not a toy example.
-- **Pilot of real planting** — not yet. That needs Sime Darby Property's actual site list and some field validation,
+- **Pilot of real planting**: not yet. That needs Sime Darby Property's actual site list and some field validation,
   both scoped below. Until then it is not something to base a climate disclosure or a planting contract on.
 
 ## What exists today

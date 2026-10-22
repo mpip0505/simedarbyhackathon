@@ -19,7 +19,7 @@ Written for: anyone about to quote a number from this project. Read this first. 
   satellite-derived, not field truth. Details: `backend/data/cache/crosscheck.json`.
 - **No ground truth.** No tree inventory, LiDAR or field plots exist for this project.
 - **Scores.** Delivered (`score_source: "ml"`); the ranking is validated for consistency and stability, not
-  correctness — there is no ground truth, see [docs/ml-model.md](ml-model.md). Any site ML did not score keeps
+  correctness, there is no ground truth, see [docs/ml-model.md](ml-model.md). Any site ML did not score keeps
   the labelled placeholder.
 - **Not disclosure-grade.** What a real pilot would need: [docs/pilot-readiness.md](pilot-readiness.md).
 - **Outside facts in the pitch.** Checked in [docs/pitch-fact-check.md](pitch-fact-check.md); several need softer wording

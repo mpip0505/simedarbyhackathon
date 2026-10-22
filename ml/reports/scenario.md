@@ -1,15 +1,15 @@
-# Planting-impact scenario — NOT a forecast
+# Planting-impact scenario, NOT a forecast
 Data version `f12bc98c3fbd`. Regenerate with `python -m ml.scenario --k 50 --years 25`.
 
 > **This is a scenario, not a prediction.** It shows what a plausible outcome could look like under a stated growth assumption we did not fit to any field data (none exists for Elmina) - it is not a trend fitted to the yearly series, which the project already says is noisier than its signal. Change the assumption, change the chart. It is also scoped to the *planted set's own average canopy*, not a township-wide figure, and it makes no claim about temperature or carbon - those need relationships this project has not measured.
 
 ## The one measured input
-Ceiling = **15.1%** canopy (NDVI >= 0.6) — measured today inside Elmina's existing OSM-mapped parks (NDVI >= 0.6, latest window). Notably modest: even Elmina's existing green space is mostly lawn and young landscaping, not closed tree canopy, which is itself worth saying rather than hiding behind a rosier assumption.
+Ceiling = **15.1%** canopy (NDVI >= 0.6), measured today inside Elmina's existing OSM-mapped parks (NDVI >= 0.6, latest window). Notably modest: even Elmina's existing green space is mostly lawn and young landscaping, not closed tree canopy, which is itself worth saying rather than hiding behind a rosier assumption.
 
 ## The one assumed input
-Years to close 90% of the gap to that ceiling: **10 (fast)**, **15 (default)**, **20 (slow)**. Not fitted, not cited — a named, swappable assumption. Replace with real nursery/arborist input before using this for anything beyond an illustrative pitch chart.
+Years to close 90% of the gap to that ceiling: **10 (fast)**, **15 (default)**, **20 (slow)**. Not fitted, not cited, a named, swappable assumption. Replace with real nursery/arborist input before using this for anything beyond an illustrative pitch chart.
 
-## Top 50 ranked sites, planted vs doing nothing — average canopy % over time
+## Top 50 ranked sites, planted vs doing nothing, average canopy % over time
 Today's average across the top 50 sites: **3.8%**.
 
 | year | do_nothing | fast | default | slow |

@@ -66,7 +66,7 @@ shade score turns out to hinge entirely on where `unshaded_cap_m` happens to lan
 
 ### Is there a future / forecast dashboard?
 
-Not a forecast — deliberately. The backend's yearly series is five historical points with noise
+Not a forecast, deliberately. The backend's yearly series is five historical points with noise
 bigger than the signal (one year's canopy band already spans 6.6-21.9%); fitting a trend through
 that and presenting it as a prediction would be the overclaiming this whole project refuses to do
 elsewhere. Instead:
@@ -110,7 +110,7 @@ trying to reach into the API from here.
 | `tests/test_scoring_model.py` | output contract, transform behaviour, and the sign of every term |
 | `shortlist.py` | spread-out top-N for the pitch, separate from the scored/ranked file |
 | `uncertainty.py` | Monte Carlo over weights + judgement constants: a range per site, not one number |
-| `scenario.py` | planting-impact scenario (not a forecast) — see "Is there a future / forecast dashboard?" below |
+| `scenario.py` | planting-impact scenario (not a forecast), see "Is there a future / forecast dashboard?" below |
 | `reports/` | generated; regenerate with `ml.validation` / `ml.shortlist` / `ml.uncertainty` / `ml.scenario` |
 
 ## The model in six lines

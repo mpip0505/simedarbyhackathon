@@ -36,7 +36,7 @@ any further design can reuse its logic files and replace the look. Below is the 
   `score_source` is not `ml`.
 - Overlays, series, the corridor, the basemap layers and the cross-check come from the cache folder. They do not exist in mock mode (404), so the interface must cope with that.
 
-## 4. For ML (original brief — see `ml/README.md` for what was actually delivered)
+## 4. For ML (original brief, see `ml/README.md` for what was actually delivered)
 Start with [data-dictionary.md](data-dictionary.md). It lists every feature with units, ranges and cautions.
 ```python
 from backend.ml_io import load_sites_df, write_scores
