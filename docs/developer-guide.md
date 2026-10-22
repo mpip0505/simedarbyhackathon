@@ -90,7 +90,10 @@ export GEE_PROJECT=<your-project-id>       # PowerShell: $env:GEE_PROJECT = "<yo
 Steps run in order and stop at the first failure: OSM download, OSM layers, corridor, Earth Engine composites and
 summary, yearly series, canopy sensitivity, independent cross-check, map overlays, candidate sites.
 Builds are deterministic: a full rebuild from a fresh download reproduced the committed data exactly (same
-`data_version`, same 564 site IDs, same numbers). Network calls retry transient failures, and
+`data_version`, same 564 site IDs, same numbers) on the machine that built it. The `data_version` hash covers full-precision
+coordinates, and different GEOS builds return the same polygon with different last float digits (27 sites differ between Windows, macOS and
+Linux), so a rebuild on another operating system gets a different hash for identical sites; the tests compare sites and shapes to 0.1 mm
+instead. Rebuild and commit the cache on one machine. Network calls retry transient failures, and
 `backend/data/cache/build_info.json` records when OSM and satellite data were really fetched.
 
 ## The scoring model (`ml/`)

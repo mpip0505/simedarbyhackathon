@@ -48,7 +48,18 @@ def test_text_that_would_run_as_a_formula_is_neutralised():
     assert my_sites.safe_cell("plain") == "plain" and my_sites.safe_cell(None) == ""
 
 
+def _flat(coords):
+    """Every number in a GeoJSON coordinate array, in order."""
+    if isinstance(coords, (int, float)):
+        return [coords]
+    return [n for part in coords for n in _flat(part)]
+
+
 def test_building_the_simulated_sites_is_unchanged_by_the_shared_code_path():
+    """Same sites, same numbers, same shapes. The shapes are compared to a nano-degree (about 0.1 mm), not bit for bit:
+    GEOS builds on different machines return the same polygon with its last float digits differing (27 of 564 sites
+    differ this way between Windows, macOS and Linux), which changes the hash in `data_version` without changing any site.
+    So this does not compare the hash. If it fails, a site, a property or a shape really changed."""
     layers, rasters = generate.load_inputs()
     try:
         fc = generate.to_feature_collection(generate.build_sites(layers, rasters))
@@ -56,7 +67,13 @@ def test_building_the_simulated_sites_is_unchanged_by_the_shared_code_path():
         for s in rasters.values():
             s.close()
     committed = json.loads((CACHE_DIR / "sites.geojson").read_text(encoding="utf-8"))
-    assert fc["data_version"] == committed["data_version"]
+    fresh = {f["properties"]["site_id"]: f for f in fc["features"]}
+    old = {f["properties"]["site_id"]: f for f in committed["features"]}
+    assert fresh.keys() == old.keys()
+    for site_id, f in fresh.items():
+        assert f["properties"] == old[site_id]["properties"], site_id
+        a, b = _flat(f["geometry"]["coordinates"]), _flat(old[site_id]["geometry"]["coordinates"])
+        assert len(a) == len(b) and all(abs(x - y) <= 1e-9 for x, y in zip(a, b)), site_id
 
 
 def test_a_simulated_sites_own_centre_scores_exactly_as_committed_and_outside_points_are_skipped():
