@@ -82,3 +82,13 @@ test("the siting screen is not called a conflict screen anywhere a person reads,
   assert.match(all, /no forest-edge layer is mapped/);
   assert.match(all, /Siting screen: field review needed/);
 });
+
+test("the OSM-only page says it is a licence fallback and a proximity screen, not a second model", () => {
+  const page = read("open-data.html") + read("js/open-data-main.js");
+  assert.match(page, /OSM-only licence fallback/);
+  assert.match(page, /not a second model/);
+  assert.match(page, /60%/);
+  assert.match(page, /cannot be compared with the satellite model/);
+  assert.match(page, /does not replace the satellite method/);
+  assert.doesNotMatch(page, /Open-data fallback<\/h1>/);
+});

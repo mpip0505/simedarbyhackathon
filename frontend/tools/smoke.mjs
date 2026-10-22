@@ -945,6 +945,10 @@ try {
     await waitFor(`document.querySelector('#fallback-root table') && !document.querySelector('#fallback-map').hidden`, "OSM-only fallback");
     assert.match(await evaluate(`document.querySelector('#fallback-status').textContent`), new RegExp(`${osmReport.features.length} simulated candidates.*OSM-only.*Input hashes match`));
     assert.equal(await evaluate(`document.querySelectorAll('#fallback-root tbody tr').length`), 10);
+    const fallbackText = await evaluate(`document.body.innerText`);
+    assert.match(fallbackText, /OSM-only licence fallback/);
+    assert.match(fallbackText, /not a second model/);
+    assert.match(fallbackText, /cannot see heat, tree cover, actual shade or species/);
     await evaluate(`window.__fallbackBlobs = []; const make = URL.createObjectURL.bind(URL); URL.createObjectURL = (b) => { window.__fallbackBlobs.push(b); return make(b); }; [...document.querySelectorAll('#fallback-root button')].forEach(b => b.click())`);
     const csv = await evaluate(`window.__fallbackBlobs[0].text()`);
     const geo = JSON.parse(await evaluate(`window.__fallbackBlobs[1].text()`));

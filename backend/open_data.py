@@ -1,4 +1,4 @@
-"""Earth Engine independent, OSM-only candidate screening.
+"""The OSM-only licence fallback: a proximity screen that needs no Earth Engine. Not a second model.
 
 `python -m backend.open_data` reads only the five OSM GeoJSON layers and writes open_data_sites.geojson.
 It does not read satellite-derived candidates, rasters, heat, canopy, scores or the cached corridor.
@@ -19,7 +19,7 @@ from backend.provenance import file_hashes
 from backend.sites.generate import BUILDING_BUFFER_M, ROAD_BUFFER_M, candidate_land, grid_cells
 
 LAYERS = ("open_land", "parks", "roads", "buildings", "paths")
-NOTE = ("OSM-only screening of simulated 30 m cells, not a planting approval and not a shade survey. "
+NOTE = ("OSM-only licence fallback: a proximity screen of simulated 30 m cells, not a second model, not a planting approval and not a shade survey. "
         "Ranks use footpath and park proximity only. Heat, existing tree cover, actual shade, utilities, soil, ownership and species suitability are unknown. "
         "Scores cannot be compared with the satellite model. Mapping gaps can omit land, buildings and paths.")
 

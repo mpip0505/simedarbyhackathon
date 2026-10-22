@@ -115,6 +115,9 @@ No. It flags **mapped roads within 15 m, buildings within 10 m and footpath over
 **10h. Where does the shade-exposure number come from? Your calculator starts empty.**
 On purpose: nothing is guessed. Without inputs it shows what needs no assumption (the unique mapped homes the shortlist reaches) and lists each missing input with what would fill it. The one input that can be measured today is the **current shade share**, from timed shade walks: a stopwatch on a route, pooled over at least five walks on two routes ([shade-walk-protocol.md](shade-walk-protocol.md)). That fills only the baseline. The shade after planting, residents per building and route use stay assumptions until someone measures them, so the output is a scenario. No walks have been done yet.
 
+**10i. Is the OSM-only path a second model? What does it replace?**
+No. It is a licence fallback. Our Earth Engine registration is noncommercial, so a commercial buyer could ask what runs without it. The OSM-only screen ranks simulated cells only by closeness to a mapped footpath (60%) and a mapped park (40%); it cannot see heat, tree cover, shade or species, and its scores cannot be compared with the satellite model. It replaces the Earth Engine compute step for a reduced screening, not the satellite method, and whether the full satellite workflow may be used commercially is a separate decision.
+
 **11. How does the ranking handle biodiversity and endangered species?**
 It does not model species. Biodiversity enters through connectivity along the corridor and through vegetation context.
 Species choice, ERT planting lists and soil suitability would need Sime Darby Property's landscape data. We say so rather

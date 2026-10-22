@@ -25,7 +25,8 @@ async function load() {
     const rows = openDataRows(report);
     const top = [...report.features].sort((a, b) => a.properties.rank - b.properties.rank).slice(0, 10);
     clear(root).append(
-      el("section", { class: "card" }, el("h2", {}, "What this list uses"),
+      el("section", { class: "card" }, el("h2", {}, "What this fallback is, and is not"),
+        el("p", {}, "A proximity screen, not a second model. It exists so a reduced screening can run on open map data alone."),
         el("p", {}, report.note),
         el("p", { class: "small-note" }, "Ranking: 60% footpath proximity + 40% park proximity. Each proximity score is 100 / (1 + distance / scale), with scales of 50 m for paths and 250 m for parks. These are prototype choices, without field calibration."),
         el("p", { class: "small-note" }, "Candidates come from mapped open land, excluding parks, roads buffered by 8 m from centre lines and buildings buffered by 3 m. Those buffers are screening choices, not legal setbacks. Full cells that touch those exclusions are left out. Water and other unmapped obstacles still need field review."),
@@ -33,7 +34,7 @@ async function load() {
         el("div", { class: "plan-actions" },
           el("button", { type: "button", class: "btn btn-secondary", onclick: () => download("elmina-osm-only.csv", toCsv(rows, Object.keys(rows[0]).map((key) => ({ key, label: key }))), "text/csv") }, "Download OSM-only list (CSV)"),
           el("button", { type: "button", class: "btn btn-secondary", onclick: () => download("elmina-osm-only.geojson", JSON.stringify(report), "application/geo+json") }, "Download OSM-only map (GeoJSON)"))),
-      el("section", { class: "card" }, el("h2", {}, "First 10 OSM-only candidates"),
+      el("section", { class: "card" }, el("h2", {}, "First 10 candidates by proximity"),
         el("p", { class: "small-note" }, "Scores describe proximity, not heat relief or existing shade. Every candidate still needs inspection."),
         el("div", { class: "table-scroll" }, el("table", { class: "plan-table" },
           el("caption", { class: "sr-only" }, "Simulated OSM-only candidates"),

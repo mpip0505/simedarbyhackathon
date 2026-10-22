@@ -26,7 +26,7 @@ below for the rest of the trail.
 [Limitations](#limitations-read-this-before-quoting-any-number) · [Data credits](#data-credits)
 
 ## Quick start
-New: **resident shade-exposure scenarios**, a **siting screen** (mapped roads, buildings and footpaths near a site; not wildlife), and an **OSM-only fallback**. See [methods and demo sequence](docs/assessment-response.md). The fallback opens at `/app/open-data.html`; its candidate rebuild needs no Earth Engine data or credentials.
+New: **resident shade-exposure scenarios**, a **siting screen** (mapped roads, buildings and footpaths near a site; not wildlife), and an **OSM-only licence fallback** (a proximity screen on open map data, not a second model). See [methods and demo sequence](docs/assessment-response.md). The fallback opens at `/app/open-data.html`; its candidate rebuild needs no Earth Engine data or credentials.
 
 Needs Python 3.12. The demo runs **offline**: no Earth Engine login and no internet.
 ```bash

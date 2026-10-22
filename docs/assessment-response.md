@@ -6,7 +6,7 @@ The supplied assessment is the working baseline, not a predicted judging score. 
 |---|---|---|
 | Resident shade exposure | Pilot plan step 3: unshaded person-minutes per day from unique building reach and explicit population, walking and shade assumptions; CSV includes assumptions and horizon | Timed shade walks, route-use counts and occupancy data; repeat comparable visits after planting |
 | Siting screen (formerly called conflict screening) | Road/building proximity and footpath-overlap triggers on site cards and Pilot plan; siting-flag-only filter; CSV and GeoJSON exports | Utilities, wires, sight lines, actual setbacks, soil, access and species/root requirements |
-| Earth Engine dependency | OSM-only candidate generator, independent endpoint and page, source hashes, CSV/GeoJSON | Full satellite workflow's commercial eligibility and terms remain a separate decision |
+| Earth Engine dependency | OSM-only licence fallback (a proximity screen, not a second model): candidate generator, independent endpoint and page, source hashes, CSV/GeoJSON | Full satellite workflow's commercial eligibility and terms remain a separate decision |
 | First customer | Proposed first customer: Sime Darby Property's Elmina landscape operations team; sustainability team as reporting partner | Named individual, budget owner, interview and pilot agreement; no customer commitment exists |
 | Headline cost/tree numbers | Existing planner-entered capacity, trees/site and costs | Actual layout and quotations; no local rate or one-tree-per-cell assumption is inserted |
 
@@ -32,7 +32,9 @@ Distances use UTM metres from the **candidate polygon edge**. Review triggers: w
 
 States: `review` (mapped trigger), `unknown` (map layer unavailable), `no-trigger` (no trigger in the available map). No state means safe to plant. Human field checks remain independent and start Not checked. Scores/ranks stay unchanged. Missing/stale reports show unknown. Site version and OSM SHA-256 hashes detect changed inputs. Exports retain caveats.
 
-## Runnable OSM-only fallback
+## Runnable OSM-only licence fallback
+
+**What it is:** A licence fallback, not a second model: it lets a reduced screening run without Google Earth Engine, whose registration for this project is noncommercial. It ranks cells only by closeness to a mapped footpath (60%) and a mapped park (40%). It cannot see heat, tree cover, actual shade or species, its scores cannot be compared with the satellite model, and it does not replace the satellite method.
 
 Build: `python -m backend.open_data`. Reads **only** five OSM layers: open land, parks, roads, buildings and paths. It constructs its own simulated 30 m cells; it does not load satellite-derived candidates, the cached corridor, rasters, scores or Earth Engine credentials.
 

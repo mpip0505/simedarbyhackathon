@@ -48,6 +48,9 @@ OpenStreetMap fetch and the cloud-masked composites are the same. The free map-d
 - **Hosting:** a free tier is enough for a demo (`render.yaml`); production would need access control and an audit trail (see [pilot-readiness.md](pilot-readiness.md)).
 
 ## The licensing point, stated openly
+**A runnable fallback exists, and it is not a second model.** `python -m backend.open_data` builds an OSM-only proximity screen (60% footpath, 40% park proximity) with no Earth Engine; it cannot see heat, tree cover or shade and is not comparable with the satellite scores. It shows a reduced screening can run on open data; it does not settle the satellite path.
+
+
 Our Google Earth Engine registration is **noncommercial**, and says no payment is received for the work. A paid pilot or internal commercial use by a company changes that:
 Google's current commercial terms would need to be checked and a commercial plan taken, **or** the imagery step moved to an open-data pipeline (Sentinel-2 and Landsat are both
 free to download from their providers). Replacing the full satellite method would require rewriting `backend/gee/` and re-checking results; that replacement is not built. A reduced **OSM-only fallback is now runnable** (`python -m backend.open_data`, `/app/open-data.html`): it constructs candidates and ranks footpath/park proximity without any Earth Engine artifact or credential. It has no heat or actual-shade measurement. See [assessment-response.md](assessment-response.md) for its method, hashes, downloads and the remaining licensing distinction.
