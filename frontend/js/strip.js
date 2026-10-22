@@ -1,7 +1,7 @@
 // A strip of key figures (css .stats): each tile is a label, a big value with a small unit, and a note underneath.
 import { el, clear } from "./dom.js";
 
-/** tiles: [{ label, value, unit, note }] as made by stats.js (Plant first) and report-logic.js (Before and after). */
+/** tiles: [{ label, value, unit, note }] as made by stats.js (Plant first) and report-logic.js (Trends). */
 export function renderStrip(container, tiles) {
   clear(container).append(...tiles.map((t) => el("div", { class: "stat" },
     el("div", { class: "stat-label" }, t.label),

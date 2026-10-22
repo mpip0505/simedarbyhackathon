@@ -37,19 +37,17 @@ export function interventionPlanBlock(plan, entry, props, { field, select, input
 }
 
 /** The maintenance-readiness block in a pilot-plan site card: who keeps the trees alive. */
-export function readinessBlock(plan, entry, trees, { field, select, input, key, keepOpen }) {
+export function readinessBlock(plan, entry, trees, { field, select, input, key }) {
   const r = readiness(entry, trees);
-  const d = el("details", { class: "pp-checks", "data-key": key("ready") },
-    el("summary", {}, `Establishment and maintenance readiness: ${r.label}`),
-    el("div", { class: "pp-grid", style: { margin: "8px 0" } },
+  return el("div", { class: "iv" },
+    el("p", { class: "pp-prio" }, `Where it stands: ${r.label}`),
+    el("div", { class: "pp-grid" },
       field("Planned species", input(entry.species, key("ready-species"), `Planned species for ${entry.id}`, (v) => plan.setReadiness(entry.id, "species", v, "pilot"), { max: 60, placeholder: "Awaiting ecologist selection" })),
       field("Watering availability", select(WATERING, entry.watering, key("ready-water"), `Watering availability for ${entry.id}`, (v) => plan.setReadiness(entry.id, "watering", v, "pilot"))),
       field("Maintenance responsibility", input(entry.maintainer, key("ready-owner"), `Who maintains ${entry.id}`, (v) => plan.setReadiness(entry.id, "maintainer", v, "pilot"), { max: 60, placeholder: "Unassigned" })),
       field("Establishment inspections", input(entry.establishment, key("ready-est"), `Establishment inspection schedule for ${entry.id}`, (v) => plan.setReadiness(entry.id, "establishment", v, "pilot"), { max: 80, placeholder: "for example monthly for 24 months" }))),
     el("table", { class: "measure-table" }, el("tbody", {}, r.rows.map((row) => el("tr", {}, el("td", {}, row.label), el("td", { class: row.set ? null : "iv-unknown" }, row.value))))),
-    el("p", { class: "small-note" }, "Soil and drainage come from the field check above; survival only from recorded tree inspections in step 4. No survival rate is estimated: the early years after planting are when most urban trees die, so these records are what a real pilot measures."));
-  if (keepOpen.has(key("ready"))) d.open = true;
-  return d;
+    el("p", { class: "small-note" }, "Soil and drainage come from the field checks above; survival only from recorded tree inspections on the Trees tab. No survival rate is estimated: the early years after planting are when most urban trees die, so these records are what a real pilot measures."));
 }
 
 /**

@@ -39,11 +39,11 @@ def test_status_file_exists_and_is_linked_from_the_readme():
     assert "docs/status.md" in (ROOT / "README.md").read_text(encoding="utf-8")
 
 
-def test_the_readme_names_every_view_and_says_three():
+def test_the_readme_names_every_view_and_says_seven():
     readme = (ROOT / "README.md").read_text(encoding="utf-8")
     html = (ROOT / "frontend" / "index.html").read_text(encoding="utf-8")
-    assert len(set(re.findall(r'data-view="([a-z]+)"', html))) == 3
-    for view in ("Plant first", "Before and after", "Pilot plan"):
-        assert view in readme
-    assert "three views" in readme
-    assert "two views" not in readme
+    assert len(set(re.findall(r'data-view="([a-z]+)"', html))) == 7
+    for view in ("Home", "Map", "Sites", "Trends", "Tracker", "Methods and limits", "Advanced tools"):
+        assert f"**{view}**" in readme
+    assert "seven pages" in readme
+    assert "three views" not in readme and "two views" not in readme

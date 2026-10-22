@@ -1,4 +1,4 @@
-# PRD: Elmina Canopy Prioritiser
+# PRD: Canopia
 
 Current implementation addendum (22 October 2026): [assessment-response.md](docs/assessment-response.md) documents resident shade-exposure scenarios, mapped conflict screening and the independent OSM-only fallback. It supplements the historical requirements/status below. Team/registration details and real field/usability results were explicitly excluded from this implementation.
 
@@ -26,7 +26,7 @@ Sime Darby Property's stated goal is 210,000 trees at completion in City of Elmi
 threatened (ERT) species. Even on the highest tree count in the developer's own material (over 41,000), most of that goal is
 still ahead, and the order in which sites get planted is a choice.
 
-The **Canopy Prioritiser** scores every candidate planting site on three things and ranks them:
+**Canopia** (formerly the Canopy Prioritiser) scores every candidate planting site on three things and ranks them:
 1. **Heat relief** (cooling benefit): hot, sparsely vegetated surroundings score higher. Landsat surface temperature and Sentinel-2 vegetation index.
 2. **Links green areas** (habitat connectivity): sites that close gaps along the Urban Biodiversity Corridor score higher.
 3. **Shade for walkers** (shade on walking routes): sites beside footpaths that have little or no tree cover score higher.
@@ -103,7 +103,7 @@ team sequences planting today, and whether they want a ranking tool in this form
 | 2 | Weight-stability and consistency validation written up, stating plainly that there are no ground-truth labels | **Not met** |
 | 3 | Opening screen passes the 10-second test: someone who has never seen it can say where the first sites are, and that they are examples | Not yet tested with people |
 | 4 | Demo runs offline from a fresh clone with the two commands in the README | Designed for. Confirm on the demo machine |
-| 5 | The honesty labels (simulated, preview scores, limits, credits) are always on screen, no banned phrase appears, and each canopy or temperature number carries its caveat | Labels and banned phrases: met in automated tests (88 frontend tests pass). Caveat pairing: checked by review, not by a test |
+| 5 | The honesty labels (simulated, preview scores, limits, credits) are always on screen, no banned phrase appears, and each canopy or temperature number carries its caveat | Labels and banned phrases: met in automated tests (95 frontend tests pass). Caveat pairing: checked by review, not by a test |
 | 6 | Every outside claim in the pitch traces to `docs/pitch-fact-check.md` or a committed data file | Fact-check and judge Q&A drafted. Deck not in the repo |
 
 **Pilot hypotheses (after the hackathon; no targets set, to be agreed with Sime Darby Property)**
@@ -240,6 +240,10 @@ Priority: **Must**, **Should**, **Could**. Status: Done, Partial, Open.
 | W-9 | States: loading, no match, service unreachable, example data, preview scores, rejected or stale score file | Must | Done | `frontend/js/main.js`, `frontend/index.html` |
 | W-10 | Small-screen layout (the sidebar becomes a strip, panels stack under the map) | Should | Partial: checked at 1440, 1100 and 390px in Chromium only; `frontend/tools/smoke.mjs` is updated but has not been run against this layout | `frontend/css/app.css` |
 | W-11 | Final visual design pass that keeps the honesty elements | Should | Done: the Canopy dashboard system is installed (tokens, components, sidebar layout) with a live style guide; honesty elements kept and tested | [docs/design-system.md](docs/design-system.md), `frontend/styleguide.html` |
+| W-14 | Sites page: every site in a sortable, filterable table that follows the slider weights, and opens a site on the map | Should | Done | `frontend/js/sites.js`, `sites-table.js` |
+| W-15 | Methods and limits page (limits, data credits, build facts) and a sidebar that only holds pages; tools in the top bar | Should | Done | `frontend/index.html`, `frontend/js/main.js` |
+| W-16 | Pilot plan as a table first (tabs: Sites, Field results, Trees, Evidence; one site per page), "Create pilot plan" as a five-page flow with a step rail you cannot click, no accordions, and a project switcher (one township today; a second needs its own data) | Should | Done | `frontend/js/pilot-ui.js`, `frontend/js/projects.js` |
+| W-17 | Tracker: every picked site as a card on a board of five stages (Shortlisted, Visit planned, Visited, Approved, Planted), each with the one next step on its own page; the old Pilot plan becomes Advanced tools | Should | Done | `frontend/js/tracker.js`, `frontend/js/tracker-logic.js`, `frontend/tests/tracker-logic.test.mjs` |
 | W-12 | Plotted charts for the yearly series | Could | Partial: bar charts with ranges and hover are done (`frontend/js/charts.js`); plotted lines are not | `frontend/js/charts.js` |
 | W-13 | Compare two sites, shareable selection link, print view | Could | Open | [docs/ux-wireframe.md](docs/ux-wireframe.md) |
 
@@ -264,7 +268,7 @@ Priority: **Must**, **Should**, **Could**. Status: Done, Partial, Open.
 | Performance | Re-ranking on a slider move feels instant for 564 sites | Not measured |
 | Compatibility | Checked at 1440x900 and a phone width in headless Chrome only | Partial. Test the demo machine and browser |
 | Licensing | OpenStreetMap (ODbL) attribution and Sentinel-2 and Landsat credits shown. Leaflet and the font are bundled with their licences. Earth Engine use is registered as noncommercial | Done. The noncommercial limit matters for a pilot |
-| Quality | Frontend: 88 unit tests (pass), plus a browser smoke test (updated for the dashboard layout, not yet re-run). Backend: 194 tests as reported in the README (run `python -m pytest backend/tests -q` to confirm). A GitHub Actions workflow exists but has not run yet | Partial |
+| Quality | Frontend: 95 unit tests (pass), plus a browser smoke test (updated for the dashboard layout, not yet re-run). Backend: 194 tests as reported in the README (run `python -m pytest backend/tests -q` to confirm). A GitHub Actions workflow exists but has not run yet | Partial |
 | Environment | Python 3.12 for the API. Node 22 for tests only. A full rebuild needs an Earth Engine login and a `GEE_PROJECT` | |
 
 ### 6.3 Product guardrails (honesty rules)
@@ -396,7 +400,7 @@ The brief's two-week plan, with where the repository stands. Calendar dates are 
 1. **See the answer.** The map opens with the top five sites numbered.
 2. **Ask "what if?"** Move a slider; the order changes and a note says by how much.
 3. **Pick a site.** The card says why in a sentence, then four bullets.
-4. **Check time.** Switch to Before and after for the honest verdict and "How sure are we?".
+4. **Check time.** Switch to Trends (the before and after view) for the honest verdict and "How sure are we?".
 5. **Take it away.** Download the ranked list, marked as example sites.
 
 Words to avoid on stage: the list in [docs/judge-qa.md](docs/judge-qa.md) ("Phrases to avoid") and [6.3](#63-product-guardrails-honesty-rules).

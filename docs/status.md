@@ -6,8 +6,8 @@ Other documents link here instead of quoting counts.
 | Measure | Count | How it is counted |
 |---|---|---|
 | Python tests | 316 | `pytest --collect-only` over `backend/tests` and `ml/tests` |
-| Frontend unit tests | 213 | summary of `node --test frontend/tests/*.test.mjs` |
-| Browser checks | 46 | `await check(` calls in `frontend/tools/smoke.mjs` (needs a running API and Chrome to execute) |
-| Views | 3 (Plant first, Before and after, Pilot plan) | `data-view=` buttons in `frontend/index.html` |
+| Frontend unit tests | 229 | summary of `node --test frontend/tests/*.test.mjs` |
+| Browser checks | 49 | `await check(` calls in `frontend/tools/smoke.mjs` (needs a running API and Chrome to execute) |
+| Views | 7 (Home, Map, Sites, Trends, Tracker, Methods and limits, Advanced tools) | `data-view=` buttons in `frontend/index.html` |
 
 These are counts of tests that exist, not a statement that they pass on your machine; run the commands in the README to see that.

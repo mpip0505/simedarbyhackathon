@@ -9,8 +9,8 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>Where to plant first: Canopy Prioritiser</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='7' fill='%23FF4D00'/%3E%3Cg transform='translate(4.5 4.5) scale(.625)'%3E%3Ccircle cx='12' cy='9.5' r='6' fill='%23fff'/%3E%3Crect x='11' y='14' width='2' height='7' rx='1' fill='%23fff'/%3E%3C/g%3E%3C/svg%3E">
+  <title>Canopia: where to plant first</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Crect width='24' height='24' rx='7' fill='%23FF4D00'/%3E%3Cg transform='translate(3 3) scale(.75)' fill='%23fff' stroke='%23FF4D00' stroke-width='1.4'%3E%3Ccircle cx='8.5' cy='14' r='5.2'/%3E%3Ccircle cx='15.5' cy='14' r='5.2'/%3E%3Ccircle cx='12' cy='8.5' r='5.2'/%3E%3C/g%3E%3C/svg%3E">
   <link rel="stylesheet" href="vendor/leaflet/leaflet.css">
   <link rel="stylesheet" href="css/app.css">
 </head>
@@ -29,6 +29,14 @@
     <symbol id="i-minus" viewBox="0 0 24 24"><path d="M5 12h14"></path></symbol>
     <symbol id="i-plus" viewBox="0 0 24 24"><path d="M5 12h14M12 5v14"></path></symbol>
     <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"></path></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"></circle><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"></path><path d="M12 17h.01"></path></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"></path><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"></path></symbol>
+    <symbol id="i-chev-down" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6"></path></symbol>
+    <symbol id="i-updown" viewBox="0 0 24 24"><path d="m7 15 5 5 5-5"></path><path d="m7 9 5-5 5 5"></path></symbol>
+    <symbol id="i-home" viewBox="0 0 24 24"><path d="M3 10.5 12 3l9 7.5V20a1 1 0 0 1-1 1h-5v-6H9v6H4a1 1 0 0 1-1-1z"></path></symbol>
+    <symbol id="i-trend" viewBox="0 0 24 24"><path d="M3 17l6-6 4 4 8-8"></path><path d="M15 7h6v6"></path></symbol>
+    <symbol id="i-list-checks" viewBox="0 0 24 24"><path d="M10 6h11M10 12h11M10 18h11M3 6l1.5 1.5L7 5M3 12l1.5 1.5L7 11M3 18l1.5 1.5L7 16"></path></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"></path></symbol>
     <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"></circle><path d="m21 21-4.3-4.3"></path></symbol>
   </svg>
 
@@ -36,50 +44,55 @@
     <!-- ========== sidebar ========== -->
     <aside id="sidebar" class="sidebar">
       <div class="side-org">
-        <span class="logo" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24"><circle cx="12" cy="9.5" r="6" fill="#fff"></circle><rect x="11" y="14" width="2" height="7" rx="1" fill="#fff"></rect></svg></span>
-        <span class="side-org-name">Canopy Prioritiser</span>
+        <span class="logo" aria-hidden="true"><svg width="15" height="15" viewBox="0 0 24 24"><circle cx="8.5" cy="14" r="5.2" fill="#fff" stroke="#FF4D00" stroke-width="1.4"></circle><circle cx="15.5" cy="14" r="5.2" fill="#fff" stroke="#FF4D00" stroke-width="1.4"></circle><circle cx="12" cy="8.5" r="5.2" fill="#fff" stroke="#FF4D00" stroke-width="1.4"></circle></svg></span>
+        <span class="side-org-name">Canopia</span>
         <span class="chip">Screening</span>
       </div>
       <p class="side-label">Project</p>
-      <p class="side-project">City of Elmina (pilot)</p>
-      <nav id="view-tabs" class="side-nav" aria-label="Views">
-        <button type="button" class="nav-item" data-view="prioritise" aria-current="page"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-map"></use></svg><span>Plant first</span></button>
-        <button type="button" class="nav-item" data-view="report"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-columns"></use></svg><span>Before and after</span></button>
-        <button type="button" class="nav-item" data-view="pilot"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-table"></use></svg><span>Pilot plan</span></button>
+      <div class="switcher menu-wrap">
+        <button type="button" id="project-button" class="switcher-btn" aria-expanded="false" aria-controls="project-menu">
+          <span id="project-name" class="switcher-name">City of Elmina</span><span id="project-kind" class="chip chip-quiet">Pilot township</span>
+          <svg class="ic" width="14" height="14" aria-hidden="true"><use href="#i-updown"></use></svg>
+        </button>
+        <div id="project-menu" class="menu menu-pop switcher-menu" role="group" aria-label="Projects" hidden>
+          <p class="menu-label">Projects</p>
+          <div id="project-list"></div>
+          <div class="menu-sep"></div>
+          <button type="button" class="menu-item" id="add-city"><svg class="ic" width="14" height="14" aria-hidden="true"><use href="#i-plus"></use></svg>Add a city&hellip;</button>
+        </div>
+      </div>
+      <nav id="view-tabs" class="side-nav" aria-label="Pages">
+        <button type="button" class="nav-item" data-view="start"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-home"></use></svg><span>Home</span></button>
+        <p class="side-label">Explore</p>
+        <button type="button" class="nav-item" data-view="prioritise" aria-current="page"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-map"></use></svg><span>Map</span></button>
+        <button type="button" class="nav-item" data-view="sites"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-table"></use></svg><span>Sites</span></button>
+        <button type="button" class="nav-item" data-view="report"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-trend"></use></svg><span>Trends</span></button>
+        <button type="button" class="nav-item" data-view="tracker"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-list-checks"></use></svg><span>Tracker</span></button>
+        <p class="side-label">More</p>
+        <button type="button" class="nav-item" data-view="about"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-book"></use></svg><span>Methods and limits</span></button>
+        <button type="button" class="nav-item" data-view="pilot"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-file"></use></svg><span>Advanced tools</span></button>
       </nav>
-      <div class="side-nav" role="group" aria-label="Shortcuts">
-        <button type="button" class="nav-item" data-action="sites"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-table"></use></svg><span>Sites</span></button>
-        <button type="button" class="nav-item" data-action="layers"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-layers"></use></svg><span>Layers</span></button>
-        <button type="button" class="nav-item" data-action="limits"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-file"></use></svg><span>Methods and limits</span></button>
-      </div>
-      <div class="side-quick">
-        <p class="side-label">Quick access</p>
-        <button type="button" class="nav-item" data-action="download"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-download"></use></svg><span>Download ranked list</span></button>
-        <button type="button" class="nav-item" data-action="geojson"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-map"></use></svg><span>Map file for GIS</span></button>
-        <button type="button" class="nav-item" data-action="brief"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-file"></use></svg><span>Print planting brief</span></button>
-        <button type="button" class="nav-item" data-action="credits"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-book"></use></svg><span>Data credits</span></button>
-        <button type="button" class="nav-item" data-action="share"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-file"></use></svg><span>Copy link to this view</span></button>
-        <button type="button" class="nav-item" data-action="tour"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-map"></use></svg><span>Take the tour</span></button>
-        <button type="button" class="nav-item" id="contrast-toggle" data-action="contrast" aria-pressed="false"><svg class="ic" width="16" height="16" aria-hidden="true"><use href="#i-layers"></use></svg><span>High contrast</span></button>
-      </div>
-      <section class="side-status" aria-label="Data status">
-        <h2>Data status</h2>
-        <ul>
-          <li><span class="chip chip-warn" data-mirror="chip-simulated" data-required="honesty">Example sites (simulated)</span></li>
-          <li><span class="chip" data-mirror="chip-scores" data-required="honesty">Scores: loading</span></li>
-          <li><span class="chip chip-quiet" data-mirror="chip-mode">Data: loading</span></li>
-          <li><span class="chip chip-quiet" data-corridor-chip>Corridor: loading</span></li>
-        </ul>
-      </section>
     </aside>
 
     <div id="content">
       <!-- ========== top bar ========== -->
       <header id="topbar" class="topbar">
         <nav class="crumbs" aria-label="Breadcrumb">
-          <span>Pilot: City of Elmina</span><span class="crumb-sep" aria-hidden="true">/</span><span id="crumb-view" aria-current="page">Plant first</span>
+          <span id="crumb-project">Pilot: City of Elmina</span><span class="crumb-sep" aria-hidden="true">/</span><span id="crumb-view" aria-current="page">Map</span>
         </nav>
-        <button type="button" class="btn btn-secondary btn-sm" data-action="download"><svg class="ic" width="14" height="14" aria-hidden="true"><use href="#i-download"></use></svg>Download list</button>
+        <div class="topbar-tools">
+          <button type="button" class="btn btn-ghost btn-sm" data-action="tour"><svg class="ic" width="14" height="14" aria-hidden="true"><use href="#i-help"></use></svg><span class="btn-label">Take the tour</span></button>
+          <button type="button" class="btn btn-secondary btn-sm" data-action="share" title="Copy a link to this view, with your slider settings and the selected site"><svg class="ic" width="14" height="14" aria-hidden="true"><use href="#i-link"></use></svg><span class="btn-label">Share</span></button>
+          <div class="menu-wrap">
+            <button type="button" id="export-button" class="btn btn-secondary btn-sm" aria-expanded="false" aria-controls="export-menu"><svg class="ic" width="14" height="14" aria-hidden="true"><use href="#i-download"></use></svg><span class="btn-label">Export</span><svg class="ic" width="12" height="12" aria-hidden="true"><use href="#i-chev-down"></use></svg></button>
+            <div id="export-menu" class="menu menu-pop" role="group" aria-label="Export" hidden>
+              <button type="button" class="menu-item" data-action="download">Ranked list (CSV)</button>
+              <button type="button" class="menu-item" data-action="geojson">Map file for GIS (GeoJSON)</button>
+              <div class="menu-sep"></div>
+              <button type="button" class="menu-item" data-action="brief">Planting brief (print)</button>
+            </div>
+          </div>
+        </div>
       </header>
 
       <div id="notices" role="status" aria-live="polite"></div>
@@ -95,28 +108,42 @@
 
       <div id="stage">
         <main id="main" tabindex="-1">
-          <!-- ========== Plant first ========== -->
-          <section id="view-prioritise" class="page" aria-label="Plant first">
+          <!-- ========== Start here ========== -->
+          <section id="view-start" class="page" hidden aria-label="Start here">
+            <div class="start">
+              <p class="start-eyebrow">City of Elmina · example data</p>
+              <h1>Where should trees go first?</h1>
+              <p class="start-lead">This tool ranks sites in City of Elmina by how much a new tree could help: cooling hot, bare ground, linking green areas and shading footpaths. You decide which sites to plant. The tool never decides for you.</p>
+              <ol class="start-steps">
+                <li>
+                  <span class="pp-n">1</span>
+                  <div><h2>See where to plant first</h2>
+                    <p>The map shows every candidate site, ranked. Move the three sliders to say what matters most to you, and the ranking follows.</p>
+                    <button type="button" class="btn btn-primary" data-go="prioritise">Open the map</button></div>
+                </li>
+                <li>
+                  <span class="pp-n">2</span>
+                  <div><h2>Check why a site ranks high</h2>
+                    <p>Click any site to see its score, what drives it and what the data cannot tell you. The Sites page lists all of them side by side.</p>
+                    <button type="button" class="btn btn-secondary" data-go="sites">Open the sites table</button></div>
+                </li>
+                <li>
+                  <span class="pp-n">3</span>
+                  <div><h2>Track your sites</h2>
+                    <p>Add the sites you like to your shortlist, then follow each one in the Tracker: visit it, decide, plant, and check the trees. A person still has to check each site on the ground before anything is planted.</p>
+                    <button type="button" class="btn btn-secondary" data-go="tracker">Open the tracker</button></div>
+                </li>
+              </ol>
+              <p class="start-note">Good to know: the sites are examples (simulated), and scores are previews until the scoring model is connected. This is not a tree count or a carbon figure. <button type="button" class="link-button" data-action="limits">Limits of this data</button></p>
+            </div>
+          </section>
+
+          <!-- ========== Where to plant first ========== -->
+          <section id="view-prioritise" class="page page-map" aria-label="Map">
             <p id="preview-note" class="notice" role="note" data-required="honesty" hidden>
               Preview scores: the scoring model is not connected yet. Sites are examples (simulated), not Sime Darby Property's list.
             </p>
 
-            <div class="page-head">
-              <div class="page-title">
-                <h1>Where to plant first</h1>
-                <p id="screening-note" data-required="honesty">
-                  A screening tool: sites ranked by heat relief, green links and shade for walkers. Not a tree count or a carbon figure.
-                </p>
-              </div>
-              <ul id="status" class="chips" aria-label="Data status">
-                <li id="chip-pilot" class="chip">Pilot township: City of Elmina</li>
-                <li id="chip-simulated" class="chip chip-warn" data-required="honesty">Example sites (simulated)</li>
-                <li id="chip-scores" class="chip" data-required="honesty">Scores: loading</li>
-                <li id="chip-mode" class="chip chip-quiet">Data: loading</li>
-              </ul>
-            </div>
-
-            <div id="stats-plant" class="stats" aria-label="At a glance"></div>
 
             <div class="work work-fill">
               <div class="work-main">
@@ -141,6 +168,7 @@
                         <label class="quiet"><input class="cb" type="checkbox" data-layer="tiles"> Street map (needs internet)</label>
                       </div>
                     </div>
+                    <button type="button" id="shortlist-button" class="btn btn-secondary btn-sm" data-go="tracker" title="Open your shortlist in the Tracker">Shortlist <span id="shortlist-count" class="shortlist-n">0</span></button>
                     <button type="button" class="btn btn-secondary btn-sm btn-icon" data-action="download" aria-label="Download list" title="Download list"><svg class="ic" width="14" height="14" aria-hidden="true"><use href="#i-download"></use></svg></button>
                   </div>
                   <div class="map-box">
@@ -182,6 +210,7 @@
                     </button>
                   </div>
                   <div class="sheet-body" id="matters-body">
+                    <p class="rail-intro">Drag a slider to say what matters most to you. The ranking follows.</p>
                     <form id="weights-form" onsubmit="return false">
                       <div class="weight-row">
                         <label for="w-cooling">Heat relief</label>
@@ -216,10 +245,10 @@
                   </div>
                   <div class="sheet-body" id="top-body">
                     <div id="list-mode" class="seg seg-sm" role="group" aria-label="Which list" hidden>
-                      <label class="pill" title="Strict order by score"><input type="radio" name="list-mode" value="ranked" checked><span>Ranked</span></label>
+                      <label class="pill" title="Strict order by score"><input type="radio" name="list-mode" value="ranked" checked><span>Best first</span></label>
                       <label class="pill" title="A spread-out top 20, capped per 250 m block so a first round covers more areas"><input type="radio" name="list-mode" value="shortlist"><span>Spread out</span></label>
                     </div>
-                    <div id="filters" class="seg seg-sm" role="group" aria-label="Filter sites">
+                    <div id="filters" class="seg seg-sm" role="group" aria-label="Filter sites" hidden>
                       <label class="pill"><input type="radio" name="origin" value="all" checked><span>All</span></label>
                       <label class="pill"><input type="radio" name="origin" value="open_land"><span>Open land</span></label>
                       <label class="pill"><input type="radio" name="origin" value="corridor_edge"><span>Corridor edge</span></label>
@@ -244,18 +273,20 @@
               </div>
             </div>
 
-            <article class="card" id="card-plan"></article>
-            <article class="card" id="card-impact" hidden></article>
-            <article class="card" id="card-tradeoff" hidden></article>
           </section>
 
-          <!-- ========== Pilot plan ========== -->
-          <section id="view-pilot" class="page" hidden aria-label="Pilot plan">
+          <!-- ========== Tracker ========== -->
+          <section id="view-tracker" class="page" hidden aria-label="Tracker">
+            <div id="tracker-root"></div>
+          </section>
+
+          <!-- ========== Advanced tools (the pilot plan) ========== -->
+          <section id="view-pilot" class="page" hidden aria-label="Advanced tools">
             <div id="pilot-root"></div>
           </section>
 
-          <!-- ========== Before and after ========== -->
-          <section id="view-report" class="page" hidden aria-label="Before and after">
+          <!-- ========== Trends ========== -->
+          <section id="view-report" class="page" hidden aria-label="Trends">
             <div class="page-head">
               <div class="page-title">
                 <h1 id="report-headline"></h1>
@@ -324,6 +355,83 @@
 
             <p id="report-credits"></p>
           </section>
+
+          <!-- ========== Sites: every site in one table ========== -->
+          <section id="view-sites" class="page" hidden aria-label="Sites">
+            <div class="page-head">
+              <div class="page-title">
+                <h1>Sites</h1>
+                <p id="screening-note" data-required="honesty">
+                  Every candidate site, ranked by how much a new tree there could help: cooling hot ground, linking green areas and shading footpaths. A screening tool, not a tree count or a carbon figure.
+                </p>
+                <p id="sites-note"></p>
+              </div>
+              <ul id="status" class="chips" aria-label="Data status">
+                <li id="chip-pilot" class="chip" hidden>Pilot township: City of Elmina</li>
+                <li id="chip-simulated" class="chip chip-warn" data-required="honesty">Example sites (simulated)</li>
+                <li id="chip-scores" class="chip" data-required="honesty">Scores: loading</li>
+                <li id="chip-mode" class="chip chip-quiet">Data: loading</li>
+              </ul>
+            </div>
+            <div id="stats-plant" class="stats" aria-label="At a glance"></div>
+            <article class="card" id="card-plan"></article>
+            <div class="sites-bar">
+              <div class="seg seg-sm" role="group" aria-label="Filter sites by origin">
+                <label class="pill"><input type="radio" name="origin-sites" value="all" checked><span>All</span></label>
+                <label class="pill"><input type="radio" name="origin-sites" value="open_land"><span>Open land</span></label>
+                <label class="pill"><input type="radio" name="origin-sites" value="corridor_edge"><span>Corridor edge</span></label>
+              </div>
+              <div class="field field-search sites-search">
+                <svg class="ic" width="14" height="14" aria-hidden="true"><use href="#i-search"></use></svg>
+                <input id="sites-search" type="search" placeholder="Find a site, e.g. ELM-3672" aria-label="Find a site by name">
+              </div>
+              <span class="grow"></span>
+              <span id="sites-count" class="muted"></span>
+              <button type="button" class="btn btn-secondary btn-sm" data-action="download"><svg class="ic" width="14" height="14" aria-hidden="true"><use href="#i-download"></use></svg>Download list</button>
+            </div>
+            <div class="table-card">
+              <div class="table-scroll table-scroll-tall">
+                <table id="sites-table" class="table sites-table">
+                  <caption class="sr-only">All sites, ranked. Use the column headings to sort.</caption>
+                  <thead></thead>
+                  <tbody></tbody>
+                </table>
+              </div>
+              <p id="sites-empty" hidden>No sites match these filters. <button type="button" id="sites-clear" class="link-button">Clear filters</button></p>
+            </div>
+            <section class="deeper" aria-labelledby="h-deeper">
+              <h2 id="h-deeper">More ways to look at the ranking</h2>
+              <p class="deeper-lead">Optional: what the top sites reach, and the same first sites chosen in different ways.</p>
+              <article class="card" id="card-impact" hidden></article>
+              <article class="card" id="card-tradeoff" hidden></article>
+            </section>
+          </section>
+
+          <!-- ========== Methods and limits ========== -->
+          <section id="view-about" class="page" hidden aria-label="Methods and limits">
+            <div class="page-head">
+              <div class="page-title">
+                <h1>Methods and limits</h1>
+                <p>Read these before quoting a number. The sites are examples, the scores rank sites against each other, and there are no field data yet.</p>
+              </div>
+            </div>
+            <div class="about-grid">
+              <section class="card about-card" aria-labelledby="h-about-limits">
+                <h2 id="h-about-limits">Limits of this data</h2>
+                <ul id="about-caveats"></ul>
+              </section>
+              <div class="about-side">
+                <section class="card about-card" aria-labelledby="h-about-credits">
+                  <h2 id="h-about-credits">Data credits</h2>
+                  <ul id="about-credits"></ul>
+                </section>
+                <section class="card about-card" aria-labelledby="h-about-build">
+                  <h2 id="h-about-build">This build</h2>
+                  <div id="about-build" class="kv-list"></div>
+                </section>
+              </div>
+            </div>
+          </section>
         </main>
         <div id="loading" role="status">Loading Elmina data&hellip;</div>
       </div>
@@ -359,6 +467,19 @@
       <li>Checked: there were enough clear satellite images through cloud; the result depends on the greenness cut-off; two other satellite maps disagree on tree cover; the top of the list holds up under 2,000 plausible weightings.</li>
       <li>Not done: no field plots, tree inventory or drone survey, so nothing here shows the ranking is right. A field check sheet is ready for the first walk.</li>
     </ul>
+    <form method="dialog"><button type="submit" class="btn btn-secondary">Close</button></form>
+  </dialog>
+  <dialog id="dlg-city" aria-labelledby="dlg-city-title">
+    <h2 id="dlg-city-title">Add a city</h2>
+    <p>Canopia has real data for one township today: City of Elmina. The method has not been run on any other township, so there is nothing to switch to yet.</p>
+    <p>What a second city needs, in short:</p>
+    <ul>
+      <li>Its study area and boundary as settings, instead of the Elmina box built into the data pipeline.</li>
+      <li>A site-ID prefix for the township, and its own cross-check numbers and caveat wording.</li>
+      <li>Its corridor outline, if the developer has one (otherwise an approximate one is drawn from OpenStreetMap parks).</li>
+      <li>Its own cached data behind its own API. Add it to <code>js/projects.js</code> and it appears in this menu.</li>
+    </ul>
+    <p class="muted">Our estimate, not measured: one to two days of engineering for the first extra township. Details are in <code>docs/commercial-case.md</code>, "What repeating it for another township needs".</p>
     <form method="dialog"><button type="submit" class="btn btn-secondary">Close</button></form>
   </dialog>
   <dialog id="dlg-credits" aria-labelledby="dlg-credits-title">

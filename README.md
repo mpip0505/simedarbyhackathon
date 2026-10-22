@@ -1,10 +1,10 @@
 <p align="center">
-  <img src="docs/assets/banner.svg" alt="Canopy Prioritiser: a grid of 30 metre cells with the five highest priority sites numbered 1 to 5" width="100%">
+  <img src="docs/assets/banner.svg" alt="Canopia: a grid of 30 metre cells with the five highest priority sites numbered 1 to 5" width="100%">
 </p>
 
-# Canopy Prioritiser
+# Canopia
 
-**Where should we plant first, and why?** Canopy Prioritiser turns free satellite and map data into a ranked, explained shortlist of places to plant,
+**Where should we plant first, and why?** Canopia turns free satellite and map data into a ranked, explained shortlist of places to plant,
 then helps a planner check that shortlist on the ground and turn it into a work plan. It was built for the Sime Darby Property University Hackathon 2026
 (Planet track, theme *Township of Tomorrow*) by team Triple T, and **piloted on City of Elmina** so the method can be repeated in other townships.
 
@@ -19,18 +19,18 @@ then helps a planner check that shortlist on the ground and turn it into a work 
 
 ## Purpose
 A township has a limited number of trees to plant each season, a long walking network with little shade, and a biodiversity corridor with gaps in it. Deciding *where* is slow,
-and a map of canopy cover alone shows what is there, not what to do next. Canopy Prioritiser answers three questions, in order:
+and a map of canopy cover alone shows what is there, not what to do next. Canopia answers three questions, in order:
 
 1. **Where first?** Every candidate site gets three scores (cooling, connectivity, shade) from named, transparent inputs. You change what matters and the ranking re-sorts live.
 2. **Why there?** Each site gets a one-sentence reason, the measurements behind it, and how steady its rank is across 2,000 plausible weightings.
-3. **What next?** The shortlist goes into a Pilot plan: five ground checks per site that start as *Not checked*, a blind field sheet to send out, the completed sheet brought back and compared with the model, keep-or-reject with a reason, phases, and recorded survival.
+3. **What next?** The shortlist goes into the Tracker: each site moves from shortlisted to planted, with five ground checks per site that start as *Not checked*, a blind field sheet to send out, the completed sheet brought back and compared with the model, keep-or-reject with a reason, phases, and recorded survival.
 
 ## Who it is for
 A **landscape or sustainability planning officer** at a developer such as Sime Darby Property (a hypothesis to confirm with mentors), who must choose where a limited planting budget goes and justify the choice.
 A sustainability analyst is served by a second view that shows the two satellite periods side by side with honest verdicts. Residents benefit indirectly: the tool counts the unshaded footpath and mapped homes the first sites reach.
 
 ## What it looks like
-The dashboard has three views: **Plant first** (map, sliders, ranked list, site card), **Before and after** (two satellite periods, charts, an independent-map comparison) and **Pilot plan** (shortlist to field checks to work plan).
+The dashboard has seven pages: **Home** (what this is and where to start), **Map** (full-screen map, sliders, ranked list, site card), **Sites** (every site in one sortable table, with the shortlist and analysis), **Trends** (two satellite periods, charts, an independent-map comparison), **Tracker** (each picked site on a board from shortlisted to planted, with one next step per card), **Methods and limits**, and **Advanced tools** (field sheets, evidence, costs and scenarios for a real pilot).
 
 | Plant first | Site card |
 |---|---|
@@ -47,13 +47,13 @@ The planner's journey has three stages. Everything inside the app is the **plann
 
 ```mermaid
 flowchart LR
-  subgraph A["A. Plan (Plant first)"]
+  subgraph A["A. Plan (Map)"]
     direction TB
     A1["Explore the map<br/>top 5 numbered"] --> A2["Understand a site<br/>one-sentence reason"]
     A2 --> A3["Prioritise<br/>sliders re-rank live"]
     A3 --> A4["Evaluate<br/>what the first sites reach,<br/>five ways of choosing"]
   end
-  subgraph B["B. Verify (Pilot plan, steps 1 and 2)"]
+  subgraph B["B. Verify (Tracker)"]
     direction TB
     B1["Shortlist + five field checks<br/>all start Not checked"] --> B2["Freeze the original ranking<br/>download a blind field sheet"]
     B2 --> B3["Import the completed sheet<br/>agree, differ or insufficient"]
@@ -99,7 +99,7 @@ flowchart TB
   RAS --> SITES
   SITES --> SCORE["Scoring model (ml/)<br/>cooling, connectivity, shade<br/>no fitted parameters"]
   SCORE --> API["FastAPI<br/>read-only, committed data,<br/>works offline"]
-  API --> APP["Web app<br/>Plant first, Before and after, Pilot plan"]
+  API --> APP["Web app<br/>Map, Sites, Trends, Tracker, Advanced tools"]
   SCORE -.-> REP["Reports: rank steadiness,<br/>reach, trade-off"]
   REP -.-> API
 ```
@@ -148,11 +148,11 @@ uvicorn backend.api.main:app --port 8000
 Open http://localhost:8000/ (the interactive API is at http://localhost:8000/docs). **Live link:** not deployed yet; `Dockerfile` and `render.yaml` are ready ([developer guide](docs/developer-guide.md#the-web-app)).
 
 A short path through the app:
-1. **Plant first:** click the site numbered 1 and read why it ranks there.
+1. **Map:** click the site numbered 1 and read why it ranks there.
 2. Move the "What matters most?" sliders so heat counts most; the note says how many of the top 10 changed.
-3. Open the reach and trade-off cards: what the first sites reach, and five ways of choosing.
-4. **Pilot plan:** press *Add the first five ranked sites*, then *Freeze original shortlist*, and download the blind field sheet. Every field check reads *Not checked*.
-5. **Before and after:** two satellite periods, with the verdicts and the independent-map comparison.
+3. Open **Sites**: the table, and the reach and trade-off cards (what the first sites reach, and five ways of choosing).
+4. **Tracker:** press *Add the first five ranked sites*, plan a visit, and download the field sheet (the original ranking is frozen for you, and the sheet has no ranks or scores). Every field check reads *Not checked*.
+5. **Trends:** two satellite periods, with the verdicts and the independent-map comparison.
 
 **Have your own list of points?** `python -m backend.my_sites your_points.csv` scores them with the same measurements and model, offline ([docs/bring-your-own-sites.md](docs/bring-your-own-sites.md)).
 

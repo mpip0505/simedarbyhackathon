@@ -1,5 +1,5 @@
 <svg xmlns="http://www.w3.org/2000/svg" width="1280" height="300" viewBox="0 0 1280 300" role="img" aria-labelledby="t d">
-<title id="t">Canopy Prioritiser</title><desc id="d">A grid of 30 metre cells with the five highest priority sites numbered 1 to 5.</desc>
+<title id="t">Canopia</title><desc id="d">A grid of 30 metre cells with the five highest priority sites numbered 1 to 5.</desc>
 <rect width="1280" height="300" fill="#181816"/>
 <rect x="746" y="40" width="34" height="34" rx="3" fill="#3B4A36"/>
 <rect x="784" y="40" width="34" height="34" rx="3" fill="#363633"/>
@@ -98,7 +98,7 @@
 <rect x="936.0" y="192.0" width="34" height="34" rx="3" fill="#D13C06"/><text x="953.0" y="215.0" text-anchor="middle" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF">3</text>
 <rect x="1126.0" y="192.0" width="34" height="34" rx="3" fill="#D13C06"/><text x="1143.0" y="215.0" text-anchor="middle" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF">4</text>
 <rect x="784.0" y="230.0" width="34" height="34" rx="3" fill="#D13C06"/><text x="801.0" y="253.0" text-anchor="middle" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="18" font-weight="700" fill="#FFFFFF">5</text>
-<text x="56" y="120" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="58" font-weight="700" fill="#FFFFFF">Canopy Prioritiser</text>
+<text x="56" y="120" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="58" font-weight="700" fill="#FFFFFF">Canopia</text>
 <text x="56" y="164" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="24" fill="#E4E4E0">Where should we plant first, and why?</text>
 <text x="56" y="204" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="16" fill="#A9A9A3">An explainable screening tool, from free satellite and map data to a field-checked plan.</text>
 <text x="56" y="246" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" fill="#FF4D00">Pilot township: City of Elmina  |  Team Triple T</text><text x="56" y="268" font-family="Segoe UI, Helvetica, Arial, sans-serif" font-size="15" fill="#A9A9A3">Sime Darby Property University Hackathon 2026, Planet track</text>
