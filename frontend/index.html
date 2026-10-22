@@ -16,6 +16,7 @@
 </head>
 <body>
   <a class="skip-link" href="#main">Skip to the main content</a>
+  <a class="skip-link" href="#top-list">Skip to the ranked list</a>
   <!-- icons, drawn once and used with <use href="#i-name"> -->
   <svg class="sprite" aria-hidden="true" focusable="false">
     <symbol id="i-map" viewBox="0 0 24 24"><polygon points="3 6 9 3 15 6 21 3 21 18 15 21 9 18 3 21"></polygon><line x1="9" y1="3" x2="9" y2="18"></line><line x1="15" y1="6" x2="15" y2="21"></line></symbol>
@@ -230,7 +231,7 @@
                     <div class="list-window">
                       <label class="conflict-filter"><input type="checkbox" id="conflict-only" aria-describedby="conflict-filter-note"> Show sites with a siting flag only</label>
                       <p id="conflict-filter-note" class="small-note"></p>
-                      <ol id="top-list" class="site-list"></ol>
+                      <ol id="top-list" class="site-list" tabindex="-1"></ol>
                       <p id="no-match" hidden>No sites match these filters. <button type="button" id="clear-filters" class="link-button">Clear filters</button></p>
                     </div>
                     <p id="list-note" class="small-note" hidden></p>

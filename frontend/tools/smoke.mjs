@@ -779,6 +779,13 @@ try {
     assert.equal(await evaluate(`document.querySelectorAll('#print-brief table')[0].querySelectorAll('tbody tr').length`), 10);
     assert.equal(await evaluate(`getComputedStyle(document.querySelector('#print-brief')).display`), "none", "the brief must not show on screen");
   });
+  await check("a second skip link jumps to the ranked list, and the small segmented controls are at least 24 px tall", async () => {
+    await evaluate(`document.querySelectorAll('.skip-link')[1].click()`);
+    assert.equal(await evaluate(`document.activeElement.id`), "top-list");
+    const short = await evaluate(`[...document.querySelectorAll('.seg-sm > button')].filter((b) => b.offsetHeight > 0 && b.offsetHeight < 24).length`);
+    assert.equal(short, 0, `${short} small segmented buttons are under 24 px`);
+  });
+
   await check("the skip link is the first thing Tab reaches and it moves focus to the main content", async () => {
     await evaluate(`document.activeElement.blur(); document.body.tabIndex = -1; document.body.focus(); document.body.removeAttribute('tabindex')`);   // Tab now starts from the top of the page
     await send("Input.dispatchKeyEvent", { type: "keyDown", key: "Tab", code: "Tab", windowsVirtualKeyCode: 9 });

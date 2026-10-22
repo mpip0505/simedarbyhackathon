@@ -7,7 +7,7 @@ Other documents link here instead of quoting counts.
 |---|---|---|
 | Python tests | 308 | `pytest --collect-only` over `backend/tests` and `ml/tests` |
 | Frontend unit tests | 213 | summary of `node --test frontend/tests/*.test.mjs` |
-| Browser checks | 45 | `await check(` calls in `frontend/tools/smoke.mjs` (needs a running API and Chrome to execute) |
+| Browser checks | 46 | `await check(` calls in `frontend/tools/smoke.mjs` (needs a running API and Chrome to execute) |
 | Views | 3 (Plant first, Before and after, Pilot plan) | `data-view=` buttons in `frontend/index.html` |
 
 These are counts of tests that exist, not a statement that they pass on your machine; run the commands in the README to see that.
