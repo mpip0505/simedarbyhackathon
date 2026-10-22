@@ -147,6 +147,19 @@ def build_sites(layers: dict, rasters: dict) -> gpd.GeoDataFrame:
     land, open_part = candidate_land(to_m("open_land"), to_m("parks"), to_m("corridor"), to_m("buildings"),
                                      to_m("roads"))
     cells = grid_cells(land)
+    gdf, _ = features_for_cells(cells, layers, rasters, open_part=open_part)
+    return gdf
+
+
+def features_for_cells(cells: list, layers: dict, rasters: dict, *, open_part=None, ids: list | None = None,
+                       source: str = "simulated") -> tuple:
+    """Measure the features of each cell (shapely polygons in METRIC_CRS) exactly as for the simulated sites.
+
+    Returns (GeoDataFrame, kept): kept lists the index of every input cell that got a row, so a caller who supplied the
+    cells can say which ones had no usable satellite data. open_part decides `origin` (None leaves it unset); ids
+    replaces the grid-position site ids; source labels the rows. build_sites calls this, so the simulated sites and any
+    user-supplied sites go through one code path."""
+    to_m = lambda name: layers[name].to_crs(METRIC_CRS).geometry
     cells_4326 = list(gpd.GeoSeries(cells, crs=METRIC_CRS).to_crs(4326))
 
     ndvi = zonal(rasters["ndvi_latest"], cells_4326, np.mean)
@@ -176,8 +189,8 @@ def build_sites(layers: dict, rasters: dict) -> gpd.GeoDataFrame:
     bld_types = layers["buildings"]["building"].reset_index(drop=True)
     b_tree = bld.sindex
 
-    rows = []
-    for cell, g4326, n, nb, t, tb, v, c in zip(cells, cells_4326, ndvi, ndvi_b, lst, lst_b, valid, canopy):
+    rows, kept = [], []
+    for i, (cell, g4326, n, nb, t, tb, v, c) in enumerate(zip(cells, cells_4326, ndvi, ndvi_b, lst, lst_b, valid, canopy)):
         if n is None or t is None or c is None:
             continue  # no clear satellite data over this cell
         if n < MIN_PLANTABLE_NDVI:
@@ -199,8 +212,8 @@ def build_sites(layers: dict, rasters: dict) -> gpd.GeoDataFrame:
         bi = b_tree.query(disc, predicate="intersects")
         b_area = sum(bld.iloc[i].intersection(disc).area for i in bi)
         row = {
-            "source": "simulated",
-            "origin": "open_land" if ctr.within(open_part) else "corridor_edge",
+            "source": source,
+            "origin": None if open_part is None else ("open_land" if ctr.within(open_part) else "corridor_edge"),
             "area_m2": round(cell.area, 1),
             "ndvi_mean": _rnd(n, 3), "lst_c_mean": _rnd(t), "canopy_pct_baseline": _rnd(c, 1),
             "ndvi_mean_baseline": _rnd(nb, 3), "lst_c_mean_baseline": _rnd(tb),
@@ -220,15 +233,17 @@ def build_sites(layers: dict, rasters: dict) -> gpd.GeoDataFrame:
             "residential_buildings_within_250m": int(sum(bld_types.iloc[i] in RESIDENTIAL for i in bi)),
             "built_up_frac_250m": _rnd(b_area / disc.area, 3),
             "block_id": block_id(ctr),
-            "_id": cell_id(cell), "geometry": g4326,
+            "_id": cell_id(cell) if ids is None else ids[i], "geometry": g4326,
         }
         for r in CONTEXT_RADII_M:
             row[f"lst_mean_{r}m"] = _rnd(disc_mean(rasters["lst_latest"], lon, lat, r))
             row[f"ndvi_mean_{r}m"] = _rnd(disc_mean(rasters["ndvi_latest"], lon, lat, r), 3)
         rows.append(row)
+        kept.append(i)
     gdf = gpd.GeoDataFrame(rows, geometry="geometry", crs=4326)
-    gdf.insert(0, "site_id", gdf.pop("_id"))
-    return gdf
+    if len(gdf):
+        gdf.insert(0, "site_id", gdf.pop("_id"))
+    return gdf, kept
 
 
 def validate(gdf) -> None:
@@ -259,13 +274,18 @@ def flat_table(gdf) -> pd.DataFrame:
     return df
 
 
-def main() -> None:
+def load_inputs() -> tuple:
+    """The cached OSM layers (GeoDataFrames) and opened rasters the feature measurement needs. Close the rasters when done."""
     read = lambda n: gpd.read_file(OSM_DIR / f"{n}.geojson")
     layers = {n: read(n) for n in ("open_land", "parks", "buildings", "roads", "paths")}
     layers["corridor"] = gpd.read_file(CACHE_DIR / "corridor.geojson")
     layers["spine"] = gpd.read_file(CACHE_DIR / "corridor_spine.geojson")
     names = ("ndvi_latest", "ndvi_baseline", "lst_latest", "lst_baseline", "lst_valid_latest")
-    opened = {n: rasterio.open(RASTER_DIR / f"{n}.tif") for n in names}
+    return layers, {n: rasterio.open(RASTER_DIR / f"{n}.tif") for n in names}
+
+
+def main() -> None:
+    layers, opened = load_inputs()
     try:
         gdf = build_sites(layers, opened)
     finally:

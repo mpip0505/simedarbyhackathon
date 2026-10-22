@@ -29,6 +29,7 @@ Test, browser-check and view counts are never typed into prose: they come from [
 | Document | What it is |
 |---|---|
 | [pilot-readiness.md](pilot-readiness.md) | what a real pilot needs and what it would measure |
+| [bring-your-own-sites.md](bring-your-own-sites.md) | score your own list of points offline with the same measurements and model |
 | [decision-support.md](decision-support.md) | intervention suggestion, best-coverage round, maintenance readiness |
 | [validate-review-replan.md](validate-review-replan.md) | the freeze, review and replan loop, with equal-size benchmarks |
 | [shade-walk-protocol.md](shade-walk-protocol.md) | how to walk a route with a stopwatch to measure the current shade share |

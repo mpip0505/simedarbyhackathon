@@ -118,6 +118,9 @@ On purpose: nothing is guessed. Without inputs it shows what needs no assumption
 **10i. Is the OSM-only path a second model? What does it replace?**
 No. It is a licence fallback. Our Earth Engine registration is noncommercial, so a commercial buyer could ask what runs without it. The OSM-only screen ranks simulated cells only by closeness to a mapped footpath (60%) and a mapped park (40%); it cannot see heat, tree cover, shade or species, and its scores cannot be compared with the satellite model. It replaces the Earth Engine compute step for a reduced screening, not the satellite method, and whether the full satellite workflow may be used commercially is a separate decision.
 
+**10j. Your sites are simulated. Could Sime Darby Property's real list be scored?**
+Yes, for any point inside the Elmina study area: `python -m backend.my_sites their_points.csv` measures each point with the same code that measures the simulated sites and scores it with the same model, offline ([bring-your-own-sites.md](bring-your-own-sites.md)). A test shows a simulated site's own centre reproduces its committed scores exactly. Limits: it is a command-line step, not a web upload; the scores are percentile ranks against the simulated Elmina set, not absolute quality; it knows nothing about ownership, utilities or tree health; and another township needs the pipeline run for that area first.
+
 **11. How does the ranking handle biodiversity and endangered species?**
 It does not model species. Biodiversity enters through connectivity along the corridor and through vegetation context.
 Species choice, ERT planting lists and soil suitability would need Sime Darby Property's landscape data. We say so rather

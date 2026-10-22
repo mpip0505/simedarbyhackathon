@@ -74,6 +74,7 @@ The additions can be rebuilt separately:
 ```bash
 python -m backend.conflicts   # the siting screen: existing site geometries + cached OSM; preserves scores
 python -m backend.open_data   # ONLY cached OSM; constructs a separate candidate list
+python -m backend.my_sites your_points.csv   # scores your own lat/lon points with the same measurements and model (docs/bring-your-own-sites.md)
 ```
 
 ```bash

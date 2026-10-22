@@ -119,6 +119,7 @@ Other canopy tools (Tree Equity Score, i-Tree Landscape, Boston's Right Place, R
 - **Reach, de-duplicated:** what the first sites actually touch (unshaded footpath, mapped homes, gaps in the approximate corridor), each counted once, and five ways of choosing compared as a trade-off, not a league table ([ml/reports/tradeoff.md](ml/reports/tradeoff.md)).
 - **Best 10 together beats the top 10 on reach:** a best-coverage round reaches about 51% more footpath and about three times the (approximate) corridor gap of the plain top 10 ([docs/decision-support.md](docs/decision-support.md)).
 - **Protect before you plant (a screening suggestion, not a finding):** 75 of the 564 example sites are already green by satellite, so the tool flags them for an ecologist's review before any planting. Reproduce: `node frontend/tools/intervention_counts.mjs`.
+- **Your own sites can be dropped in:** any point inside the Elmina study area is measured by the same code and scored by the same model (`python -m backend.my_sites`), and a test proves a simulated site's own centre reproduces its committed scores exactly.
 - **From ranking to field to plan:** a loop most map tools stop short of, with a frozen original ranking so later changes are compared against it.
 - **Honest limits on screen**, not buried in a footnote.
 
@@ -152,6 +153,8 @@ A short path through the app:
 3. Open the reach and trade-off cards: what the first sites reach, and five ways of choosing.
 4. **Pilot plan:** press *Add the first five ranked sites*, then *Freeze original shortlist*, and download the blind field sheet. Every field check reads *Not checked*.
 5. **Before and after:** two satellite periods, with the verdicts and the independent-map comparison.
+
+**Have your own list of points?** `python -m backend.my_sites your_points.csv` scores them with the same measurements and model, offline ([docs/bring-your-own-sites.md](docs/bring-your-own-sites.md)).
 
 Test counts, browser checks and views are measured, not typed: [docs/status.md](docs/status.md). `python -m pytest backend/tests ml/tests -q` and `node --test "frontend/tests/*.test.mjs"` run everything that needs no network.
 

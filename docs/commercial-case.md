@@ -47,6 +47,9 @@ OpenStreetMap fetch and the cloud-masked composites are the same. The free map-d
 - **Imagery and map data:** free (Sentinel-2, Landsat, OpenStreetMap) at the volumes used here.
 - **Hosting:** a free tier is enough for a demo (`render.yaml`); production would need access control and an audit trail (see [pilot-readiness.md](pilot-readiness.md)).
 
+## A real site list can be dropped in
+The simulated sites are a stand-in. Any list of real points inside the Elmina study area can be scored offline with the same measurements and model (`python -m backend.my_sites`, see [bring-your-own-sites.md](bring-your-own-sites.md)); a test shows the shared code reproduces the committed scores exactly. That is the cheapest proof for a buyer that their own list could replace ours. It is a command-line step and not yet a web upload.
+
 ## The licensing point, stated openly
 **A runnable fallback exists, and it is not a second model.** `python -m backend.open_data` builds an OSM-only proximity screen (60% footpath, 40% park proximity) with no Earth Engine; it cannot see heat, tree cover or shade and is not comparable with the satellite scores. It shows a reduced screening can run on open data; it does not settle the satellite path.
 
