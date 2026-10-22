@@ -750,3 +750,6 @@ dialog form[method="dialog"] { display: flex; justify-content: flex-end; margin:
 .opt { display: flex; flex-direction: column; gap: 10px; }
 .opt-card { padding: 12px; border: 1px solid var(--accent-line); border-radius: var(--r-3); background: #fff; }
 .opt-table tr.opt-best th, .opt-table tr.opt-best td { font-weight: 600; background: var(--accent-tint); }
+
+/* Long source-file hashes wrap inside the field-import preview on narrow screens. */
+.pp-import-preview { overflow-wrap: anywhere; }

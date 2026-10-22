@@ -11,6 +11,8 @@ import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync
 import { tmpdir } from "node:os";
 import { join } from "node:path";
 import assert from "node:assert/strict";
+import { parseCsv } from "../js/observations.js";
+import { toCsv } from "../js/csv.js";
 
 const BASE = process.argv[2] || "http://127.0.0.1:8000";
 const SHOTS = process.argv[3] || join(tmpdir(), "elmina-ui-shots");
@@ -103,8 +105,9 @@ const setSlider = (key, value) => evaluate(`(() => { const i = document.querySel
 const DEFAULT_NOTE = "The list and map update as you move these.";
 const results = [];
 async function check(name, fn) {
+  if(process.env.SMOKE_MATCH && !name.includes(process.env.SMOKE_MATCH))return;
   try { await fn(); results.push([true, name]); console.log(`  ok   ${name}`); }
-  catch (error) { results.push([false, name]); console.log(`  FAIL ${name}\n       ${error.message.split("\n")[0]}`); }
+  catch (error) { results.push([false, name]); console.log(`  FAIL ${name}\n       ${error.message.split("\n")[0]}`); if(process.env.SMOKE_MATCH)console.log(JSON.stringify(problems)); }
 }
 
 try {
@@ -536,6 +539,8 @@ try {
     // 1 shortlist: field feasibility is separate from priority and starts unknown
     await clickText("Add the first five ranked sites");
     const [a, b, c] = await ids();
+    await clickText("Freeze original shortlist");
+    assert.match(await text(), /Original shortlist frozen/);
     assert.equal((await ids()).length, 5);
     assert.match(await text(), new RegExp(`${a}[\\s\\S]*Priority: rank #1, score[\\s\\S]*Field feasibility: Not checked`));
     await setVal(`site:${a}:check-access`, "ok");
@@ -569,29 +574,45 @@ try {
     assert.equal(await evaluate(`${root}.querySelectorAll('.pp-obs').length`), 0);
 
     // a good file: two observations, one blank row left out and not guessed
-    await importCsv(`${HEAD}\r\n${a},3,101,none,sparse,yes,P1,"open, no trees",Aisha,2026-10-24\r\n${b},3,101,full,dense,no,,,,\r\n${c},3,101,,sparse,yes,,,,`);
-    assert.match(await text(), /Imported 2 observations: \d+ agree with the model, \d+ differ\./);
-    assert.match(await text(), new RegExp(`Left out because an answer was blank \\(still Needs inspection\\): ${c}`));
+    const raw = parseCsv(sheet), headers=raw[0];
+    const filled=raw.slice(1).map(row=>Object.fromEntries(headers.map((h,i)=>[h,row[i]]))).map(row=>({...row,shade_on_path:row.site_id===c?"":row.site_id===b?"full":"none",canopy_class:row.site_id===b?"dense":"sparse",path_in_use:"yes",observer:"Synthetic walker",date:"2026-10-22",notes:"SYNTHETIC browser test"}));
+    await importCsv(toCsv(filled,headers.map(key=>({key,label:key}))));
+    assert.match(await text(), /Preview ready/);
+    assert.equal(await evaluate(`${root}.querySelectorAll('.pp-obs').length`), 0,"preview must not mutate observations");
+    await send("Emulation.setDeviceMetricsOverride", { width:390,height:844,deviceScaleFactor:1,mobile:false });
+    await evaluate(`document.querySelector('[data-import-preview]').scrollIntoView({block:'center'})`);
+    assert.ok(await evaluate(`document.documentElement.scrollWidth <= 400`),"field-import preview overflows on a phone");
+    await shot("pilot-import-preview-mobile");
+    await send("Emulation.setDeviceMetricsOverride", { width:1440,height:900,deviceScaleFactor:1,mobile:false });
+    await clickText("Confirm field import");
+    assert.match(await text(), /Imported 2 observations: \d+ agree, \d+ differ, \d+ insufficient/);
+    assert.match(await text(), /incomplete rows left out|Imported 2 observations/);
     assert.equal(await evaluate(`${root}.querySelectorAll('.pp-obs').length`), 2);
     assert.match(await text(), /one visit's comparison, not validation/);
     assert.equal(await evaluate(`${root}.querySelector('[data-key="site:${c}:status"]').value`), "needs-inspection");
     assert.equal(await evaluate(`${root}.querySelector('[data-key="site:${a}:status"]').value`), "inspected");
 
     // 3 review: keep one, reject one; a rejection asks for a reason and offers next-ranked alternatives
+    for(const id of [a,b]) {
+      await setVal(`${id}:reviewer`,"Synthetic planner");
+      await setVal(`${id}:reviewDate`,"2026-10-22");
+      await setVal(`${id}:reason`,id===b?"no access road":"Synthetic inspection reviewed");
+    }
     await inSite(a, "Keep the site");
-    await inSite(b, "Reject the site");
+    await inSite(b, "Reject and find replacement");
     assert.equal(await evaluate(`${root}.querySelector('[data-key="site:${b}:status"]').value`), "rejected");
-    assert.match(await text(), /Add a reason for rejecting this site/);
-    await setVal(`site:${b}:reason`, "no access road");
-    assert.match(await text(), /Next-ranked alternatives/);
+    assert.match(await text(), /Eligible frozen alternatives/);
     const before = (await ids()).length;
     await evaluate(`[...${root}.querySelectorAll('.pp-alt-list button')][0].click()`);
     assert.equal((await ids()).length, before + 1, "the replacement joins the plan");
     assert.match(await text(), /Planner's decision: keep the site\./);
 
-    // 4 plan the work: approving with unresolved checks is allowed but flagged; phases, own numbers, unique reach, work schedule
+    // 4 plan the work: unresolved checks prevent approval; completing them reopens human review.
+    assert.equal(await evaluate(`${root}.querySelector('[data-key="site:${a}:status"] option[value="approved"]').disabled`),true);
+    for(const key of ["access","utilities","space_soil","maintenance","existing_trees"])await setVal(`site:${a}:check-${key}`,"ok");
+    await inSite(a,"Keep the site");
     await setVal(`site:${a}:status`, "approved");
-    assert.match(await text(), /Approved with checks not yet OK/);
+    assert.equal(await evaluate(`${root}.querySelector('[data-key="site:${a}:status"]').value`),"approved");
     await setVal(`site:${a}:phase`, "1");
     await setVal("set:treesPerSite", "3");
     await setVal("set:costPerTree", "10");
@@ -618,6 +639,18 @@ try {
     assert.match(await text(), /Recorded survival among inspected trees: 1 of 1 \(100%\)/);
     await clickText("Download tree register (CSV)");
     assert.match(await blobText(2), /T1,.*Shorea leprosula,2025-11-15/);
+    await clickText("Download evidence package (JSON)");
+    const evidence=JSON.parse(await blobText(3));
+    assert.equal(evidence.snapshot.selected_ids.length,5);
+    assert.equal(evidence.imports.length,1);
+    assert.ok(evidence.events.some(e=>e.type==="replacement"));
+    assert.equal(evidence.benchmark.random.draws,500);
+    assert.equal(evidence.benchmark.original.ids.length,5);
+    assert.equal(evidence.items.find(e=>e.id===b).replacement_id.length>0,true);
+    await evaluate(`document.querySelector('#decision-benchmark-heading').scrollIntoView({block:'start'})`);
+    await shot("pilot-decision-benchmark");
+    await clickText("Download decision benchmark (CSV)");
+    assert.match(await blobText(4),/random_distribution/);
 
     // remembered after a reload
     await send("Page.navigate", { url: "about:blank" });

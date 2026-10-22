@@ -1,3 +1,4 @@
+import { recordStatus, TEST_REVIEW } from "./plan-fixtures.mjs";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { FIELD_SHEET_COLUMNS, MAX_ENTRIES, NOTE_MAX, PLAN_CAVEAT, PLAN_COLUMNS, STORAGE_KEY, createPlan, fieldSheetRows, planRows, planTiles, safeCell, sanitise } from "../js/plan.js";
@@ -30,7 +31,7 @@ test("adding, changing, noting and removing a site", () => {
 test("the plan is remembered through the storage it was given", () => {
   const storage = fakeStorage();
   const a = createPlan(storage);
-  a.add("ELM-2"); a.setStatus("ELM-2", "approved"); a.setNote("ELM-2", "ok");
+  a.add("ELM-2"); recordStatus(a, "ELM-2", "approved"); a.setNote("ELM-2", "ok");
   const b = createPlan(storage);
   assert.deepEqual(b.list().map((x) => [x.id, x.status, x.note]), [["ELM-2", "approved", "ok"]]);
 });
@@ -66,7 +67,7 @@ test("the plan has a size limit and refuses invalid ids", () => {
 test("counts and tiles reflect the statuses", () => {
   const plan = createPlan(fakeStorage());
   for (const id of ["A", "B", "C", "D"]) plan.add(id);
-  plan.setStatus("A", "needs-inspection"); plan.setStatus("B", "needs-inspection"); plan.setStatus("C", "approved");
+  plan.setStatus("A", "needs-inspection"); plan.setStatus("B", "needs-inspection"); recordStatus(plan, "C", "approved");
   const c = plan.counts();
   assert.equal(c.total, 4); assert.equal(c.by["needs-inspection"], 2); assert.equal(c.by.approved, 1); assert.equal(c.by.proposed, 1);
   assert.deepEqual(planTiles(c).map((t) => t.value), ["4", "2", "1", "0"]);
@@ -76,7 +77,7 @@ test("listeners hear the source of each change", () => {
   const plan = createPlan(fakeStorage());
   const heard = [];
   const off = plan.subscribe((source) => heard.push(source));
-  plan.add("ELM-1", "card"); plan.setStatus("ELM-1", "approved", "panel"); plan.setStatus("ELM-1", "approved", "panel");
+  plan.add("ELM-1", "card"); plan.setStatus("ELM-1", "needs-inspection", "panel"); plan.setStatus("ELM-1", "needs-inspection", "panel");
   off(); plan.remove("ELM-1", "panel");
   assert.deepEqual(heard, ["card", "panel"], "no event for an unchanged value or after unsubscribing");
 });
@@ -90,7 +91,7 @@ test("the plan file has the current rank, place and a plain note, in plan order,
   assert.equal(rows[0].status, "Needs inspection");
   assert.match(String(rows[0].lat), /^3\.0001/);
   const csv = toCsv(rows, PLAN_COLUMNS);
-  assert.match(csv.split("\r\n")[0], /^site_id,status,note,reason,inspection_batch,planting_phase,team,field_feasibility,checks_not_ok,field_observation,suggested_intervention,chosen_intervention,intervention_reviewed_by,maintenance_readiness,planned_species,watering,maintenance_responsibility,establishment_inspections,survival_observation,current_rank,current_score,origin,lat,lon,source,about_this_file$/);
+  assert.match(csv.split("\r\n")[0], /^site_id,status,note,reason,inspection_batch,planting_phase,team,field_feasibility,checks_not_ok,field_observation,suggested_intervention,chosen_intervention,intervention_reviewed_by,maintenance_readiness,planned_species,watering,maintenance_responsibility,establishment_inspections,survival_observation,current_rank,current_score,origin,lat,lon,source,about_this_file,snapshot_id,data_version,original_rank,replaces_id,replacement_id,inspection_by,inspection_date,review_by,review_date,review_decision$/);
   assert.match(csv, /not inspected or verified/);
 });
 
@@ -108,7 +109,7 @@ test("a note that a spreadsheet would run as a formula is neutralised", () => {
 test("the field sheet lists only Needs inspection sites, by place only, in the columns the importer reads", () => {
   const plan = createPlan(fakeStorage());
   plan.add("ELM-1"); plan.add("ELM-2"); plan.add("ELM-3");
-  plan.setStatus("ELM-2", "needs-inspection"); plan.setStatus("ELM-3", "approved");
+  plan.setStatus("ELM-2", "needs-inspection"); recordStatus(plan, "ELM-3", "approved");
   const rows = fieldSheetRows(plan.list(), byId);
   assert.deepEqual(rows.map((r) => r.site_id), ["ELM-2"]);
   assert.deepEqual(Object.keys(rows[0]), FIELD_SHEET_COLUMNS);

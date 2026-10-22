@@ -309,7 +309,7 @@ async function boot() {
   // The planting plan: the planner's own shortlist, kept in this browser only (see plan.js)
   let storage = null;
   try { storage = window.localStorage; } catch { /* blocked storage: the plan still works for this visit */ }
-  const plan = createPlan(storage);
+  const plan = createPlan(storage,{dataVersion:()=>meta.data_version,today:()=>new Date().toLocaleDateString("en-CA",{timeZone:"Asia/Singapore"})});
   let planPanel = null;
 
   const syncHash = () => {
@@ -401,7 +401,7 @@ async function boot() {
     JSON.stringify(toGeoJson(currentRanked(), { scoreSource: meta.score_source, dataVersion: meta.data_version ?? null, plan, conflicts })), "application/geo+json");
   actions.brief = () => {
     const s = store.get();
-    renderBrief($("#print-brief"), currentRanked(), { ctx, steadyOf, meta, weights: s.weights, custom: !s.usingServer, planRows: planRows(plan.list(), byId, plan.trees()) });
+    renderBrief($("#print-brief"), currentRanked(), { ctx, steadyOf, meta, weights: s.weights, custom: !s.usingServer, planRows: planRows(plan.list(), byId, plan.trees(), plan.snapshot()) });
     window.print();
   };
   $("#coach-dismiss").addEventListener("click", () => { $("#coach").hidden = true; });
@@ -421,10 +421,11 @@ async function boot() {
   });
   plan.subscribe(() => markPlan(list, plan.ids()));
   const pilot = renderPilot($("#pilot-root"), {
+    meta:()=>meta,weights:()=>store.get().weights,
     exposure: createExposure(storage),
     conflicts: () => conflicts,
     plan, byId: () => byId, ranked: () => currentRanked(), onSelect: async (id) => { await showView("prioritise"); select(id, "list"); }, download,
-    reachSets: () => (reachSets?.stale === false ? reachSets : null), today: () => new Date().toISOString().slice(0, 10), backToMap: () => showView("prioritise"),
+    reachSets: () => (reachSets?.stale === false ? reachSets : null), today: () => new Date().toLocaleDateString("en-CA",{timeZone:"Asia/Singapore"}), backToMap: () => showView("prioritise"),
   });
 
   const start = parseHash(location.hash);              // a shared link: weights and site in the address

@@ -122,3 +122,7 @@ Set `CHROME_PATH` if the browser is somewhere unusual.
 - While ML scores are not merged, everything shows the labelled placeholder. The interface switches automatically when
   `score_source` becomes `ml`.
 - Site cells are 30 m, so they are small at the default zoom; a designed version may want a zoom-dependent marker size.
+
+## Evidence workflow modules
+
+`review.js` owns frozen snapshots and safe import previews; `review-ui.js` connects freeze, issued blind sheets, confirmation, attributed review and evidence export. `decision-benchmark.js` compares equal-size methods and seeded random distributions. `plan.js` retains v1/v2 records in v3 storage and enforces new evidence gates. See [validate-review-replan.md](validate-review-replan.md). For focused smoke debugging, set `SMOKE_MATCH` to a substring of a check name; unset it for the complete suite. Automated synthetic checks are not independent-human usability results.

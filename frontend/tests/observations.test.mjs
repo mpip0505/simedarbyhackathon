@@ -67,12 +67,12 @@ test("the comparison names what differs and never calls agreement a validation",
   assert.equal(compareObservation({ shade_on_path: "full", canopy_class: "dense" }, props).differences.length, 2);
 });
 
-test("with no footpath nearby, only the canopy claim is compared", () => {
+test("without a comparable footpath, agreement is insufficient but canopy contradictions remain visible", () => {
   const props = { path_length_within_50m: 0, path_canopy_frac_50m: null, canopy_pct_baseline: 5 };
-  assert.equal(compareObservation({ shade_on_path: "full", canopy_class: "none" }, props).outcome, "agree");
+  assert.equal(compareObservation({ shade_on_path: "full", canopy_class: "none" }, props).outcome, "insufficient");
   assert.equal(compareObservation({ shade_on_path: "full", canopy_class: "moderate" }, props).outcome, "disagree");
 });
 
 test("import counts", () => {
-  assert.deepEqual(summariseImport([{ outcome: "agree" }, { outcome: "disagree" }, { outcome: "agree" }]), { total: 3, agree: 2, disagree: 1 });
+  assert.deepEqual(summariseImport([{ outcome: "agree" }, { outcome: "disagree" }, { outcome: "agree" }]), { total: 3, agree: 2, disagree: 1, insufficient: 0 });
 });

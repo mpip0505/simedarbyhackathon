@@ -1,3 +1,4 @@
+import { recordStatus, TEST_REVIEW } from "./plan-fixtures.mjs";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { INTERVENTIONS, interventionCounts, interventionReview, suggestIntervention } from "../js/intervention.js";
@@ -94,7 +95,7 @@ test("readiness: six rows, unknowns stay unknown, soil comes from the field chec
 
 test("warnings: an unreviewed Protect or Regenerate, planting a Protect site, and planting with no maintainer are flagged", () => {
   const plan = createPlan(store());
-  plan.add("A"); plan.setIntervention("A", "protect"); plan.setStatus("A", "approved");
+  plan.add("A"); plan.setIntervention("A", "protect"); recordStatus(plan, "A", "approved");
   const w = warnings(plan.get("A"));
   assert.ok(w.some((x) => /name the ecologist/.test(x)));
   assert.ok(w.some((x) => /Protect existing vegetation/.test(x)));

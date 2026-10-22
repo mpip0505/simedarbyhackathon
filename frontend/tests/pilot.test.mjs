@@ -1,3 +1,4 @@
+import { recordStatus, TEST_REVIEW } from "./plan-fixtures.mjs";
 import { test } from "node:test";
 import assert from "node:assert/strict";
 import { SCHEDULE_COLUMNS, blocksOf, inspectionPlan, nextAction, plantingPlan, suggestAlternatives, unionReach, workSchedule } from "../js/pilot.js";
@@ -10,7 +11,7 @@ const none = { inspectionsPerDay: null, costPerInspection: null, treesPerSite: n
 function planWith(specs) {
   const plan = createPlan(store());
   for (const [id, status, extra = {}] of specs) {
-    plan.add(id); plan.setStatus(id, status);
+    plan.add(id); recordStatus(plan, id, status);
     if (extra.batch) plan.setBatch(id, extra.batch);
     if (extra.phase) plan.setPhase(id, extra.phase);
   }
@@ -76,7 +77,7 @@ test("the work schedule gives one row per site, with a next action for each stat
 // ---------------- trees: schedule and survival ----------------
 function trees(specs) {
   const plan = createPlan(store());
-  plan.add("S"); plan.setStatus("S", "planted");
+  plan.add("S"); recordStatus(plan, "S", "planted");
   for (const [species, planted, next, obs = []] of specs) {
     const id = plan.addTree({ site_id: "S", species, planted_on: planted, next_inspection: next });
     for (const [date, condition] of obs) plan.addObservation(id, { date, condition });

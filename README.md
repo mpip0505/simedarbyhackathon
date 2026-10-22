@@ -270,3 +270,7 @@ they are exercised by `python -m backend.build_cache` with your login.
 Map data (c) OpenStreetMap contributors (ODbL). Contains modified Copernicus Sentinel-2 data (European Space Agency).
 Landsat 8/9 Collection 2 Level-2 data courtesy of the U.S. Geological Survey. ESA WorldCover and Google Dynamic World
 used for the cross-check. Processed with Google Earth Engine (noncommercial use).
+
+## Validate, review and replan
+
+Pilot plan now freezes original ranks/weights/data, exports attributable blind sheets, previews imports, gates statuses on inspection and human review, tracks replacements and compares equal-size baselines including seeded random selections. Workflow, CSV compatibility and evidence limits: [docs/validate-review-replan.md](docs/validate-review-replan.md). Your intervention, maintenance-readiness and best-coverage features remain available. No real field or independent-user results are claimed.

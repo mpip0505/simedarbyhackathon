@@ -17,9 +17,9 @@ Open the app in a private window (so the planting plan starts empty), screen 144
 | 1 | "You have a limited number of trees to plant this season. Find the site the tool ranks first and tell me why it ranks there." | says the one-sentence reason (heat, shade or corridor gap) in their own words | 3 min |
 | 2 | "Change what matters most so heat counts for everything. Did the top of the list change? How do you know?" | moves the sliders and reads the note about how many of the top 10 changed | 3 min |
 | 3 | "Choose five sites to look at first and put them on a shortlist." | five sites in the Pilot plan | 4 min |
-| 4 | "Pick two of them to inspect on the ground and get a sheet you can hand to someone." | two sites marked Needs inspection and a field sheet downloaded | 4 min |
-| 5 | "Someone walked those two sites and filled the sheet in (the facilitator takes the sheet they downloaded in task 4, types in made-up answers for the two sites, writes SYNTHETIC in the notes column, and hands the file back; `docs/field-check/example_completed_synthetic.csv` shows the format). Bring the answers back and tell me what you learn." | imports the file and states which agree or differ | 5 min |
-| 6 | "One site does not look right. Reject it and find a replacement." | status Rejected, a reason entered, a next-ranked alternative added | 4 min |
+| 4 | "Pick two of them to inspect on the ground and get a sheet you can hand to someone." | original shortlist frozen, two sites marked Needs inspection and a versioned field sheet downloaded | 4 min |
+| 5 | "Someone walked those two sites and filled the sheet in (the facilitator takes the sheet they downloaded in task 4, types in made-up answers for the two sites, writes SYNTHETIC in the notes column, and hands the file back; `docs/field-check/example_completed_synthetic.csv` shows the format). Bring the answers back and tell me what you learn." | previews the file without changing observations, confirms import, and explains agree, disagree or insufficient evidence | 5 min |
+| 6 | "One site does not look right. Reject it and find a replacement." | named, dated rejection review with a reason; linked eligible replacement added as Needs inspection | 4 min |
 | 7 | "Which sites can you say are safe to plant?" | answers that none is confirmed, because the checks are Not checked or only the planner's entries | 2 min |
 
 ## What to record
@@ -39,3 +39,7 @@ Completion rate per task, median time per task, total errors, and the three most
 |---|---|---|---|---|---|---|---|---|
 | P1 | | | | | | | | |
 | P2 | | | | | | | | |
+
+## Additional reproducibility tasks
+
+After task 6, ask the participant to compare the original and revised reach, explain why equal-size method rows differ from reference rows, and download the evidence package. Record success, time and confusion separately. Ask them to distinguish a mapped trigger, an observation disagreement and a confirmed field issue. Use [usability-session-log.csv](usability-session-log.csv) for raw task records. The file intentionally contains headers only: no sessions have been run. Keep synthetic demonstration sheets clearly labelled and preserve their issued metadata.

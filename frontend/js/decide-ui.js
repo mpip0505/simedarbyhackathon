@@ -66,7 +66,7 @@ export function createOptimizerPanel(ctx) {
     const reach = ctx.reachSets();
     const ranked = ctx.ranked();
     const byId = ctx.byId();
-    const rejected = new Set(ctx.plan.list().filter((e) => e.status === "rejected").map((e) => e.id));
+    const rejected = new Set([...(ctx.plan.excluded?.()??[]),...ctx.plan.list().filter((e) => e.status === "rejected" || Object.values(e.checks??{}).includes("issue")).map((e) => e.id)]);
     const controls = el("div", { class: "pp-grid" },
       el("label", { class: "pp-field" }, el("span", {}, "Sites you can inspect this round"),
         el("select", { class: "select", "data-key": "opt:k", onchange: (e) => { state.k = Number(e.target.value); draw(); } }, CAPACITIES.map((k) => el("option", { value: String(k), selected: k === state.k ? "" : null }, String(k))))),

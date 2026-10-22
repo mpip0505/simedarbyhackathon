@@ -3,12 +3,12 @@
 import { el, clear } from "./dom.js";
 import { renderStrip } from "./strip.js";
 import { toCsv } from "./csv.js";
-import { FIELD_SHEET_COLUMNS, NOTE_MAX, PLAN_CAVEAT, PLAN_COLUMNS, STATUSES, feasibility, fieldSheetRows, planRows, planTiles } from "./plan.js";
+import { FIELD_SHEET_COLUMNS, NOTE_MAX, PLAN_CAVEAT, PLAN_COLUMNS, STATUSES, feasibility, fieldSheetRows, planRows, planTiles, transitionProblem } from "./plan.js";
 
-const statusSelect = (value, label, onChange) => {
-  const select = el("select", { class: "select", "aria-label": label, onchange: (e) => onChange(e.target.value) },
-    STATUSES.map((s) => el("option", { value: s.key }, s.label)));
-  select.value = value;
+const statusSelect = (entry, label, onChange) => {
+  const select = el("select", { class: "select", "aria-label": label, onchange: (e) => { if(onChange(e.target.value)===false)select.value=entry.status; } },
+    STATUSES.map((s) => el("option", { value: s.key, disabled:Boolean(transitionProblem(entry,s.key)), title:transitionProblem(entry,s.key) }, s.label)));
+  select.value = entry.status;
   return select;
 };
 
@@ -25,7 +25,7 @@ export function planControls(plan, siteId) {
       return;
     }
     const entry = plan.get(siteId);
-    const status = statusSelect(entry.status, `Status of ${siteId}`, (v) => plan.setStatus(siteId, v, "card"));
+    const status = statusSelect(entry, `Status of ${siteId}`, (v) => plan.setStatus(siteId, v, "card"));
     const note = el("input", { type: "text", class: "input", maxlength: String(NOTE_MAX), value: entry.note, placeholder: "Note, for example: check access", "aria-label": `Note for ${siteId}`,
       onchange: (e) => plan.setNote(siteId, e.target.value, "card") });
     const remove = el("button", { type: "button", class: "btn btn-ghost btn-sm", onclick: () => { plan.remove(siteId, "card"); draw("add"); } }, "Remove from plan");
@@ -62,7 +62,7 @@ export function renderPlanPanel(card, plan, { byId, onSelect, topIds, download, 
         return el("tr", {},
           el("th", { scope: "row" }, f ? el("button", { type: "button", class: "link-button", onclick: () => onSelect(e.id) }, e.id) : e.id),
           el("td", { class: "num" }, f ? `#${f.properties.rank}` : "not in data"),
-          el("td", {}, statusSelect(e.status, `Status of ${e.id}`, (v) => plan.setStatus(e.id, v, "panel"))),
+          el("td", {}, statusSelect(e, `Status of ${e.id}`, (v) => plan.setStatus(e.id, v, "panel"))),
           el("td", {}, el("input", { type: "text", class: "input", maxlength: String(NOTE_MAX), value: e.note, "aria-label": `Note for ${e.id}`, onchange: (ev) => plan.setNote(e.id, ev.target.value, "panel") })),
           el("td", {}, el("button", { type: "button", class: "btn btn-ghost btn-sm", "aria-label": `Remove ${e.id} from the plan`, onclick: () => plan.remove(e.id, "panel-rows") }, "Remove")));
       })))));
@@ -76,7 +76,7 @@ export function renderPlanPanel(card, plan, { byId, onSelect, topIds, download, 
     say.textContent = added ? `Added ${added} site${added === 1 ? "" : "s"} as Proposed.` : "Those sites are already in the plan.";
   } }, "Add the first five in the list");
   const dlPlan = el("button", { type: "button", class: "btn btn-secondary btn-sm", onclick: () => {
-    const rows = planRows(plan.list(), byId(), plan.trees());
+    const rows = planRows(plan.list(), byId(), plan.trees(), plan.snapshot());
     if (!rows.length) { say.textContent = "The plan is empty."; return; }
     download("elmina-planting-plan.csv", toCsv(rows, PLAN_COLUMNS));
   } }, "Download plan (CSV)");

@@ -7,16 +7,16 @@ import { el, clear, append } from "./dom.js";
 import { toCsv, centroid } from "./csv.js";
 import { renderStrip } from "./strip.js";
 import {
-  CHECKS, CHECK_VALUES, CONDITIONS, FIELD_SHEET_COLUMNS, NOTE_MAX, PHASES, PLAN_CAVEAT, PLAN_COLUMNS, STATUSES, feasibility, fieldSheetRows, planRows, warnings,
+  CHECKS, CHECK_VALUES, CONDITIONS, NOTE_MAX, PHASES, PLAN_CAVEAT, PLAN_COLUMNS, STATUSES, feasibility, planRows, warnings, transitionProblem,
 } from "./plan.js";
-import { compareObservation, readFieldSheet, summariseImport } from "./observations.js";
-import { SCHEDULE_COLUMNS, STEP_NAMES, blocksOf, inspectionPlan, nextStep, plantingPlan, suggestAlternatives, unionReach, workSchedule } from "./pilot.js";
+import { SCHEDULE_COLUMNS, STEP_NAMES, blocksOf, inspectionPlan, nextStep, plantingPlan, unionReach, workSchedule } from "./pilot.js";
 import { STATE_LABEL, TREE_COLUMNS, maintenanceSchedule, survivalReport, treeRows } from "./trees.js";
 import { exposurePanel } from "./exposure-ui.js";
 import { conflictFor, conflictRows } from "./screening.js";
 import { conflictBlock } from "./screening-ui.js";
 import { appPageUrl } from "./api.js";
 import { createOptimizerPanel, interventionPlanBlock, readinessBlock } from "./decide-ui.js";
+import { createReviewUI } from "./review-ui.js";
 
 const LEAD = "Turn a shortlist into a work package: check the ground, inspect, decide, plan the work, then record what was planted. Everything here is your own record, saved on this device only. Nothing is inspected, approved or planted by this tool.";
 
@@ -25,7 +25,7 @@ const keepOpen = new Set();                       // <details> that were open, b
 
 function field(label, control) { return el("label", { class: "pp-field" }, el("span", {}, label), control); }
 function select(options, value, key, label, onChange) {
-  const s = el("select", { class: "select", "data-key": key, "aria-label": label, onchange: (e) => onChange(e.target.value) }, options.map((o) => el("option", { value: o.key }, o.label)));
+  const s = el("select", { class: "select", "data-key": key, "aria-label": label, onchange: (e) => onChange(e.target.value) }, options.map((o) => el("option", { value: o.key, disabled:o.disabled, title:o.title }, o.label)));
   s.value = value;
   return s;
 }
@@ -39,7 +39,6 @@ const numInput = (value, key, label, onChange, placeholder = "") => input(value 
 /** Fill the workspace. ctx: { plan, byId(), ranked(), onSelect(id), download(name, text, type), reachSets(), today(), backToMap() }. Returns { redraw() }. */
 export function renderPilot(root, ctx) {
   const { plan } = ctx;
-  let importNote = null;                           // what the last import said, kept across redraws
   const optimizer = createOptimizerPanel({
     plan, ranked: ctx.ranked, byId: ctx.byId, reachSets: ctx.reachSets,
     onAdd: (ids) => {
@@ -53,12 +52,14 @@ export function renderPilot(root, ctx) {
       return added;
     },
   });
+  const reviewUI = createReviewUI(plan,ctx,redraw);
 
   function redraw() {
     const active = document.activeElement?.dataset?.key;
     const scroll = root.closest("#main")?.scrollTop ?? 0;
     for (const d of root.querySelectorAll("details[data-key]")) { if (d.open) keepOpen.add(d.dataset.key); else keepOpen.delete(d.dataset.key); }
     draw();
+    for(const d of root.querySelectorAll("details[data-key]")) if(keepOpen.has(d.dataset.key))d.open=true;
     if (active) root.querySelector(`[data-key="${CSS.escape(active)}"]`)?.focus({ preventScroll: true });
     const main = root.closest("#main");
     if (main) main.scrollTop = scroll;
@@ -75,10 +76,12 @@ export function renderPilot(root, ctx) {
       el("div", { class: "page-head" }, el("div", { class: "page-title" }, el("h1", {}, "Pilot plan"), el("p", {}, LEAD)),
         el("ul", { class: "chips", "aria-label": "About the pilot plan" }, el("li", { class: "chip chip-warn" }, "Your entries, not verified"), el("li", { class: "chip chip-quiet" }, "Saved on this device only"))),
       guide(step),
+      reviewUI.snapshotPanel(),
       el("p", { class: "small-note" }, el("a", { href: appPageUrl("open-data.html") }, "Open the OSM-only fallback"), ": a separate screening list that runs without Earth Engine, using mapped open land, paths and parks."),
       sectionShortlist(entries, byId),
       sectionInspect(entries, byId, settings),
       sectionWork(entries, byId, settings),
+      reviewUI.benchmarkPanel(),
       sectionTrees(entries, trees, byId),
       el("p", { class: "caption pp-caption" }, PLAN_CAVEAT));
   }
@@ -117,9 +120,10 @@ export function renderPilot(root, ctx) {
       el("div", { class: "pp-site-head" },
         el("button", { type: "button", class: "link-button pp-id", onclick: () => ctx.onSelect(e.id) }, e.id),
         el("span", { class: "pp-prio" }, f ? `Priority: rank #${f.properties.rank}, score ${f.properties.score_total.toFixed(1)}` : "Priority: not in the current data"),
+        plan.snapshot()?el("span",{class:"pp-prio"},`Original rank: #${plan.snapshot().candidates.find(f=>f.properties.site_id===e.id)?.properties.rank??"not frozen"}${e.replaces_id?`; replaces ${e.replaces_id}`:""}`):null,
         el("span", { class: `chip pp-feas pp-feas-${fe.state}` }, `Field feasibility: ${fe.label}`)),
       el("div", { class: "pp-grid" },
-        field("Status", select(STATUSES, e.status, key("status"), `Status of ${e.id}`, (v) => plan.setStatus(e.id, v, "pilot"))),
+        field("Status", select(STATUSES.map(s=>({...s,disabled:Boolean(transitionProblem(e,s.key)),title:transitionProblem(e,s.key)})), e.status, key("status"), `Status of ${e.id}`, (v) => {if(!plan.setStatus(e.id,v,"pilot"))reviewUI.say(plan.problem());})),
         field("Inspection batch", input(e.batch, key("batch"), `Inspection batch of ${e.id}`, (v) => plan.setBatch(e.id, v, "pilot"), { max: 24, placeholder: "for example Week 1" })),
         field("Planting phase", select([{ key: "", label: "Not set" }, ...PHASES.map((p) => ({ key: p, label: `Phase ${p}` }))], e.phase, key("phase"), `Planting phase of ${e.id}`, (v) => plan.setPhase(e.id, v, "pilot"))),
         field("Responsible team", input(e.team, key("team"), `Responsible team for ${e.id}`, (v) => plan.setTeam(e.id, v, "pilot"), { max: 40, placeholder: "optional" })),
@@ -130,8 +134,9 @@ export function renderPilot(root, ctx) {
       conflictBlock(conflictFor(ctx.conflicts?.(), e.id)),
       showReason ? field(e.status === "rejected" ? "Reason for rejecting" : "What the problem is", input(e.reason, key("reason"), `Reason for ${e.id}`, (v) => plan.setReason(e.id, v, "pilot"), { max: NOTE_MAX, placeholder: "for example: no access road" })) : null,
       observationBlock(e, f),
+      reviewUI.reviewForm(e),
       warns.length ? el("ul", { class: "pp-warn" }, warns.map((w) => el("li", {}, w))) : null,
-      e.status === "rejected" ? alternativesBlock(e) : null,
+      e.status === "rejected" ? reviewUI.replacements(e) : null,
       el("div", { class: "pp-site-foot" }, el("button", { type: "button", class: "btn btn-ghost btn-sm", "data-key": key("remove"), "aria-label": `Remove ${e.id} from the plan`, onclick: () => plan.remove(e.id, "pilot") }, "Remove from plan")));
   }
 
@@ -150,24 +155,13 @@ export function renderPilot(root, ctx) {
     const o = e.observed;
     const agree = o.outcome === "agree";
     return el("div", { class: `pp-obs ${agree ? "pp-obs-agree" : "pp-obs-differ"}` },
-      el("p", {}, el("strong", {}, agree ? "Field observation agrees with the model" : "Field observation differs from the model"),
+      el("p", {}, el("strong", {}, agree ? "Field observation agrees with the frozen model proxies" : o.outcome==="insufficient"?"Insufficient evidence for comparison":"Field observation differs from the frozen model proxies"),
         ` (${o.date || "no date"}${o.observer ? `, ${o.observer}` : ""}${o.imported_on ? `, imported ${o.imported_on}` : ""})`),
       el("p", { class: "small-note" }, `Seen: shade on the path ${o.shade_on_path}, tree cover ${o.canopy_class}, path in use ${o.path_in_use}.${o.photo_id ? ` Photo ${o.photo_id}.` : ""}${o.notes ? ` Note: ${o.notes}` : ""}`),
       o.differences.length ? el("ul", { class: "small-note" }, o.differences.map((d) => el("li", {}, d))) : null,
       el("p", { class: "small-note" }, f ? "The model's side comes from satellite proxies, so this is one visit's comparison, not validation." : ""),
-      e.reviewed ? el("p", { class: "small-note" }, `Planner's decision: ${e.reviewed === "kept" ? "keep the site" : "site rejected"}.`)
-        : el("div", { class: "plan-actions" },
-          el("button", { type: "button", class: "btn btn-secondary btn-sm", onclick: () => plan.setReviewed(e.id, "kept", "pilot") }, "Keep the site"),
-          el("button", { type: "button", class: "btn btn-secondary btn-sm", onclick: () => plan.setReviewed(e.id, "rejected", "pilot") }, "Reject the site")));
-  }
-
-  function alternativesBlock(e) {
-    const alts = suggestAlternatives(e.id, ctx.ranked(), plan.ids(), 3);
-    return el("div", { class: "pp-alts" }, el("p", { class: "small-note" }, el("strong", {}, "Next-ranked alternatives "), "(nearby sites first; not yet in your plan):"),
-      alts.length ? el("ul", { class: "pp-alt-list" }, alts.map((a) => el("li", {},
-        `${a.id}: rank #${a.rank}, score ${a.score.toFixed(1)}${a.sameBlock ? ", same 250 m area" : ""} `,
-        el("button", { type: "button", class: "btn btn-secondary btn-sm", "aria-label": `Add ${a.id} to the plan`, onclick: () => { plan.add(a.id, "pilot"); plan.setStatus(a.id, "needs-inspection", "pilot"); } }, "Add and mark Needs inspection"))))
-        : el("p", { class: "small-note" }, "Every ranked site is already in the plan."));
+      o.provenance?el("p",{class:"small-note"},`Source ${o.provenance.filename}; ${o.provenance.trust}; data ${o.provenance.data_version}; original rank #${o.original_rank??"unknown"}.`):el("p",{class:"small-note"},"Legacy observation: source provenance is missing."),
+      e.reviewed ? el("p", { class: "small-note" }, `Planner's decision: ${e.reviewed === "kept" ? "keep the site" : "site rejected"}.`) : null);
   }
 
   // ---------- 2. inspect ----------
@@ -180,16 +174,6 @@ export function renderPilot(root, ctx) {
       { label: "Rejected", value: String(ip.rejected), unit: "", note: "need a replacement or none" },
       { label: "Days of inspection", value: ip.days === null ? "Not set" : String(ip.days), unit: ip.days === null ? "" : "days", note: ip.days === null ? "enter inspections per day" : "from your own capacity" },
     ]);
-    const status = el("p", { class: "plan-say", role: "status" });
-    if (importNote) status.append(...importNote);
-    const fileInput = el("input", { type: "file", accept: ".csv,text/csv", class: "sr-only", id: "pilot-import-file", tabindex: "-1", onchange: async (e) => {
-      const file = e.target.files?.[0];
-      e.target.value = "";
-      if (!file) return;
-      let text;
-      try { text = await file.text(); } catch { importNote = [document.createTextNode("The file could not be read.")]; redraw(); return; }
-      importFile(text);
-    } });
     return section("2", "Inspect: send a field sheet out, bring the answers back", [
       tiles,
       el("div", { class: "pp-two" },
@@ -204,48 +188,11 @@ export function renderPilot(root, ctx) {
           ip.batches.length ? el("table", { class: "plan-table" },
             el("thead", {}, el("tr", {}, ["Batch", "Sites", "Days", ""].map((h, i) => el("th", { scope: "col", class: i === 1 || i === 2 ? "num" : null }, h)))),
             el("tbody", {}, ip.batches.map((b) => el("tr", {}, el("th", { scope: "row" }, b.name), el("td", { class: "num" }, String(b.count)), el("td", { class: "num" }, b.days === null ? "Not set" : String(b.days)),
-              el("td", {}, el("button", { type: "button", class: "btn btn-secondary btn-sm", "aria-label": `Download the field sheet for ${b.name}`, onclick: () => downloadSheet(b.name === "No batch yet" ? "" : b.name) }, "Field sheet")))))) : el("p", { class: "plan-empty" }, "No sites are marked Needs inspection yet."))),
-      el("div", { class: "plan-actions" },
-        el("button", { type: "button", class: "btn btn-secondary btn-sm", onclick: () => downloadSheet(null) }, "Download field sheet (all)"),
-        el("label", { class: "btn btn-primary btn-sm", for: "pilot-import-file" }, "Import completed field sheet"), fileInput),
-      status,
-      el("p", { class: "small-note" }, "The field sheet shows place only, never a rank or score. After the walk, import the completed CSV here: each row is checked (known site, in your plan, allowed answers, valid date) and a bad file is refused whole. Blank answers are left out, not guessed."),
+              el("td", {}, el("button", { type: "button", class: "btn btn-secondary btn-sm", "aria-label": `Download the field sheet for ${b.name}`, onclick: () => reviewUI.downloadSheet(b.name === "No batch yet" ? "" : b.name) }, "Field sheet")))))) : el("p", { class: "plan-empty" }, "No sites are marked Needs inspection yet."))),
+      el("div", { class: "plan-actions" }, el("button", { type: "button", class: "btn btn-secondary btn-sm", onclick: () => reviewUI.downloadSheet(null) }, "Download field sheet (all)")),
+      reviewUI.importControls(),
+      el("p", { class: "small-note" }, "New sheets include snapshot, data and sheet identifiers, but no ranks or scores. Preview the imported rows before confirmation. Incomplete answers remain unknown; malformed or mismatched files are refused whole."),
     ]);
-  }
-
-  function downloadSheet(batch) {
-    const rows = fieldSheetRows(plan.list(), ctx.byId(), batch);
-    if (!rows.length) { importNote = [document.createTextNode("No site is marked Needs inspection" + (batch ? ` in batch ${batch}` : batch === "" ? " without a batch" : "") + ".")]; redraw(); return; }
-    ctx.download(batch ? `elmina-field-sheet-${batch.replace(/[^A-Za-z0-9_-]+/g, "-")}.csv` : "elmina-field-sheet.csv", toCsv(rows, FIELD_SHEET_COLUMNS.map((c) => ({ key: c, label: c }))));
-    importNote = [document.createTextNode(`Field sheet made for ${rows.length} site${rows.length === 1 ? "" : "s"}: place only, no rank or score.`)];
-    redraw();
-  }
-
-  function importFile(text) {
-    const byId = ctx.byId();
-    const result = readFieldSheet(text, { knownIds: new Set(byId.keys()), planIds: plan.ids() });
-    const note = [];
-    if (!result.ok) {
-      note.push(document.createTextNode("This file was not imported. Nothing in your plan changed."),
-        el("ul", { class: "pp-problems" }, (result.problems.length ? result.problems : ["No row had all three answers."]).map((p) => el("li", {}, p))));
-      if (result.insufficient.length) note.push(el("p", {}, `${result.insufficient.length} row${result.insufficient.length === 1 ? "" : "s"} had blank answers: ${result.insufficient.map((x) => x.site_id).join(", ")}.`));
-      importNote = note;
-      redraw();
-      return;
-    }
-    const today = ctx.today();
-    const outcomes = [];
-    for (const entry of result.entries) {
-      const cmp = compareObservation(entry, byId.get(entry.site_id).properties);
-      plan.setObserved(entry.site_id, { ...entry, outcome: cmp.outcome, differences: cmp.differences, imported_on: today }, "pilot");
-      outcomes.push(cmp);
-    }
-    const s = summariseImport(outcomes);
-    note.push(document.createTextNode(`Imported ${s.total} observation${s.total === 1 ? "" : "s"}: ${s.agree} agree with the model, ${s.disagree} differ. Review each in step 1 and keep or reject the site.`));
-    if (result.insufficient.length) note.push(el("p", {}, `Left out because an answer was blank (still Needs inspection): ${result.insufficient.map((x) => x.site_id).join(", ")}.`));
-    if (result.ignored) note.push(el("p", {}, `${result.ignored} row${result.ignored === 1 ? "" : "s"} without a site id ignored.`));
-    importNote = note;
-    redraw();
   }
 
   // ---------- 4. plan the work ----------
@@ -286,7 +233,7 @@ export function renderPilot(root, ctx) {
           if (rows.length) ctx.download("elmina-plan-conflicts.csv", toCsv(rows, Object.keys(rows[0]).map((key) => ({ key, label: key }))));
         } }, "Download mapped conflicts (CSV)"),
         el("button", { type: "button", class: "btn btn-secondary btn-sm", onclick: () => entries.length ? ctx.download("elmina-work-schedule.csv", toCsv(workSchedule(entries), SCHEDULE_COLUMNS)) : null }, "Download work schedule (CSV)"),
-        el("button", { type: "button", class: "btn btn-secondary btn-sm", onclick: () => entries.length ? ctx.download("elmina-planting-plan.csv", toCsv(planRows(entries, byId, plan.trees()), PLAN_COLUMNS)) : null }, "Download plan (CSV)")),
+        el("button", { type: "button", class: "btn btn-secondary btn-sm", onclick: () => entries.length ? ctx.download("elmina-planting-plan.csv", toCsv(planRows(entries, byId, plan.trees(), plan.snapshot()), PLAN_COLUMNS)) : null }, "Download plan (CSV)")),
     ]);
   }
 

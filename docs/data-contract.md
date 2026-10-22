@@ -79,3 +79,7 @@ While ML is not delivered, the API fills a simple stand-in (`placeholder`) from 
 
 ## Caveats (also served at `/meta` and `/summary`)
 See `CAVEATS` in `backend/config.py`. Show them in the UI.
+
+## Local field evidence v3
+
+The browser freezes original ranking inputs and appends `data_version,snapshot_id,sheet_id` to the existing ten blind-sheet columns. Completed CSV imports are previewed and confirmed locally; comparison outcomes are agree, disagree or insufficient. Legacy sheets require explicit unverified preview. No field records are posted to the API. Plan CSV preserves prior columns and appends original rank, provenance and review/replacement attribution. Full contract and limits: [validate-review-replan.md](validate-review-replan.md).

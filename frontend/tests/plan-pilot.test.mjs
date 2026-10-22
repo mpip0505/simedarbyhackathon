@@ -1,3 +1,4 @@
+import { recordStatus, TEST_REVIEW } from "./plan-fixtures.mjs";
 // The extended planting plan: field-feasibility checks, batches and phases, imported observations, tree records, settings.
 import { test } from "node:test";
 import assert from "node:assert/strict";
@@ -43,21 +44,14 @@ test("unknown check names and values are refused", () => {
   assert.deepEqual(CHECK_VALUES.map((c) => c.key), ["unknown", "ok", "issue"]);
 });
 
-test("warnings flag approval with unresolved checks, a rejection without a reason, and an unreviewed disagreement", () => {
-  const plan = createPlan(fakeStorage());
-  plan.add("ELM-1"); plan.setStatus("ELM-1", "approved");
-  assert.match(warnings(plan.get("ELM-1"))[0], /Approved with checks not yet OK/);
-  plan.setCheck("ELM-1", "access", "issue");
-  assert.match(warnings(plan.get("ELM-1"))[0], /although a check found a problem/);
-  plan.add("ELM-2"); plan.setStatus("ELM-2", "rejected");
-  assert.match(warnings(plan.get("ELM-2"))[0], /Add a reason/);
-  plan.setReason("ELM-2", "no access road");
-  assert.deepEqual(warnings(plan.get("ELM-2")), []);
-  plan.add("ELM-3");
-  plan.setObserved("ELM-3", { shade_on_path: "full", canopy_class: "dense", path_in_use: "yes", outcome: "disagree", differences: ["x"] });
-  assert.match(warnings(plan.get("ELM-3"))[0], /disagrees with the model/);
-  plan.setReviewed("ELM-3", "kept");
-  assert.deepEqual(warnings(plan.get("ELM-3")), []);
+test("legacy statuses still show missing-evidence warnings, while new unsupported approvals are refused", () => {
+  const plan=createPlan(fakeStorage());plan.add("ELM-1");
+  assert.equal(plan.setStatus("ELM-1","approved"),false);
+  const old={...plan.get("ELM-1"),status:"approved"};
+  assert.match(warnings(old)[0],/Approved with checks not yet OK/);
+  old.checks.access="issue";assert.match(warnings(old)[0],/although a check found a problem/);
+  assert.match(warnings({...old,status:"rejected",reason:""})[0],/Add a reason/);
+  assert.ok(warnings(old).some(x=>/Legacy status/.test(x)));
 });
 
 test("batch, phase and team are kept, trimmed and limited", () => {
@@ -71,15 +65,15 @@ test("batch, phase and team are kept, trimmed and limited", () => {
   assert.equal(plan.get("ELM-1").batch.length, 24);
 });
 
-test("an imported observation moves a site to Inspected, and rejecting after review rejects it", () => {
+test("an unverified observation preserves inspection status, and an attributed review can reject it", () => {
   const plan = createPlan(fakeStorage());
   plan.add("ELM-1"); plan.setStatus("ELM-1", "needs-inspection");
-  plan.setObserved("ELM-1", { shade_on_path: "none", canopy_class: "sparse", path_in_use: "yes", outcome: "agree", differences: [], date: "2026-10-24" });
-  assert.equal(plan.get("ELM-1").status, "inspected");
-  assert.equal(plan.get("ELM-1").observed.outcome, "agree");
+  plan.setObserved("ELM-1", { shade_on_path: "none", canopy_class: "sparse", path_in_use: "yes", outcome: "agree", differences: [], date: "2026-10-22" });
+  assert.equal(plan.get("ELM-1").status, "needs-inspection");
+  assert.equal(plan.get("ELM-1").observed.outcome, "insufficient", "legacy observations have no issued-sheet provenance");
   plan.setObserved("ELM-1", { shade_on_path: "bogus", canopy_class: "sparse", path_in_use: "yes", outcome: "agree" });
   assert.equal(plan.get("ELM-1").observed.shade_on_path, "none", "an invalid observation is refused");
-  plan.setReviewed("ELM-1", "rejected");
+  plan.setReviewed("ELM-1", "rejected", "test", TEST_REVIEW);
   assert.equal(plan.get("ELM-1").status, "rejected");
 });
 
@@ -97,7 +91,7 @@ test("tree records need a site recorded as Planted, a species and a valid planti
   const plan = createPlan(fakeStorage());
   plan.add("ELM-1");
   assert.equal(plan.addTree({ site_id: "ELM-1", species: "Shorea", planted_on: "2026-11-01" }), null, "not Planted yet");
-  plan.setStatus("ELM-1", "planted");
+  recordStatus(plan, "ELM-1", "planted");
   assert.equal(plan.addTree({ site_id: "ELM-1", species: "", planted_on: "2026-11-01" }), null, "no species");
   assert.equal(plan.addTree({ site_id: "ELM-1", species: "Shorea", planted_on: "2026-02-31" }), null, "an impossible date");
   const id = plan.addTree({ site_id: "ELM-1", species: "Shorea", planted_on: "2026-11-01", owner: "Contractor", lat: 3.17, lon: 101.5 });
@@ -108,7 +102,7 @@ test("tree records need a site recorded as Planted, a species and a valid planti
 
 test("tree observations are dated, sorted, validated and limited", () => {
   const plan = createPlan(fakeStorage());
-  plan.add("ELM-1"); plan.setStatus("ELM-1", "planted");
+  plan.add("ELM-1"); recordStatus(plan, "ELM-1", "planted");
   const id = plan.addTree({ site_id: "ELM-1", species: "Shorea", planted_on: "2026-11-01" });
   assert.equal(plan.addObservation(id, { date: "2027-05-01", condition: "alive-good" }), true);
   assert.equal(plan.addObservation(id, { date: "2027-02-01", condition: "dead", note: "gone" }), true);
@@ -121,7 +115,7 @@ test("tree observations are dated, sorted, validated and limited", () => {
 test("tree records and settings survive a reload of the same storage", () => {
   const storage = fakeStorage();
   const a = createPlan(storage);
-  a.add("ELM-1"); a.setStatus("ELM-1", "planted");
+  a.add("ELM-1"); recordStatus(a, "ELM-1", "planted");
   const id = a.addTree({ site_id: "ELM-1", species: "Shorea", planted_on: "2026-11-01" });
   a.addObservation(id, { date: "2027-05-01", condition: "alive-good" });
   a.setSetting("inspectionsPerDay", "6");
