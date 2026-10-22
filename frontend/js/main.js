@@ -401,7 +401,7 @@ async function boot() {
     JSON.stringify(toGeoJson(currentRanked(), { scoreSource: meta.score_source, dataVersion: meta.data_version ?? null, plan, conflicts })), "application/geo+json");
   actions.brief = () => {
     const s = store.get();
-    renderBrief($("#print-brief"), currentRanked(), { ctx, steadyOf, meta, weights: s.weights, custom: !s.usingServer, planRows: planRows(plan.list(), byId) });
+    renderBrief($("#print-brief"), currentRanked(), { ctx, steadyOf, meta, weights: s.weights, custom: !s.usingServer, planRows: planRows(plan.list(), byId, plan.trees()) });
     window.print();
   };
   $("#coach-dismiss").addEventListener("click", () => { $("#coach").hidden = true; });

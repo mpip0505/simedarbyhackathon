@@ -3,6 +3,7 @@
 // this browser only. Nothing here inspects, verifies, approves or plants anything, and nothing is sent anywhere. An unknown stays unknown.
 // Pure logic plus a small store over an injected storage (localStorage in the app, a fake in tests). No DOM.
 import { centroid } from "./csv.js";
+import { INTERVENTION_LABEL, suggestIntervention } from "./intervention.js";
 
 export const STATUSES = [
   { key: "proposed", label: "Proposed" },
@@ -47,11 +48,19 @@ export const PLAN_COLUMNS = [
   { key: "site_id", label: "site_id" }, { key: "status", label: "status" }, { key: "note", label: "note" },
   { key: "reason", label: "reason" }, { key: "batch", label: "inspection_batch" }, { key: "phase", label: "planting_phase" }, { key: "team", label: "team" },
   { key: "feasibility", label: "field_feasibility" }, { key: "unresolved", label: "checks_not_ok" }, { key: "observation", label: "field_observation" },
+  { key: "suggested", label: "suggested_intervention" }, { key: "intervention", label: "chosen_intervention" }, { key: "intervention_by", label: "intervention_reviewed_by" },
+  { key: "readiness", label: "maintenance_readiness" }, { key: "species", label: "planned_species" }, { key: "watering", label: "watering" }, { key: "maintainer", label: "maintenance_responsibility" },
+  { key: "establishment", label: "establishment_inspections" }, { key: "survival", label: "survival_observation" },
   { key: "rank", label: "current_rank" }, { key: "score_total", label: "current_score" }, { key: "origin", label: "origin" },
   { key: "lat", label: "lat" }, { key: "lon", label: "lon" }, { key: "source", label: "source" }, { key: "plan_note", label: "about_this_file" },
 ];
 
 export const FIELD_SHEET_COLUMNS = ["site_id", "lat", "lon", "shade_on_path", "canopy_class", "path_in_use", "photo_id", "notes", "observer", "date"];
+
+// Maintenance readiness: who keeps the trees alive. Each starts unknown and stays so until the planner records it; no survival rate is guessed.
+export const WATERING = [{ key: "unknown", label: "Unknown" }, { key: "available", label: "Available" }, { key: "none", label: "Not available" }];
+const WATERING_KEYS = new Set(WATERING.map((w) => w.key));
+export const INTERVENTION_KEYS = new Set(["protect", "regenerate", "plant-shade", "inspect"]);   // the keys in intervention.js
 
 export const PLAN_CAVEAT = "These are the planner's own entries, saved on this device only. Nothing here has been inspected by this tool, and a status such as Planted only records what was typed.";
 
@@ -89,6 +98,8 @@ function cleanEntry(it) {
     id: it.id, status: it.status, note: cleanNote(it.note), checks: cleanChecks(it.checks), reason: cleanText(it.reason, NOTE_MAX),
     batch: cleanText(it.batch, 24), phase: PHASES.includes(String(it.phase)) ? String(it.phase) : "", team: cleanText(it.team, 40),
     observed: cleanObserved(it.observed), reviewed: ["", "kept", "rejected"].includes(it.reviewed) ? it.reviewed : "",
+    intervention: INTERVENTION_KEYS.has(it.intervention) ? it.intervention : "", interventionBy: cleanText(it.interventionBy, 60), interventionOn: cleanDate(it.interventionOn),
+    species: cleanText(it.species, 60), watering: WATERING_KEYS.has(it.watering) ? it.watering : "unknown", maintainer: cleanText(it.maintainer, 60), establishment: cleanText(it.establishment, 80),
   };
 }
 
@@ -140,6 +151,26 @@ export function feasibility(entry) {
   return { state, ok, issue, unknown, label };
 }
 
+/**
+ * Establishment and maintenance readiness for one entry: six rows of { key, label, value, set } and how many are set. trees is that site's tree records.
+ * Soil and drainage come from the field check; survival only from recorded inspections. An unknown is shown as unknown, never filled in.
+ */
+export function readiness(entry, trees = []) {
+  const soil = entry.checks.space_soil;
+  const inspected = trees.filter((t) => t.observations.length);
+  const alive = inspected.filter((t) => ["alive-good", "alive-poor"].includes(t.observations[t.observations.length - 1].condition)).length;
+  const rows = [
+    { key: "species", label: "Species", value: entry.species || "Awaiting ecologist selection", set: Boolean(entry.species) },
+    { key: "soil", label: "Soil and drainage", value: soil === "ok" ? "Checked, OK" : soil === "issue" ? "Checked, problem found" : "Not checked", set: soil !== "unknown" },
+    { key: "watering", label: "Watering availability", value: WATERING.find((w) => w.key === entry.watering).label, set: entry.watering !== "unknown" },
+    { key: "maintainer", label: "Maintenance responsibility", value: entry.maintainer || "Unassigned", set: Boolean(entry.maintainer) },
+    { key: "establishment", label: "Establishment inspections", value: entry.establishment || "To be set by planner", set: Boolean(entry.establishment) },
+    { key: "survival", label: "Survival observation", value: inspected.length ? `${alive} of ${inspected.length} inspected trees alive` : trees.length ? "Trees recorded, none inspected yet" : "No field data", set: inspected.length > 0 },
+  ];
+  const n = rows.filter((r) => r.set).length;
+  return { rows, set: n, label: `${n} of ${rows.length} recorded` };
+}
+
 /** Plain warnings about one entry: things the planner may want to fix. Never blocks anything. */
 export function warnings(entry) {
   const out = [];
@@ -147,6 +178,9 @@ export function warnings(entry) {
   if ((entry.status === "approved" || entry.status === "planted") && f.state !== "all-ok") out.push(f.state === "issue" ? "Marked as " + STATUS_LABEL[entry.status] + " although a check found a problem" : "Marked as " + STATUS_LABEL[entry.status] + " with checks not yet OK");
   if (entry.status === "rejected" && !entry.reason) out.push("Add a reason for rejecting this site");
   if (entry.observed?.outcome === "disagree" && !entry.reviewed) out.push("The field observation disagrees with the model: keep or reject this site");
+  if ((entry.intervention === "protect" || entry.intervention === "regenerate") && !entry.interventionBy) out.push(`${entry.intervention === "protect" ? "Protect" : "Regenerate"} is chosen: name the ecologist who reviewed it`);
+  if ((entry.status === "approved" || entry.status === "planted") && entry.intervention === "protect") out.push("Marked for planting although the chosen intervention is Protect existing vegetation");
+  if ((entry.status === "approved" || entry.status === "planted") && !entry.maintainer) out.push("No one is named as responsible for maintenance");
   return out;
 }
 
@@ -187,6 +221,20 @@ export function createPlan(storage) {
     setBatch: (id, batch, source) => edit(id, source, (it) => { const n = cleanText(batch, 24); if (it.batch === n) return false; it.batch = n; }),
     setPhase: (id, phase, source) => edit(id, source, (it) => { const n = PHASES.includes(String(phase)) ? String(phase) : ""; if (it.phase === n) return false; it.phase = n; }),
     setTeam: (id, team, source) => edit(id, source, (it) => { const n = cleanText(team, 40); if (it.team === n) return false; it.team = n; }),
+    /** The planner's chosen intervention (a key from intervention.js, or "" to go back to the suggestion), who reviewed it and when. */
+    setIntervention: (id, key, source) => edit(id, source, (it) => { if (key !== "" && !INTERVENTION_KEYS.has(key)) return false; if (it.intervention === key) return false; it.intervention = key; }),
+    setInterventionBy: (id, text, source) => edit(id, source, (it) => { const n = cleanText(text, 60); if (it.interventionBy === n) return false; it.interventionBy = n; }),
+    setInterventionOn: (id, date, source) => edit(id, source, (it) => { const n = cleanDate(date); if (it.interventionOn === n) return false; it.interventionOn = n; }),
+    /** One readiness field: species, maintainer or establishment (text), or watering (a WATERING key). */
+    setReadiness: (id, field, value, source) => edit(id, source, (it) => {
+      let n;
+      if (field === "watering") { if (!WATERING_KEYS.has(value)) return false; n = value; }
+      else if (field === "species" || field === "maintainer") n = cleanText(value, 60);
+      else if (field === "establishment") n = cleanText(value, 80);
+      else return false;
+      if (it[field] === n) return false;
+      it[field] = n;
+    }),
     /** Store an imported field observation and move a Needs inspection site to Inspected (a person still decides to keep or reject it). */
     setObserved: (id, observed, source) => edit(id, source, (it) => {
       const o = cleanObserved(observed);
@@ -253,18 +301,24 @@ export function createPlan(storage) {
 /** A spreadsheet reads a cell starting with = + - @ as a formula; a leading apostrophe stops that. */
 export const safeCell = (text) => (/^[=+\-@\t\r]/.test(String(text)) ? `'${text}` : text);
 
-/** One row per planned site that the current data knows, in plan order, ready for toCsv(rows, PLAN_COLUMNS). */
-export function planRows(entries, byId) {
+/** One row per planned site that the current data knows, in plan order, ready for toCsv(rows, PLAN_COLUMNS). trees: the plan's tree records. */
+export function planRows(entries, byId, trees = []) {
   const rows = [];
   for (const e of entries) {
     const f = byId.get(e.id);
     if (!f) continue;
     const c = centroid(f.geometry);
     const fe = feasibility(e);
+    const ready = readiness(e, trees.filter((t) => t.site_id === e.id));
+    const value = (k) => ready.rows.find((r) => r.key === k).value;
     rows.push({
       site_id: e.id, status: STATUS_LABEL[e.status], note: safeCell(e.note), reason: safeCell(e.reason), batch: safeCell(e.batch), phase: e.phase, team: safeCell(e.team),
       feasibility: fe.label, unresolved: CHECKS.length - fe.ok,
       observation: e.observed ? `${e.observed.outcome === "agree" ? "Agrees with model" : "Disagrees with model"}${e.reviewed ? `; planner: ${e.reviewed}` : ""}` : "No field observation",
+      suggested: suggestIntervention(f.properties).label, intervention: e.intervention ? INTERVENTION_LABEL[e.intervention] : "Not chosen",
+      intervention_by: safeCell([e.interventionBy, e.interventionOn].filter(Boolean).join(", ")),
+      readiness: ready.label, species: safeCell(value("species")), watering: value("watering"), maintainer: safeCell(value("maintainer")),
+      establishment: safeCell(value("establishment")), survival: value("survival"),
       rank: f.properties.rank, score_total: f.properties.score_total,
       origin: f.properties.origin, lat: c ? Number(c.lat.toFixed(6)) : "", lon: c ? Number(c.lon.toFixed(6)) : "",
       source: f.properties.source ?? "simulated",

@@ -90,7 +90,7 @@ test("the plan file has the current rank, place and a plain note, in plan order,
   assert.equal(rows[0].status, "Needs inspection");
   assert.match(String(rows[0].lat), /^3\.0001/);
   const csv = toCsv(rows, PLAN_COLUMNS);
-  assert.match(csv.split("\r\n")[0], /^site_id,status,note,reason,inspection_batch,planting_phase,team,field_feasibility,checks_not_ok,field_observation,current_rank,current_score,origin,lat,lon,source,about_this_file$/);
+  assert.match(csv.split("\r\n")[0], /^site_id,status,note,reason,inspection_batch,planting_phase,team,field_feasibility,checks_not_ok,field_observation,suggested_intervention,chosen_intervention,intervention_reviewed_by,maintenance_readiness,planned_species,watering,maintenance_responsibility,establishment_inspections,survival_observation,current_rank,current_score,origin,lat,lon,source,about_this_file$/);
   assert.match(csv, /not inspected or verified/);
 });
 

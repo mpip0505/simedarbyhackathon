@@ -150,6 +150,9 @@ bar frame two views. **Plant first**: a strip of figures, the map with numbered 
 sliders that re-rank live, "Top sites" with a one-sentence reason per site, and a site card that explains the rank. **Before and
 after**: the two periods side by side with honest verdicts, an independent-map comparison and year-by-year charts. The look is the
 Canopy dashboard system in `css/app.css`, and it can be replaced without touching the logic.
+- **From ranking to decisions:** [docs/decision-support.md](docs/decision-support.md). It covers the SDP Avoid–Regenerate–Conserve intervention
+  suggestion (site card and Pilot plan), the best-coverage inspection round (+51% footpath, about 3× corridor gap versus the top 10), and
+  maintenance-readiness fields per site.
 - **Design system:** [docs/design-system.md](docs/design-system.md) (tokens, components, layout, accessibility) and the live
   component page `frontend/styleguide.html` (http://localhost:8000/app/styleguide.html).
 - **Designer brief:** [docs/frontend.md](docs/frontend.md) (components, data sources, what must stay).

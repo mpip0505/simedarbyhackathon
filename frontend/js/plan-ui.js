@@ -76,7 +76,7 @@ export function renderPlanPanel(card, plan, { byId, onSelect, topIds, download, 
     say.textContent = added ? `Added ${added} site${added === 1 ? "" : "s"} as Proposed.` : "Those sites are already in the plan.";
   } }, "Add the first five in the list");
   const dlPlan = el("button", { type: "button", class: "btn btn-secondary btn-sm", onclick: () => {
-    const rows = planRows(plan.list(), byId());
+    const rows = planRows(plan.list(), byId(), plan.trees());
     if (!rows.length) { say.textContent = "The plan is empty."; return; }
     download("elmina-planting-plan.csv", toCsv(rows, PLAN_COLUMNS));
   } }, "Download plan (CSV)");

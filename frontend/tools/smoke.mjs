@@ -729,6 +729,54 @@ try {
   });
 
   // --- security: data from the API must never run as code ---------------------------------------------------
+  await check("best-coverage round beats the ranked top 10 on reach, and plan sites carry an intervention review and maintenance readiness", async () => {
+    await open(`${BASE}/app/`);
+    await waitFor(`document.querySelector('#loading').hidden`, "the app");
+    await evaluate(`localStorage.clear()`);
+    await open(`${BASE}/app/`);
+    await waitFor(`document.querySelector('#loading').hidden`, "the app after clearing the plan");
+    // the site card suggests an intervention in SDP's terms and says who must confirm it
+    await evaluate(`document.querySelector('${ROWS}').click()`);
+    await waitFor(`!document.querySelector('#sheet-card').hidden`, "the site card");
+    const card = await evaluate(`document.querySelector('#card-body').innerText`);
+    assert.match(card, /What might this place need\?[\s\S]*SDP: (Conserve|Regenerate|Avoid)[\s\S]*Suggestion, not reviewed[\s\S]*Needs (an ecologist|the landscape team|a field visit)/);
+    await evaluate(`document.querySelector('#card-body .iv').scrollIntoView({ block: 'start' })`);
+    await shot("card-intervention");
+    await evaluate(`document.querySelector('#card-close').click()`);
+    // the optimizer compares three ways to choose 10 sites and adds the best-coverage ones as Needs inspection
+    await evaluate(`document.querySelector('#view-tabs button[data-view="pilot"]').click()`);
+    await sleep(300);
+    const root = `document.querySelector('#pilot-root')`;
+    const text = () => evaluate(`${root}.innerText`);
+    assert.match(await text(), /Best combination for your inspection capacity[\s\S]*Ranked: the top 10[\s\S]*Spread out[\s\S]*Best coverage/);
+    const cells = await evaluate(`[...${root}.querySelectorAll('.opt-table tbody tr')].map(r => [...r.cells].map(c => c.textContent))`);
+    const metres = (s) => Number(s.split(" ")[0].replace(/,/g, ""));
+    assert.equal(cells.length, 3);
+    assert.ok(metres(cells[2][1]) >= metres(cells[0][1]), `best coverage footpath ${cells[2][1]} should not be below ranked ${cells[0][1]}`);
+    assert.match(await text(), /Best is only against this proxy objective/);
+    await evaluate(`${root}.querySelector('.opt-card').scrollIntoView({ block: 'start' })`);
+    await shot("pilot-optimizer");
+    await evaluate(`[...${root}.querySelectorAll('button')].find(b => /^Add these \\d+ as Needs inspection$/.test(b.textContent)).click()`);
+    assert.match(await text(), /Added 10 sites as Needs inspection, batch "Coverage round"/);
+    assert.equal(await evaluate(`${root}.querySelectorAll('.pp-site').length`), 10);
+    // each plan site: an intervention choice with reviewer, and six readiness fields that start unknown
+    const first = await evaluate(`${root}.querySelector('.pp-site .pp-id').textContent.trim()`);
+    assert.match(await text(), /Intervention \(Avoid, Regenerate, Conserve\)[\s\S]*Suggested: /);
+    assert.match(await text(), /Establishment and maintenance readiness: 0 of 6 recorded/);
+    const setVal = (key, value) => evaluate(`(() => { const e = ${root}.querySelector('[data-key="${key}"]'); e.value = ${JSON.stringify(value)}; e.dispatchEvent(new Event('change', { bubbles: true })); })()`);
+    await setVal(`site:${first}:iv`, "regenerate");
+    assert.match(await text(), /Chosen: Regenerate habitat, needs an ecologist's review/);
+    assert.match(await text(), /Regenerate is chosen: name the ecologist who reviewed it/);
+    await setVal(`site:${first}:iv-by`, "Test ecologist");
+    assert.match(await text(), /Chosen: Regenerate habitat, reviewed by Test ecologist/);
+    await setVal(`site:${first}:ready-owner`, "Township landscape team");
+    assert.match(await text(), /Establishment and maintenance readiness: 1 of 6 recorded/);
+    await evaluate(`${root}.querySelector('.pp-site details[data-key$=":ready"]').open = true; ${root}.querySelector('.pp-site .iv-plan').scrollIntoView({ block: 'start' })`);
+    await shot("pilot-intervention-readiness");
+    await evaluate(`localStorage.clear()`);
+    await evaluate(`document.querySelector('#view-tabs button[data-view="prioritise"]').click()`);
+  });
+
   // A hostile API rewrites every site id into an HTML payload. The page is pointed at it (localhost is allowed by
   // ?api=). If any text reached an HTML sink, the onerror handler would set window.__pwned.
   const PAYLOAD = '<img src=x onerror="window.__pwned=1">';

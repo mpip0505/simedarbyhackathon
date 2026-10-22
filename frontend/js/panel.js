@@ -6,6 +6,7 @@ import { fmt, fmtC, fmtMetres, fmtPct } from "./scale.js";
 import { canSpeak, siteSpeech } from "./speech.js";
 import { planControls } from "./plan-ui.js";
 import { conflictBlock } from "./screening-ui.js";
+import { interventionCardBlock } from "./decide-ui.js";
 
 const ORDER = ["cooling", "connectivity", "shade"]; // the order used in the brief
 
@@ -56,6 +57,7 @@ export function renderCard(body, feature, { weights, ctx, total, placeholder, st
     plan ? planControls(plan, p.site_id) : null);
 
   const right = el("div", { class: "card-col" },
+    interventionCardBlock(p),
     conflict ? conflictBlock(conflict) : null,
     el("h3", {}, "Why it ranks here"),
     el("ul", { class: "card-list" }, notes.map((n) => el("li", {}, n))),

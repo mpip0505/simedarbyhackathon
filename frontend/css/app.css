@@ -740,3 +740,13 @@ dialog form[method="dialog"] { display: flex; justify-content: flex-end; margin:
   .pp-check-grid { grid-template-columns: minmax(0, 1fr); }
   .open-data-page { padding: 12px; }
 }
+
+/* ---------- intervention suggestion, maintenance readiness, best-coverage round (js/decide-ui.js) ---------- */
+.iv { display: flex; flex-direction: column; gap: 6px; padding-bottom: 12px; border-bottom: 1px solid var(--stone-150); }
+.iv h3 { margin: 0; }
+.iv-label { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 0; font-size: 14px; line-height: 20px; }
+.iv-plan { padding: 10px; border: 1px solid var(--border); border-radius: var(--r-2); }
+.iv-unknown { color: var(--text-muted); font-style: italic; }
+.opt { display: flex; flex-direction: column; gap: 10px; }
+.opt-card { padding: 12px; border: 1px solid var(--accent-line); border-radius: var(--r-3); background: #fff; }
+.opt-table tr.opt-best th, .opt-table tr.opt-best td { font-weight: 600; background: var(--accent-tint); }

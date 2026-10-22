@@ -16,6 +16,7 @@ import { exposurePanel } from "./exposure-ui.js";
 import { conflictFor, conflictRows } from "./screening.js";
 import { conflictBlock } from "./screening-ui.js";
 import { appPageUrl } from "./api.js";
+import { createOptimizerPanel, interventionPlanBlock, readinessBlock } from "./decide-ui.js";
 
 const LEAD = "Turn a shortlist into a work package: check the ground, inspect, decide, plan the work, then record what was planted. Everything here is your own record, saved on this device only. Nothing is inspected, approved or planted by this tool.";
 
@@ -39,6 +40,19 @@ const numInput = (value, key, label, onChange, placeholder = "") => input(value 
 export function renderPilot(root, ctx) {
   const { plan } = ctx;
   let importNote = null;                           // what the last import said, kept across redraws
+  const optimizer = createOptimizerPanel({
+    plan, ranked: ctx.ranked, byId: ctx.byId, reachSets: ctx.reachSets,
+    onAdd: (ids) => {
+      let added = 0;
+      for (const id of ids) {
+        if (!plan.add(id, "pilot")) continue;
+        added += 1;
+        plan.setStatus(id, "needs-inspection", "pilot");
+        plan.setBatch(id, "Coverage round", "pilot");
+      }
+      return added;
+    },
+  });
 
   function redraw() {
     const active = document.activeElement?.dataset?.key;
@@ -79,7 +93,8 @@ export function renderPilot(root, ctx) {
 
   // ---------- 1. shortlist and field feasibility ----------
   function sectionShortlist(entries, byId) {
-    const body = [];
+    optimizer.draw();
+    const body = [el("div", { class: "opt-card" }, optimizer.node)];
     if (!entries.length) {
       body.push(el("p", { class: "plan-empty" }, "No sites yet. Add the first five from the ranking, or open a site card on Plant first and press Add to planting plan."),
         el("div", { class: "plan-actions" },
@@ -110,6 +125,8 @@ export function renderPilot(root, ctx) {
         field("Responsible team", input(e.team, key("team"), `Responsible team for ${e.id}`, (v) => plan.setTeam(e.id, v, "pilot"), { max: 40, placeholder: "optional" })),
         field("Note", input(e.note, key("note"), `Note for ${e.id}`, (v) => plan.setNote(e.id, v, "pilot"), { max: NOTE_MAX, placeholder: "for example: check access" }))),
       checksBlock(e, key),
+      interventionPlanBlock(plan, e, f?.properties ?? null, { field, select, input, key }),
+      readinessBlock(plan, e, plan.trees().filter((t) => t.site_id === e.id), { field, select, input, key, keepOpen }),
       conflictBlock(conflictFor(ctx.conflicts?.(), e.id)),
       showReason ? field(e.status === "rejected" ? "Reason for rejecting" : "What the problem is", input(e.reason, key("reason"), `Reason for ${e.id}`, (v) => plan.setReason(e.id, v, "pilot"), { max: NOTE_MAX, placeholder: "for example: no access road" })) : null,
       observationBlock(e, f),
@@ -269,7 +286,7 @@ export function renderPilot(root, ctx) {
           if (rows.length) ctx.download("elmina-plan-conflicts.csv", toCsv(rows, Object.keys(rows[0]).map((key) => ({ key, label: key }))));
         } }, "Download mapped conflicts (CSV)"),
         el("button", { type: "button", class: "btn btn-secondary btn-sm", onclick: () => entries.length ? ctx.download("elmina-work-schedule.csv", toCsv(workSchedule(entries), SCHEDULE_COLUMNS)) : null }, "Download work schedule (CSV)"),
-        el("button", { type: "button", class: "btn btn-secondary btn-sm", onclick: () => entries.length ? ctx.download("elmina-planting-plan.csv", toCsv(planRows(entries, byId), PLAN_COLUMNS)) : null }, "Download plan (CSV)")),
+        el("button", { type: "button", class: "btn btn-secondary btn-sm", onclick: () => entries.length ? ctx.download("elmina-planting-plan.csv", toCsv(planRows(entries, byId, plan.trees()), PLAN_COLUMNS)) : null }, "Download plan (CSV)")),
     ]);
   }
 

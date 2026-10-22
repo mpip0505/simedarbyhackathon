@@ -73,6 +73,18 @@ walking routes. Our contribution is the repeatable pipeline from free data to a 
 weights and honest uncertainty. We are not claiming a new satellite method. The cross-check also shows why a single
 canopy map should not be trusted blindly.
 
+**10a. Is this only a tree-planting ranker? SDP's approach is Avoid, Regenerate, Conserve.**
+No. Each site gets a suggested intervention: protect existing vegetation, regenerate habitat, plant for pedestrian shade, or inspect before deciding.
+The top 10 are all corridor-gap restoration candidates, and 75 sites already look densely green to the satellite, so planting there could do harm.
+Those are flagged for checking before anyone plants. The satellite cannot tell native species or habitat quality, so these are suggestions:
+Protect and Regenerate stay flagged until a named ecologist has reviewed them. See [decision-support.md](decision-support.md).
+
+**10c. If we can only inspect 10 sites, why not just take the top 10?**
+The top 10 sit side by side and reach much of the same footpath and homes. The best-coverage round picks each next site for what it adds that
+is not yet reached. With 10 sites it reaches 51% more poorly shaded footpath, 8% more mapped homes and about three times the corridor gap.
+The cost is a lower average score (80.0 against 86.2), and we show that cost openly. It is best only against this reach objective, not
+environmentally optimal.
+
 **10b. Tree Equity Score and i-Tree already prioritise where to plant. Why another one?**
 They rank US census areas using canopy gap, heat and social vulnerability, built on US data; none of them picks individual 30 m
 cells, none has a habitat-corridor goal, and they are not built for cloudy tropical imagery. A 2025 comparison of five such tools in
