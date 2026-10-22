@@ -15,7 +15,7 @@ repository (named in the last column) so it can be re-run. **The short answer: w
 | **What the top sites reach**, de-duplicated | the first 50 sites are within 50 m of about 5,400 m of footpath where the satellite sees little tree cover (8% of the township's) and within 250 m of 349 of 968 mapped homes | `ml/reports/impact_reach.md` |
 | **Prior art and fact-check** | what other prioritisers do and what is proven; outside claims checked, two softened | `docs/prior-art.md`, `docs/pitch-fact-check.md` |
 | **Reproducibility** | a full data rebuild took about 4 minutes and reproduced the committed data exactly; every build carries a data version, and scores computed on older data are flagged | `backend/build_cache.py`, `docs/team-handoff.md` |
-| **Automated tests** | 292 backend and ML tests, 157 frontend unit tests, and a 39-check browser test that includes an accessibility scan and a hostile-data security test | `backend/tests`, `ml/tests`, `frontend/tests`, `frontend/tools/smoke.mjs` |
+| **Automated tests** | Python and ML tests, frontend unit tests and a browser test (counts are in [status.md](status.md), measured by `tools/project_status.py`) that includes an accessibility scan and a hostile-data security test | `backend/tests`, `ml/tests`, `frontend/tests`, `frontend/tools/smoke.mjs` |
 
 ## What we did not do
 The [assessment response](assessment-response.md) documents the mapped conflict screen, resident exposure scenario and runnable OSM-only fallback. Their geometry/arithmetic and operation are software checks; they add no ground observations or measured planting benefit.

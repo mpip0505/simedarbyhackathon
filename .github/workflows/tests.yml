@@ -35,3 +35,5 @@ jobs:
         run: node --test "frontend/tests/*.test.mjs"
       - name: Check the committed data is sound
         run: python -m backend.api.selfcheck
+      - name: Check docs/status.md matches the code (test, check and view counts)
+        run: python tools/project_status.py --check

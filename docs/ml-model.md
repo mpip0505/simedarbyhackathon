@@ -154,7 +154,7 @@ python -m ml.validation                   # regenerates ml/reports/validation.{j
 python -m ml.uncertainty                  # regenerates ml/reports/uncertainty.{json,md} + sites.csv
 python -m ml.shortlist                    # a spread-out top 20 for the pitch slide
 python -m ml.scenario                     # a labelled planting scenario, not a forecast
-python -m pytest ml/tests -q              # 45 tests on the model contract and the sign of every term
+python -m pytest ml/tests -q              # tests on the model contract and the sign of every term
 ```
 
 Scores are stamped with the backend's `data_version`. If the backend rebuilds its data,

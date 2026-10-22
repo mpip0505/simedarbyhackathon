@@ -17,7 +17,7 @@ CONTEXT
 - The team has three roles: Backend (done, below), ML (you), Frontend (builds the map against the same API).
 - Repository: this repo. Python 3.12. Run `pip install -r backend/requirements.txt`.
 
-WHAT THE BACKEND ALREADY DOES (all tested: 194 backend tests pass; a full rebuild from scratch reproduces the data exactly)
+WHAT THE BACKEND ALREADY DOES (all tested, counts in docs/status.md; a full rebuild from scratch reproduces the data exactly)
 - Builds cloud-masked Sentinel-2 NDVI and Landsat 8/9 surface-temperature composites over Elmina in Google Earth Engine
   (two-year median windows: baseline 2021-10 to 2023-09, latest 2024-10 to 2026-09).
 - Pulls paths, roads, parks, open land and buildings from OpenStreetMap, and builds an **approximate** corridor.

@@ -65,6 +65,6 @@ For browser checks, start the API (`python -m uvicorn backend.api.main:app --por
 node frontend/tools/smoke.mjs http://127.0.0.1:8765
 ```
 
-Verified for this change: **301 Python tests, 166 frontend tests and 43 browser checks passed**. Browser coverage includes desktop/mobile layout, accessibility scans, exports, saved exposure inputs, missing/unverifiable reports, and API-origin preservation when navigating to the fallback. Both artifact generators reproduced identical output from the committed inputs: 136 mapped-trigger sites and 518 independent OSM-only candidates.
+Verified for this change **on 2026-10-22** (a dated record; current counts are in [status.md](status.md)): **301 Python tests, 166 frontend tests and 43 browser checks passed**. Browser coverage includes desktop/mobile layout, accessibility scans, exports, saved exposure inputs, missing/unverifiable reports, and API-origin preservation when navigating to the fallback. Both artifact generators reproduced identical output from the committed inputs: 136 mapped-trigger sites and 518 independent OSM-only candidates.
 
 Rebuild the conflict report after changing satellite-site geometries or OSM layers; rebuild the fallback after changing OSM layers. Both commands also run at the end of `backend.build_cache`. The Docker image now includes `ml/reports`, which supplies reach data; container packaging was inspected, but no Docker build was run because the CLI was unavailable. These checks establish software behavior, not field effectiveness.

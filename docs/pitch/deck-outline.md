@@ -75,7 +75,7 @@ Co-benefit for People: shade where people walk, near homes. *Screen:* `screens/0
 ## Slide 7: Feasibility (Enabler)
 Demo addition: the OSM-only fallback generates its own candidates without Earth Engine, using footpath/park proximity. It has no heat or actual-shade measurement. Proposed first customer: Sime Darby Property's Elmina landscape operations team; no pilot commitment claimed. Full satellite-workflow licensing remains unresolved.
 
-- **Built and running**: 292 backend and ML tests, 157 frontend tests, a 39-check browser test including an accessibility scan and a hostile-data security test.
+- **Built and running**: Python and scoring-model tests, frontend unit tests and a browser test (current counts: [status.md](../status.md)) including an accessibility scan and a hostile-data security test.
 - **Free data**; hosting on a free tier works for a demo (`render.yaml`); exports for the planning team: ranked CSV, GIS map file and a printable brief (`screens/06-brief.png`).
 - **What we need from Sime Darby Property:** the real site list, the official corridor outline, the current tree count, and a few hours of fieldwork.
 - **Honest risks:** simulated sites; no ground truth; OpenStreetMap under-maps some areas; the Earth Engine registration is noncommercial, so a paid pilot needs a commercial plan or an open-data pipeline ([commercial-case.md](../commercial-case.md)).

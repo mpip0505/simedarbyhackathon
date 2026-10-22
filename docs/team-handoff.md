@@ -2,7 +2,7 @@
 
 Status: the backend runs end to end on real Elmina data. Everything below is from the cached files in
 `backend/data/cache/`, rebuilt by `python -m backend.build_cache` (a full rebuild from a fresh download takes about
-4 minutes and reproduced the committed data exactly). 201 backend and 97 frontend tests pass, plus a 29-check browser test.
+4 minutes and reproduced the committed data exactly). The tests pass; current counts are in [status.md](status.md).
 
 ## 1. Imagery go/no-go: GO
 Enough clear Sentinel-2 and Landsat 8/9 observations exist over City of Elmina for both periods, **using multi-date

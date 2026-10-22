@@ -82,7 +82,7 @@ No survival percentage is estimated. Most urban tree deaths happen in the early 
 
 ## Tests
 
-- `frontend/tests/intervention-optimizer.test.mjs`: 15 unit tests covering rule order, missing data, reviewer warnings, readiness unknowns, greedy correctness on a small hand-checked case, exclusions, stale data, spread-out and the CSV columns.
+- `frontend/tests/intervention-optimizer.test.mjs`: unit tests covering rule order, missing data, reviewer warnings, readiness unknowns, greedy correctness on a small hand-checked case, exclusions, stale data, spread-out and the CSV columns.
 - `frontend/tools/smoke.mjs`: one browser check that drives the site card, the optimizer table and button, the intervention review and the readiness fields.
 
 ## Next, if selected for the Top 10
