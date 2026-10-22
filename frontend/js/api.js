@@ -1,4 +1,4 @@
-// Talks to the Elmina Canopy Prioritiser API. By default it uses the same origin the page came from.
+// Talks to the Canopia API. By default it uses the same origin the page came from.
 // To point a separately hosted interface at the API, open the page with ?api=http://localhost:8000
 // (the API allows cross-origin GET requests). For safety only a localhost address (any port) or the page's own
 // origin is accepted: otherwise a crafted link could make the page load data from someone else's server.

@@ -339,6 +339,73 @@ try {
     await waitFor(`document.querySelectorAll('#map img.leaflet-image-layer').length === 0`, "the overlay to be removed");
   });
 
+  await check("the sidebar only goes to pages; the tools are in the top bar; Methods and limits is a page", async () => {
+    assert.equal(await evaluate(`document.querySelectorAll('#sidebar [data-action]').length`), 0, "no action buttons in the sidebar");
+    assert.equal(await evaluate(`[...document.querySelectorAll('#sidebar button[data-view]')].map((b) => b.dataset.view).join()`), "prioritise,sites,report,pilot,about");
+    for (const a of ["tour", "share"]) assert.equal(await evaluate(`document.querySelector('.topbar [data-action="${a}"]') !== null`), true, a);
+    await evaluate(`document.querySelector('#export-button').click()`);
+    assert.equal(await evaluate(`document.querySelector('#export-menu').hidden`), false);
+    assert.equal(await evaluate(`[...document.querySelectorAll('#export-menu [data-action]')].map((b) => b.dataset.action).join()`), "download,geojson,brief");
+    await evaluate(`document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }))`);
+    assert.equal(await evaluate(`document.querySelector('#export-menu').hidden`), true);
+    await evaluate(`document.querySelector('#view-tabs button[data-view="about"]').click()`);
+    assert.ok((await evaluate(`document.querySelectorAll('#about-caveats li').length`)) >= 5);
+    assert.match(await evaluate(`document.querySelector('#about-credits').textContent`), /OpenStreetMap/);
+    await assertCleanText("methods and limits");
+  });
+
+  await check("the project switcher lists the projects, and Add a city says what a second city needs", async () => {
+    assert.equal(await evaluate(`document.querySelector('#project-name').textContent`), "City of Elmina");
+    await evaluate(`document.querySelector('#project-button').click()`);
+    assert.equal(await evaluate(`document.querySelector('#project-menu').hidden`), false);
+    assert.equal(await evaluate(`document.querySelector('#project-list .menu-item[aria-current="true"]').textContent.includes('City of Elmina')`), true);
+    await evaluate(`document.querySelector('#add-city').click()`);
+    await waitFor(`document.querySelector('#dlg-city').open`, "the Add a city dialog");
+    assert.match(await evaluate(`document.querySelector('#dlg-city').innerText`), /not been run on any other township/);
+    await evaluate(`document.querySelector('#dlg-city').close()`);
+  });
+
+  await check("the pilot plan is one page per step: a stepper, Back and Next, and only the current step is shown", async () => {
+    await evaluate(`document.querySelector('#view-tabs button[data-view="pilot"]').click()`);
+    const shown = () => evaluate(`[...document.querySelectorAll('#pilot-root .pp-page')].filter((p) => !p.hidden).map((p) => p.dataset.step).join()`);
+    assert.equal(await evaluate(`document.querySelectorAll('#pilot-root .pp-stepper li').length`), 4);
+    const start = await shown();
+    assert.equal(start.length, 1, "exactly one step on screen");
+    await evaluate(`document.querySelectorAll('#pilot-root .pp-step')[1].click()`);
+    assert.equal(await shown(), "2");
+    assert.match(await evaluate(`document.querySelector('#pilot-root .pp-page:not([hidden]) .pp-eyebrow').textContent`), /Step 2 of 4/);
+    assert.equal(await evaluate(`document.querySelector('#pilot-root .pp-stepper [aria-current="step"]').textContent.includes('Inspect')`), true);
+    await evaluate(`[...document.querySelectorAll('#pilot-root .pp-nav button')].find((b) => /^Next/.test(b.textContent)).click()`);
+    assert.equal(await shown(), "3");
+    await evaluate(`[...document.querySelectorAll('#pilot-root .pp-nav button')].find((b) => /^Back/.test(b.textContent)).click()`);
+    assert.equal(await shown(), "2");
+    await assertCleanText("pilot plan step");
+  });
+
+  await check("Sites: every site in a sortable, filterable table, and a row opens it on the map", async () => {
+    await evaluate(`document.querySelector('#view-tabs button[data-view="sites"]').click()`);
+    await waitFor(`document.querySelectorAll('#sites-table tbody tr').length > 100`, "the table");
+    assert.equal(await evaluate(`document.querySelector('#view-sites h1').textContent`), "All sites");
+    assert.match(await evaluate(`document.querySelector('#sites-note').textContent`), /simulated/);
+    assert.equal(await evaluate(`document.querySelector('#view-prioritise').hidden`), true);
+    const first = () => evaluate(`document.querySelector('#sites-table tbody tr td:nth-child(2)').textContent`);
+    const before = await first();
+    await evaluate(`document.querySelector('#sites-table th[data-key="score"] button').click()`);
+    assert.equal(await evaluate(`document.querySelector('#sites-table th[data-key="score"]').getAttribute('aria-sort')`), "descending");
+    await evaluate(`document.querySelector('#sites-table th[data-key="rank"] button').click()`);
+    assert.equal(await first(), before, "sorting by rank again brings the top site back");
+    await evaluate(`document.querySelector('input[name="origin-sites"][value="corridor_edge"]').click()`);
+    assert.match(await evaluate(`document.querySelector('#sites-count').textContent`), /^\d+ of \d+ sites$/);
+    await evaluate(`document.querySelector('input[name="origin-sites"][value="all"]').click()`);
+    await evaluate(`(() => { const s = document.querySelector('#sites-search'); s.value = 'zzzz'; s.dispatchEvent(new Event('input', { bubbles: true })); })()`);
+    assert.equal(await evaluate(`document.querySelector('#sites-empty').hidden`), false);
+    await evaluate(`document.querySelector('#sites-clear').click()`);
+    await evaluate(`document.querySelectorAll('#sites-table tbody tr')[2].click()`);
+    await waitFor(`!document.querySelector('#sheet-card').hidden && !document.querySelector('#view-prioritise').hidden`, "Plant first with the site card");
+    assert.equal(await evaluate(`document.querySelector('#card-body .card-rank').textContent`), "3");
+    await assertCleanText("sites view");
+  });
+
   await check("Before and after: plain headline, maps, three cards, the full numbers underneath", async () => {
     await evaluate(`document.querySelector('#view-tabs button[data-view="report"]').click()`);
     await waitFor(`document.querySelector('#report-headline').textContent.length > 0`, "the report view");
@@ -424,14 +491,6 @@ try {
     await send("Input.dispatchKeyEvent", { type: "keyUp", key: "Escape", code: "Escape", windowsVirtualKeyCode: 27 });
     assert.equal(await evaluate(`document.querySelector('#tour').hidden`), true, "Escape should close the tour");
     assert.equal(await evaluate(`document.querySelectorAll('.tour-focus').length`), 0);
-  });
-  await check("high contrast switches on and off and is announced to assistive technology", async () => {
-    const btn = `document.querySelector('#contrast-toggle')`;
-    await evaluate(`${btn}.click()`);
-    assert.equal(await evaluate(`document.documentElement.dataset.contrast`), "high");
-    assert.equal(await evaluate(`${btn}.getAttribute('aria-pressed')`), "true");
-    await evaluate(`${btn}.click()`);
-    assert.equal(await evaluate(`document.documentElement.dataset.contrast`), "normal");
   });
   await check("the address keeps slider weights and the selected site, and a shared link restores them", async () => {
     await setSlider("cooling", 100);
@@ -534,7 +593,7 @@ try {
     assert.equal(await evaluate(`document.querySelector('#view-pilot').hidden`), false);
     assert.match(await text(), /Pilot plan[\s\S]*Your entries, not verified[\s\S]*Saved on this device only/);
     assert.match(await text(), /Next: Add sites to the plan/);
-    assert.match(await evaluate(`${root}.querySelector('.pp-steps [aria-current="step"]').innerText`), /Shortlist and decide/);
+    assert.match(await evaluate(`${root}.querySelector('.pp-stepper [aria-current="step"]').innerText`), /Shortlist and decide/);
 
     // 1 shortlist: field feasibility is separate from priority and starts unknown
     await clickText("Add the first five ranked sites");

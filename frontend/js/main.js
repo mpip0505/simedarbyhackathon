@@ -2,7 +2,7 @@
 // Until a slider moves, the list shows the ranking the API served (the ML model's, once it is merged).
 // Moving a slider re-ranks in the browser with the same formula as the API (js/weights.js, tested against Python).
 import { api, ApiError, ignoredApiParam, appPageUrl } from "./api.js";
-import { el, clear, $, $$ } from "./dom.js";
+import { el, clear, icon, $, $$ } from "./dom.js";
 import { createStore } from "./state.js";
 import { KEYS, retotal, topChange } from "./weights.js";
 import { buildContext } from "./drivers.js";
@@ -17,6 +17,8 @@ import { renderTopList, highlightRow, markPlan } from "./list.js";
 import { renderCard } from "./panel.js";
 import { setupSliders } from "./sliders.js";
 import { setupReport } from "./report.js";
+import { setupSitesView } from "./sites.js";
+import { PROJECTS, projectFromSearch, projectSearch } from "./projects.js";
 import { plantStats } from "./stats.js";
 import { renderStrip } from "./strip.js";
 import { renderScenario } from "./scenario.js";
@@ -27,6 +29,7 @@ import { startTour } from "./tour.js";
 import { createPlan, planRows } from "./plan.js";
 import { renderPlanPanel } from "./plan-ui.js";
 import { renderPilot } from "./pilot-ui.js";
+import { renderTracker } from "./tracker.js";
 import { createExposure } from "./exposure.js";
 import { createWalks } from "./shade-walk.js";
 import { conflictFor } from "./screening.js";
@@ -37,7 +40,7 @@ const LIST_LIMIT = 5;       // rows shown before "See all"
 const BADGES = 5;           // sites marked 1 to 5 on the map
 const OUTLINED = 10;        // sites with a dark outline
 const DEFAULT_NOTE = "The list and map update as you move these.";
-const VIEW_NAMES = { prioritise: "Plant first", report: "Before and after", pilot: "Pilot plan" };
+const VIEW_NAMES = { start: "Home", prioritise: "Map", report: "Trends", sites: "Sites", tracker: "Tracker", pilot: "Advanced tools", about: "Methods and limits" };
 const store = createStore({ selectedId: null, filter: "all", query: "", usingServer: true, expanded: false, listMode: "ranked", conflictsOnly: false });
 let started = false;
 
@@ -81,6 +84,20 @@ function showStatus(meta) {
   clear($("#caveats")).append(...meta.caveats.map((c) => el("li", {}, c)));
   $("#attribution").textContent = (meta.attribution ?? []).join("  ·  ");
   $("#built-note").textContent = meta.generated_at ? `Data built ${meta.generated_at.slice(0, 10)}.` : "";
+
+  // the same facts on the Methods and limits page
+  clear($("#about-caveats")).append(...meta.caveats.map((c) => el("li", {}, c)));
+  clear($("#about-credits")).append(...(meta.attribution ?? []).map((a) => el("li", {}, a)));
+  const scoreText = { ml: "Scoring model", placeholder: "Preview (scoring model not connected yet)", mock: "Mock (invented)" };
+  const build = [
+    ["Sites", `${meta.site_count ?? "?"} example sites (simulated)`],
+    ["Scores", scoreText[meta.score_source] ?? "Unknown"],
+    ["Data", mock ? "Mock (invented)" : "Cached real data"],
+    ["Corridor", meta.corridor_approximate === false ? "Official polygon" : "Approximate (OpenStreetMap)"],
+    ["Built", meta.generated_at ? meta.generated_at.slice(0, 10) : "–"],
+    ["Data version", meta.data_version ?? "–"],
+  ];
+  clear($("#about-build")).append(...build.map(([k, v]) => el("div", { class: "kv" }, el("span", {}, k), el("span", { class: k === "Data version" ? "mono" : null }, v))));
 }
 
 function openDialog(id) {
@@ -122,6 +139,39 @@ function setupSheets() {
   }
 }
 
+/**
+ * Small menus that open from a button (Export in the top bar, the project switcher in the sidebar). A click on an item or anywhere
+ * else closes them, and so does Escape, which then goes no further (it must not also close the site card or the layers panel).
+ */
+const menus = [];
+function setupMenu(button, menu) {
+  const set = (open) => { menu.hidden = !open; button.setAttribute("aria-expanded", String(open)); };
+  button.addEventListener("click", () => { for (const m of menus) if (m.menu !== menu && !m.menu.hidden) m.set(false); set(menu.hidden); });
+  menus.push({ button, menu, set });
+  return set;
+}
+document.addEventListener("click", (e) => { for (const m of menus) if (!m.menu.hidden && !m.button.contains(e.target)) m.set(false); });
+document.addEventListener("keydown", (e) => {
+  const open = e.key === "Escape" && menus.find((m) => !m.menu.hidden);
+  if (!open) return;
+  open.set(false);
+  open.button.focus();
+  e.stopImmediatePropagation();
+});
+setupMenu($("#export-button"), $("#export-menu"));
+
+// The project switcher: the projects come from js/projects.js. Choosing another one reopens the app on it.
+const project = projectFromSearch(location.search);
+$("#project-name").textContent = project.name;
+$("#project-kind").textContent = project.kind;
+$("#crumb-project").textContent = `${project.kind === "Pilot township" ? "Pilot: " : ""}${project.name}`;
+$("#project-list").append(...PROJECTS.map((p) => el("button", {
+  type: "button", class: "menu-item", "aria-current": p.id === project.id ? "true" : null,
+  onclick: () => { if (p.id !== project.id) location.search = projectSearch(p, location.search); },
+}, el("span", { class: "grow" }, p.name), el("span", { class: "muted" }, p.kind), p.id === project.id ? icon("check", 14) : null)));
+setupMenu($("#project-button"), $("#project-menu"));
+$("#add-city").addEventListener("click", () => openDialog("#dlg-city"));
+
 /** The Layers button opens a small panel of checkboxes; a click elsewhere closes it (so does Escape, see boot). Returns set(open). */
 function setupLayersMenu() {
   const button = $("#layers-button");
@@ -141,7 +191,6 @@ const actions = {
   credits: () => openDialog("#dlg-credits"),
   geojson: () => {},
   tour: () => {},
-  contrast: () => {},
   share: async () => {
     const say = (text) => { const note = el("div", { class: "notice" }, text); $("#notices").append(note); setTimeout(() => note.remove(), 5000); };
     try {
@@ -153,20 +202,10 @@ const actions = {
   },
   brief: () => {},
   download: () => {},                       // these need the loaded data, so boot() fills them in
-  sites: () => {},
   layers: () => {},
 };
 const scrollBehavior = () => (matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth");
 document.addEventListener("click", (e) => actions[e.target.closest?.("[data-action]")?.dataset.action]?.());
-
-// High-contrast mode: a toggle in the sidebar, remembered in this browser only.
-function setContrast(on) {
-  document.documentElement.dataset.contrast = on ? "high" : "normal";
-  $("#contrast-toggle").setAttribute("aria-pressed", String(on));
-  try { localStorage.setItem("elmina-contrast", on ? "high" : "normal"); } catch { /* the setting just will not be remembered */ }
-}
-actions.contrast = () => setContrast(document.documentElement.dataset.contrast !== "high");
-try { setContrast(localStorage.getItem("elmina-contrast") === "high"); } catch { setContrast(false); }
 
 // ---------- the app ----------
 
@@ -243,7 +282,8 @@ async function boot() {
       if (box.dataset.layer === "sites") (box.checked ? badges.group.addTo(map) : map.removeLayer(badges.group));
     });
   }
-  map.fitBounds(sitesLayer.bounds(), { padding: [30, 30] });
+  // the panel floats over the left of the map on a wide screen, so the sites are fitted into what is left of it
+  map.fitBounds(sitesLayer.bounds(), window.innerWidth > 1150 ? { paddingTopLeft: [380, 30], paddingBottomRight: [30, 30] } : { padding: [30, 30] });
   // hide the first-visit hint on the person's own first move on the map (not on the opening animation)
   for (const type of ["pointerdown", "wheel", "keydown"]) {
     map.getContainer().addEventListener(type, () => { $("#coach").hidden = true; }, { once: true });
@@ -254,6 +294,8 @@ async function boot() {
   const note = $("#weights-note");
   let byId = new Map();
   let lastRanked = null;
+  let currentView = "prioritise";
+  let sitesView = null;                  // the Sites table, set up with the tabs below
 
   const currentRanked = () => {
     const s = store.get();
@@ -349,6 +391,7 @@ async function boot() {
     $("#count").textContent = spread ? `${rows.length} spread out` : rows.length === ranked.length ? `${ranked.length} in total` : `${rows.length} of ${ranked.length}`;
     renderLegend(range);
     renderStrip($("#stats-plant"), plantStats(ranked, { placeholder, usingServer: s.usingServer }));
+    if (currentView === "sites") sitesView.render(ranked, { placeholder, usingServer: s.usingServer });
     renderSelected();
     if (s.selectedId) sitesLayer.select(s.selectedId);
 
@@ -422,16 +465,32 @@ async function boot() {
   planPanel = renderPlanPanel($("#card-plan"), plan, {
     byId: () => byId, onSelect: (id) => select(id, "list"),
     topIds: () => visibleRows(currentRanked()).slice(0, 5).map((f) => f.properties.site_id), download,
-    openPilot: () => showView("pilot"),
+    openPilot: () => showView("tracker"),
   });
   plan.subscribe(() => markPlan(list, plan.ids()));
+  const showShortlistCount = () => { $("#shortlist-count").textContent = String(plan.list().length); };
+  plan.subscribe(showShortlistCount);
+  showShortlistCount();
   const pilot = renderPilot($("#pilot-root"), {
     meta:()=>meta,weights:()=>store.get().weights,
     exposure: createExposure(storage),
     walks: createWalks(storage),
     conflicts: () => conflicts,
     plan, byId: () => byId, ranked: () => currentRanked(), onSelect: async (id) => { await showView("prioritise"); select(id, "list"); }, download,
+    setFlow: (on) => document.body.classList.toggle("flow", on),
+    mapParts: () => ({ osm, corridor, spine }),
+    setPageLabel: (label) => { $("#crumb-view").textContent = label ? `${VIEW_NAMES.pilot}: ${label}` : VIEW_NAMES.pilot; },
     reachSets: () => (reachSets?.stale === false ? reachSets : null), today: () => new Date().toLocaleDateString("en-CA",{timeZone:"Asia/Singapore"}), backToMap: () => showView("prioritise"),
+  });
+
+  const tracker = renderTracker($("#tracker-root"), {
+    plan, byId: () => byId, ranked: () => currentRanked(), weights: () => store.get().weights, meta: () => meta,
+    onSelect: async (id) => { await showView("prioritise"); select(id, "list"); }, download,
+    today: () => new Date().toLocaleDateString("en-CA", { timeZone: "Asia/Singapore" }), backToMap: () => showView("prioritise"),
+    openAdvanced: async (tab) => { await showView("pilot"); pilot.show(tab); },
+    setFlow: (on) => document.body.classList.toggle("flow", on),
+    setPageLabel: (label) => { $("#crumb-view").textContent = label ? `${VIEW_NAMES.tracker}: ${label}` : VIEW_NAMES.tracker; },
+    mapParts: () => ({ osm, corridor, spine }),
   });
 
   const start = parseHash(location.hash);              // a shared link: weights and site in the address
@@ -445,19 +504,22 @@ async function boot() {
 
   // ----- tabs -----
   let report = null;
-  let currentView = "prioritise";
+  sitesView = setupSitesView({ onPick: async (id) => { await showView("prioritise"); select(id, "list"); } });
   async function showView(name) {
     for (const b of $$("#view-tabs button")) {
       if (b.dataset.view === name) b.setAttribute("aria-current", "page"); else b.removeAttribute("aria-current");
     }
     $("#crumb-view").textContent = VIEW_NAMES[name];
-    $("#view-prioritise").hidden = name !== "prioritise";
-    $("#view-report").hidden = name !== "report";
-    $("#view-pilot").hidden = name !== "pilot";
+    if (name !== "pilot" && name !== "tracker") document.body.classList.remove("flow");           // the Pilot plan hides the sidebar on its own pages
+    for (const view of Object.keys(VIEW_NAMES)) $(`#view-${view}`).hidden = view !== name;
     if (name !== currentView) $("#main").scrollTop = 0;
     currentView = name;
+    if (name === "start") { try { storage?.setItem(START_SEEN, "1"); } catch { /* blocked storage */ } return; }
     if (name === "prioritise") { map.invalidateSize(); return; }
+    if (name === "sites") { sitesView.render(currentRanked(), { placeholder, usingServer: store.get().usingServer }); return; }
+    if (name === "tracker") { tracker.show(); return; }
     if (name === "pilot") { pilot.redraw(); return; }
+    if (name === "about") return;                       // static text, filled in by showStatus
     if (!report) {
       try {
         const [summary, series, crosscheck, scenario] = await Promise.all([api.summary(), api.series(), api.crosscheck(), api.scenario().catch(() => null)]);
@@ -465,20 +527,20 @@ async function boot() {
         $("#card-scenario").closest("section").hidden = $("#card-scenario").hidden;
         report = setupReport({ summary, series, crosscheck, overlays, osm, corridor, spine, attribution: meta.attribution ?? [], bounds: sitesLayer.bounds() });
       } catch (error) {
-        $("#view-report").append(el("p", { class: "notice notice-bad" }, `The before and after view could not load: ${error.message}`));
+        $("#view-report").append(el("p", { class: "notice notice-bad" }, `The trends view could not load: ${error.message}`));
         return;
       }
     }
     report.show();
   }
   for (const b of $$("#view-tabs button")) b.addEventListener("click", () => showView(b.dataset.view));
+  for (const b of $$("[data-go]")) b.addEventListener("click", () => showView(b.dataset.go));                       // the buttons on Start here
+  const START_SEEN = "elmina-start-seen";
+  let startSeen = false;
+  try { startSeen = storage?.getItem(START_SEEN) === "1"; } catch { /* blocked storage: show it each visit */ }
+  if (!startSeen && !start.site && !start.weights) showView("start");                // a first visit opens on Start here; a shared link opens on its site
 
-  // sidebar shortcuts: both live on Plant first, so they switch to it, bring the right part into view and open it
-  actions.sites = async () => {
-    await showView("prioritise");
-    $("#sheet-top").scrollIntoView({ block: "start", behavior: scrollBehavior() });
-    $("#search").focus({ preventScroll: true });
-  };
+  // the Layers and tour shortcuts live on Plant first, so they switch to it first
   actions.tour = async () => {
     await showView("prioritise");
     startTour($('[data-action="tour"]'));

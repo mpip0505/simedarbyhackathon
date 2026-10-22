@@ -22,8 +22,8 @@ const TOP_STYLE = { weight: 1.6, color: "#181816", opacity: 1 };   // the top si
 const SELECTED_STYLE = { weight: 3, color: "#D13C06", opacity: 1 };  // Ember, the accent
 
 /** Create a map with its own drawing layers (panes) so basemap, overlays, sites, corridor and badges stack correctly. */
-export function createMap(elementId, { zoomControl = true } = {}) {
-  const map = L.map(elementId, { preferCanvas: true, zoomControl: false, attributionControl: false, ...DEFAULT_VIEW });
+export function createMap(elementId, { zoomControl = true, canvas = true } = {}) {
+  const map = L.map(elementId, { preferCanvas: canvas, zoomControl: false, attributionControl: false, ...DEFAULT_VIEW });
   map.setView(DEFAULT_VIEW.center, DEFAULT_VIEW.zoom);
   if (zoomControl) L.control.zoom({ position: "topright" }).addTo(map);
   const panes = { basemap: 250, overlays: 300, paths: 410, corridor: 420, sites: 450, badges: 480 };

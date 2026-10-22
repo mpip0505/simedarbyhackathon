@@ -30,7 +30,7 @@ export function createReviewUI(plan,ctx,redraw) {
   }
   function reviewForm(e) {
     const d=draft(e);d.id=e.id;
-    return el("details",{class:"pp-checks","data-key":`review:${e.id}`},el("summary",{},"Record inspection and human review"),
+    return el("div",{class:"pp-review"},
       el("p",{class:"small-note"},"Mapped triggers and imported shade observations do not confirm land permission or planting suitability. All five field checks remain separate. Keeping a site is not planting approval."),
       el("div",{class:"pp-grid"},field(d,"observer",`Inspector for ${e.id}`,"text",60),field(d,"date",`Inspection date for site ${e.id}`,"date",10),field(d,"reference",`Evidence reference for ${e.id}`)),
       el("button",{type:"button",class:"btn btn-secondary btn-sm",onclick:()=>say(plan.setInspection(e.id,{observer:d.observer,date:d.date,reference:d.reference},"pilot")?"Attributed inspection recorded; review is required.":"Enter an inspector, valid date and evidence reference.")},"Record inspection evidence"),
@@ -66,9 +66,7 @@ export function createReviewUI(plan,ctx,redraw) {
   function importControls() {
     return el("div",{},
       el("p",{class:"plan-say",role:"status"},notice),
-      el("label",{class:"conflict-filter"},el("input",{type:"checkbox",checked:allowLegacy,onchange:e=>{allowLegacy=e.target.checked;pending=null;redraw();}}),"Allow unversioned legacy preview (unverified; cannot support approval)"),
-      el("label",{class:"conflict-filter"},el("input",{type:"checkbox",checked:replacePrevious,onchange:e=>{replacePrevious=e.target.checked;}}),"Replace previous observations for corrections (reopens review)"),
-      el("label",{class:"pp-field"},el("span",{},"Import completed field sheet"),el("input",{id:"pilot-import-file",type:"file",accept:".csv,text/csv",disabled:busy,onchange:async e=>{
+      el("div",{class:"pp-field"},el("span",{id:"pilot-import-label"},"Import completed field sheet"),el("div",{class:"file"},el("input",{id:"pilot-import-file",class:"file-input sr-only",type:"file",accept:".csv,text/csv","aria-labelledby":"pilot-import-label",disabled:busy,onchange:async e=>{
         const file=e.target.files?.[0];e.target.value="";if(!file)return;
         if(file.size>1_000_000){say("File exceeds the 1 MB limit. Nothing changed.");return;}
         const revision=plan.revision();busy=true;pending=null;redraw();
@@ -78,7 +76,10 @@ export function createReviewUI(plan,ctx,redraw) {
           pending=prepareFieldImport(text,{snapshot:plan.snapshot(),currentVersion:ctx.meta?.()?.data_version,knownIds:new Set(ctx.byId().keys()),planIds:plan.ids(),sheets:plan.sheets(),revision,filename:file.name,digest,today:ctx.today(),allowLegacy});
           notice=pending.ok?"Preview ready. No observation has been saved yet.":"This file was not imported. Nothing in your plan changed.";
         } catch(error){notice=`File could not be previewed: ${error.message}. Nothing changed.`;}finally{busy=false;redraw();}
-      }})),
+      }}),el("label",{class:"btn btn-secondary btn-sm","for":"pilot-import-file"},"Choose file"),el("span",{class:"file-name"},pending?.filename??"No file chosen"))),
+      el("div",{class:"pp-import-options"},
+      el("label",{class:"conflict-filter"},el("input",{type:"checkbox",class:"cb",checked:allowLegacy,onchange:e=>{allowLegacy=e.target.checked;pending=null;redraw();}}),"Allow unversioned legacy preview (unverified; cannot support approval)"),
+      el("label",{class:"conflict-filter"},el("input",{type:"checkbox",class:"cb",checked:replacePrevious,onchange:e=>{replacePrevious=e.target.checked;}}),"Replace previous observations for corrections (reopens review)")),
       pending?el("div",{class:"pp-import-preview","data-import-preview":pending.ok?"ready":"invalid"},
         el("p",{},`Source: ${pending.filename}; SHA-256 ${pending.digest}. ${pending.entries.length} complete rows; ${pending.insufficient.length} incomplete rows left out.`),
         el("ul",{class:"pp-problems"},pending.problems.map(p=>el("li",{},p))),

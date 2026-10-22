@@ -110,7 +110,7 @@ export const STEP_NAMES = ["Shortlist and decide", "Inspect", "Plan the work", "
 /** The one thing to do next, in plain words, from where the plan stands: { step: 1 to 4, text }. */
 export function nextStep(entries, trees) {
   const has = (status) => entries.some((e) => e.status === status);
-  if (!entries.length) return { step: 1, text: "Add sites to the plan: start with the first five in the list on Plant first, or open a site card." };
+  if (!entries.length) return { step: 1, text: "Add sites to the plan: start with the first five on the Map, or open a site card." };
   if (has("proposed")) return { step: 1, text: "Mark the sites you want inspected as Needs inspection and put them in an inspection batch." };
   if (has("needs-inspection")) return { step: 2, text: "Download the field sheet, have someone walk those sites, then import the completed sheet." };
   if (entries.some((e) => (e.observed && !e.reviewed) || e.status === "inspected")) return { step: 1, text: "Review the findings: keep or reject each inspected site." };

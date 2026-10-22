@@ -37,7 +37,7 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="Elmina Canopy Prioritiser API", version="0.3.0", lifespan=lifespan)
+app = FastAPI(title="Canopia API", version="0.3.0", lifespan=lifespan)
 def cors_origins(raw: Optional[str]) -> list:
     """Open to every origin for the local demo; set CORS_ORIGINS to a comma-separated list (for example the hosted site's own address) to restrict it."""
     listed = [o.strip() for o in (raw or "").split(",") if o.strip()]

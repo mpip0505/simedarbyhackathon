@@ -1,10 +1,10 @@
 <p align="center">
-  <img src="docs/assets/banner.svg" alt="Canopy Prioritiser: a grid of 30 metre cells with the five highest priority sites numbered 1 to 5" width="100%">
+  <img src="docs/assets/banner.svg" alt="Canopia: a grid of 30 metre cells with the five highest priority sites numbered 1 to 5" width="100%">
 </p>
 
-# Canopy Prioritiser
+# Canopia
 
-**Where should we plant first, and why?** Canopy Prioritiser turns free satellite and map data into a ranked, explained shortlist of places to plant,
+**Where should we plant first, and why?** Canopia turns free satellite and map data into a ranked, explained shortlist of places to plant,
 then helps a planner check that shortlist on the ground and turn it into a work plan. It was built for the Sime Darby Property University Hackathon 2026
 (Planet track, theme *Township of Tomorrow*) by team Triple T, and **piloted on City of Elmina** so the method can be repeated in other townships.
 
@@ -19,7 +19,7 @@ then helps a planner check that shortlist on the ground and turn it into a work 
 
 ## Purpose
 A township has a limited number of trees to plant each season, a long walking network with little shade, and a biodiversity corridor with gaps in it. Deciding *where* is slow,
-and a map of canopy cover alone shows what is there, not what to do next. Canopy Prioritiser answers three questions, in order:
+and a map of canopy cover alone shows what is there, not what to do next. Canopia answers three questions, in order:
 
 1. **Where first?** Every candidate site gets three scores (cooling, connectivity, shade) from named, transparent inputs. You change what matters and the ranking re-sorts live.
 2. **Why there?** Each site gets a one-sentence reason, the measurements behind it, and how steady its rank is across 2,000 plausible weightings.

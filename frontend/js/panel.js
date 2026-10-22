@@ -50,11 +50,11 @@ export function renderCard(body, feature, { weights, ctx, total, placeholder, st
     el("div", { class: "card-total" }, el("strong", {}, fmt(p.score_total)),
       el("span", {}, `${placeholder ? "Preview score" : "Score"}, out of 100 · ranked #${p.rank} of ${total}`)),
     el("div", { class: "score-rows" }, ORDER.map((k) => scoreRow(k, p[`score_${k}`]))),
+    plan ? planControls(plan, p.site_id) : null,                      // right under the scores, so the next step is in view
     steady ? el("section", { class: "steady", "aria-label": "How steady is this rank?" },
       el("div", { class: "steady-head" }, el("h3", {}, "How steady is this rank?"), el("span", { class: steady.chip }, steady.label)),
       el("p", { class: "small-note" }, steady.detail),
-      custom ? el("p", { class: "small-note" }, "These ranges were worked out around the default weights, not the ones you have set.") : null) : null,
-    plan ? planControls(plan, p.site_id) : null);
+      custom ? el("p", { class: "small-note" }, "These ranges were worked out around the default weights, not the ones you have set.") : null) : null);
 
   const right = el("div", { class: "card-col" },
     interventionCardBlock(p),
