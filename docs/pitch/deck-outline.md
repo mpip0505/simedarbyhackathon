@@ -51,6 +51,7 @@ What is different from Tree Equity Score, i-Tree Landscape and Boston's Right Pl
 3. **Corridor connectivity is a score**, which equity-first tools do not have.
 4. **Rank steadiness:** 14 of the top 20 stay in the top 20 in at least 80% of 2,000 plausible settings ([uncertainty.md](../../ml/reports/uncertainty.md)). Austin's 2025 comparison found tools agree on broad areas but differ on specific top sites, so showing how steady a pick is matters.
 5. **Honest limits on screen.**
+6. **Secondary point, protect before you plant:** 75 of the 564 example sites are already green by satellite, so the screen flags them for an ecologist's review before any planting. A screening suggestion from satellite proxies, not a finding about habitat. Reproduce: `node frontend/tools/intervention_counts.mjs` ([decision-support.md](../decision-support.md)).
 We do not claim a new satellite method or to beat those tools. *Screen:* `screens/07-steadiness.png`.
 
 ## Slide 5: How it Works (Enabler)

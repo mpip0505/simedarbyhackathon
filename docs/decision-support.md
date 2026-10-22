@@ -25,7 +25,7 @@ The screen suggests one intervention per site from measured proxies. The first m
 
 Other rules a site also meets are listed as well, so a planner can see when a place could serve two purposes.
 
-**What it shows on Elmina:**
+**What it shows on Elmina** (reproduce the first row with `node frontend/tools/intervention_counts.mjs`; quote only what it prints):
 
 | | Protect | Regenerate | Plant for shade | Inspect |
 |---|---|---|---|---|
