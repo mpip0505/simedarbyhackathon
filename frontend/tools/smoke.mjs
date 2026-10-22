@@ -539,6 +539,7 @@ try {
     // 1 shortlist: field feasibility is separate from priority and starts unknown
     await clickText("Add the first five ranked sites");
     const [a, b, c] = await ids();
+    assert.match(await evaluate(`${root}.querySelector("[data-feasibility-summary]").textContent`), /^0 of \d+ sites have all five field checks marked OK.*None is approved for planting/);
     await clickText("Freeze original shortlist");
     assert.match(await text(), /Original shortlist frozen/);
     assert.equal((await ids()).length, 5);

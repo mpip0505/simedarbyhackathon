@@ -105,9 +105,17 @@ export function renderPilot(root, ctx) {
           el("button", { type: "button", class: "btn btn-secondary btn-sm", onclick: ctx.backToMap }, "Go to the map")));
     } else {
       body.push(el("p", { class: "pp-help" }, "Priority is how the model ranks a site. Field feasibility is what a person has confirmed on the ground. They are separate: a top-ranked site can still be unsuitable, and a check nobody has made stays Not checked."),
+        el("p", { class: "pp-help", "data-feasibility-summary": "" }, feasibilitySummary(entries)),
         ...entries.map((e) => siteCard(e, byId)));
     }
     return section("1", "Shortlist and field feasibility", body);
+  }
+
+  // "Which sites are safe to plant?" Answered from what a person has entered; it never says safe, only how many checks are confirmed.
+  function feasibilitySummary(entries) {
+    const allOk = entries.filter((e) => feasibility(e).state === "all-ok").length;
+    const problems = entries.filter((e) => feasibility(e).state === "issue").length;
+    return `${allOk} of ${entries.length} sites have all five field checks marked OK${problems ? `; ${problems} with a problem found` : ""}. None is approved for planting: that needs a person on site and an ecologist where it is flagged.`;
   }
 
   function siteCard(e, byId) {
