@@ -20,7 +20,7 @@ Calculate with the current and scenario shade shares, holding population and wal
 
 The source records **buildings, not households**; apartments and missing OSM buildings prevent a measured population count. Near a site does not establish route use. Shade fractions refer to walking time in shade, not NDVI canopy fractions. This is neither a forecast nor a measured benefit and cannot establish cooling or health effects. Missing/stale reach or missing site coverage prevents calculation.
 
-To collect evidence later, record route, date/time, weather, walking duration and shaded minutes; label resident/proxy participants and retain raw notes. Compare comparable visits. No such visits are claimed here.
+**Timed shade walks now fill the baseline input.** In the same panel, download a blank walk sheet, walk the routes with a stopwatch (protocol: [shade-walk-protocol.md](shade-walk-protocol.md)), import the completed sheet (every row is checked; a bad file is refused whole), and press **Use as the current shade share**. The pooled share is total shaded minutes over total walking minutes, needs at least 5 walks on 2 routes, and fills **only** the current-share input and its basis text; the scenario share, residents per building, walking share and minutes per day stay the planner's own inputs. Until then the panel leads with what needs no assumption (unique mapped residential buildings reached) and lists each missing input with what would fill it. **No walks have been done; the example file is synthetic.** Repeat the same routes at the same times after planting to compare comparable visits.
 
 ## Siting screen
 

@@ -28,6 +28,7 @@ import { createPlan, planRows } from "./plan.js";
 import { renderPlanPanel } from "./plan-ui.js";
 import { renderPilot } from "./pilot-ui.js";
 import { createExposure } from "./exposure.js";
+import { createWalks } from "./shade-walk.js";
 import { conflictFor } from "./screening.js";
 import { steadiness, steadySummary, shortlistRows, shortlistNote } from "./ml-logic.js";
 
@@ -423,6 +424,7 @@ async function boot() {
   const pilot = renderPilot($("#pilot-root"), {
     meta:()=>meta,weights:()=>store.get().weights,
     exposure: createExposure(storage),
+    walks: createWalks(storage),
     conflicts: () => conflicts,
     plan, byId: () => byId, ranked: () => currentRanked(), onSelect: async (id) => { await showView("prioritise"); select(id, "list"); }, download,
     reachSets: () => (reachSets?.stale === false ? reachSets : null), today: () => new Date().toLocaleDateString("en-CA",{timeZone:"Asia/Singapore"}), backToMap: () => showView("prioritise"),

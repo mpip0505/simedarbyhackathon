@@ -112,6 +112,9 @@ Not yet. [usability-test-protocol.md](usability-test-protocol.md) is the protoco
 **10g. Is the siting screen a wildlife-conflict assessment?**
 No. It flags **mapped roads within 15 m, buildings within 10 m and footpath overlap** near a candidate site, for tree-fall, clearance and access review; the thresholds are prototype choices, not legal setbacks. It does **not** assess wildlife: no forest-edge layer is mapped, so we cannot say anything about macaques or other animals, and a forest-edge flag would need an ecologist to set it. We renamed it "siting screen" because "conflict" invited that misreading. No mapped flag does not mean safe to plant.
 
+**10h. Where does the shade-exposure number come from? Your calculator starts empty.**
+On purpose: nothing is guessed. Without inputs it shows what needs no assumption (the unique mapped homes the shortlist reaches) and lists each missing input with what would fill it. The one input that can be measured today is the **current shade share**, from timed shade walks: a stopwatch on a route, pooled over at least five walks on two routes ([shade-walk-protocol.md](shade-walk-protocol.md)). That fills only the baseline. The shade after planting, residents per building and route use stay assumptions until someone measures them, so the output is a scenario. No walks have been done yet.
+
 **11. How does the ranking handle biodiversity and endangered species?**
 It does not model species. Biodiversity enters through connectivity along the corridor and through vegetation context.
 Species choice, ERT planting lists and soil suitability would need Sime Darby Property's landscape data. We say so rather

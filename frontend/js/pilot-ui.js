@@ -226,7 +226,8 @@ export function renderPilot(root, ctx) {
         el("thead", {}, el("tr", {}, ["Sites", "Count", "250 m areas", "Footpath with little tree cover", "Mapped homes", "Corridor gap"].map((h, i) => el("th", { scope: "col", class: i > 0 ? "num" : null }, h)))),
         el("tbody", {}, reachRow("Everything in the plan", allIds), reachRow("Approved and planted", goIds)))),
       el("p", { class: "small-note" }, "Reach counts what lies near the sites, every footpath sample, home and gap once. It is not a benefit. The footpath figure is satellite greenness along mapped footpaths; mapped homes are the ones OpenStreetMap shows."),
-      ctx.exposure ? exposurePanel(ctx.exposure, unionReach(reach, entries.filter((e) => e.status !== "rejected").map((e) => e.id)), ctx.download) : null,
+      ctx.exposure ? exposurePanel(ctx.exposure, unionReach(reach, entries.filter((e) => e.status !== "rejected").map((e) => e.id)), ctx.download,
+        { walks: ctx.walks, routeNames: entries.filter((e) => e.status !== "rejected").map((e) => `near ${e.id}`) }) : null,
       el("div", { class: "plan-actions" },
         el("button", { type: "button", class: "btn btn-secondary btn-sm", disabled: !entries.length, onclick: () => {
           const rows = conflictRows(entries.map((e) => byId.get(e.id)).filter(Boolean), ctx.conflicts?.());
@@ -300,6 +301,7 @@ export function renderPilot(root, ctx) {
 
   plan.subscribe(() => { if (!root.closest("[hidden]")) redraw(); });
   ctx.exposure?.subscribe(() => { if (!root.closest("[hidden]")) redraw(); });
+  ctx.walks?.subscribe(() => { if (!root.closest("[hidden]")) redraw(); });
   draw();
   return { redraw };
 }

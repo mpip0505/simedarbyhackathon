@@ -704,6 +704,58 @@ try {
     const clear = `[...document.querySelector('#card-plan').querySelectorAll('button')].find(b => /^Clear the plan|^Click again/.test(b.textContent))`;
     await evaluate(`${clear}.click()`); await evaluate(`${clear}.click()`);
   });
+  await check("timed shade walks: a bad sheet is refused, a good one fills only the current shade share with its basis, and it is remembered", async () => {
+    const WALK_HEAD = "walk_id,route_id,date,start_time,weather,participant_type,walking_minutes,shaded_minutes,notes";
+    const good = [WALK_HEAD,
+      "W01,route A,2026-11-02,09:30,sunny,resident,12,3,t", "W02,route A,2026-11-02,16:15,sunny,resident,12,5,t", "W03,route B,2026-11-02,09:50,cloudy,proxy,8,2,t",
+      "W04,route B,2026-11-03,16:30,sunny,proxy,9,4,t", "W05,route C,2026-11-03,09:40,sunny,team,15,6,t", "W06,route C,2026-11-04,16:20,overcast,team,14,7,t",
+      "W07,route A,2026-11-04,09:35,sunny,resident,11,2,t", "W08,route B,2026-11-04,16:10,sunny,proxy,10,3,t"].join("\r\n");
+    const bad = `${WALK_HEAD}\r\nW01,route A,2026-11-02,09:30,sunny,resident,10,12,t`;
+    const pilot = `document.querySelector('#pilot-root')`;
+    const importWalks = async (csv) => {
+      await evaluate(`(() => { const dt = new DataTransfer(); dt.items.add(new File([${JSON.stringify(csv)}], 'walks.csv', { type: 'text/csv' })); const i = document.querySelector('#walk-import-file'); i.files = dt.files; i.dispatchEvent(new Event('change', { bubbles: true })); })()`);
+      await sleep(500);
+    };
+    await evaluate(`localStorage.removeItem('elmina-exposure-scenario-v1'); localStorage.removeItem('elmina-shade-walks-v1');`);
+    await send("Page.navigate", { url: "about:blank" });
+    await send("Page.navigate", { url: `${BASE}/app/` });
+    await waitFor(`document.querySelectorAll('${ROWS}').length > 0 && document.querySelector('#loading').hidden`, "the page to reload");
+    await evaluate(`document.querySelector('#view-tabs button[data-view="pilot"]').click()`);
+    await evaluate(`[...${pilot}.querySelectorAll('button')].find(b => b.textContent.trim() === 'Add the first five ranked sites')?.click()`);
+    await sleep(400);
+    assert.equal(await evaluate(`${pilot}.querySelector('[data-walk-summary]').dataset.walkSummary`), "none");
+    assert.match(await evaluate(`${pilot}.querySelector('.pp-exposure').innerText`), /What needs no assumption: the active shortlist[\s\S]*unique mapped residential buildings/);
+    assert.match(await evaluate(`${pilot}.querySelector('[data-exposure-missing]').innerText`), /Current share of walking time in shade \(%\): timed shade walks/);
+    await importWalks(bad);
+    assert.match(await evaluate(`${pilot}.querySelector('.pp-walks').innerText`), /Not imported; nothing changed\. row 2: shaded_minutes \(12\) is more than walking_minutes \(10\)/);
+    assert.equal(await evaluate(`${pilot}.querySelector('[data-walk-summary]').dataset.walkSummary`), "none");
+    await importWalks(good);
+    assert.equal(await evaluate(`${pilot}.querySelector('[data-walk-summary]').dataset.walkSummary`), "enough");
+    assert.match(await evaluate(`${pilot}.querySelector('.pp-walks').innerText`), /8 walks on 3 routes, 2026-11-02 to 2026-11-04: 35\.2% of 91 walking minutes in shade/);
+    assert.match(await evaluate(`${pilot}.querySelector('.pp-walks').innerText`), /route A: 3 walks/);
+    await evaluate(`[...${pilot}.querySelectorAll('.pp-walks button')].find(b => b.textContent.trim() === 'Use as the current shade share').click()`);
+    assert.equal(await evaluate(`${pilot}.querySelector('[data-key="exposure:baselineShadePct"]').value`), "35.2");
+    assert.match(await evaluate(`${pilot}.querySelector('[data-key="exposure:basis"]').value`), /^Timed shade walks: 8 walks on 3 routes, 2026-11-02 to 2026-11-04;/);
+    assert.equal(await evaluate(`${pilot}.querySelector('[data-key="exposure:targetShadePct"]').value`), "", "the scenario share stays the planner's assumption");
+    assert.equal(await evaluate(`${pilot}.querySelector('[data-exposure-result]').dataset.exposureResult`), "needs-inputs");
+    assert.doesNotMatch(await evaluate(`${pilot}.querySelector('[data-exposure-missing]').innerText`), /Current share of walking time in shade/);
+    await importWalks(bad);
+    assert.equal(await evaluate(`${pilot}.querySelector('[data-walk-summary]').dataset.walkSummary`), "enough", "a refused file must not touch the walks already imported");
+    await send("Page.navigate", { url: "about:blank" });
+    await send("Page.navigate", { url: `${BASE}/app/` });
+    await waitFor(`document.querySelectorAll('${ROWS}').length > 0 && document.querySelector('#loading').hidden`, "the page to reload");
+    await evaluate(`document.querySelector('#view-tabs button[data-view="pilot"]').click()`);
+    await sleep(400);
+    assert.equal(await evaluate(`${pilot}.querySelector('[data-walk-summary]').dataset.walkSummary`), "enough");
+    assert.equal(await evaluate(`${pilot}.querySelector('[data-key="exposure:baselineShadePct"]').value`), "35.2");
+    await evaluate(`[...${pilot}.querySelectorAll('.pp-walks button')].find(b => b.textContent.trim() === 'Clear walks').click()`);
+    assert.equal(await evaluate(`${pilot}.querySelector('[data-walk-summary]').dataset.walkSummary`), "none");
+    await evaluate(`localStorage.removeItem('elmina-exposure-scenario-v1')`);
+    await evaluate(`document.querySelector('#view-tabs button[data-view="prioritise"]').click()`);
+    const clearPlan = `[...document.querySelector('#card-plan').querySelectorAll('button')].find(b => /^Clear the plan|^Click again/.test(b.textContent))`;
+    await evaluate(`${clearPlan}.click()`);
+    await evaluate(`${clearPlan}.click()`);
+  });
   await check("the trade-off card compares five ways of choosing, as a trade-off with no winner", async () => {
     const card = `document.querySelector('#card-tradeoff')`;
     assert.equal(await evaluate(`${card}.hidden`), false, "the card should show with scores from the scoring model");

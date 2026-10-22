@@ -25,4 +25,5 @@ https://www.simedarbyproperty.com/universityhackathon/ . Tick each box only afte
 
 ## After submitting
 - [ ] Keep a screenshot of the confirmation. Judging runs 24 to 28 October and the Top 10 are announced on 28 October; the mentoring sprint is 2 to 6 November, final submission 11 November, Top 10 pitch day 14 November, final presentation 3 December.
+- [ ] If you can walk even a few routes with a stopwatch before the final submission, do it: 5 walks on 2 routes fill the exposure baseline with a measured number ([shade-walk-protocol.md](../shade-walk-protocol.md)). Label proxy walkers as proxies.
 - [ ] Ask the mentors for the real site list, the official corridor outline, the current tree count, and a few hours of fieldwork (see [pilot-readiness.md](../pilot-readiness.md)).
