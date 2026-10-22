@@ -14,7 +14,7 @@ pip install -r ml/requirements.txt               # scipy and scikit-learn, used 
 python -m ml.run_scoring                         # -> backend/data/cache/weights.json, scores.geojson
 python -m backend.validate_scores backend/data/cache/scores.geojson     # must print OK
 python -m ml.validation                          # -> ml/reports/validation.{json,md}
-python -m pytest ml/tests -q                     # 24 tests
+python -m pytest ml/tests -q
 ```
 
 Then confirm the API picked it up:

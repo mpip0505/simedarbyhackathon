@@ -15,6 +15,14 @@ https://www.simedarbyproperty.com/universityhackathon/ . Tick each box only afte
 | Prototype or code link | yes | https://github.com/mpip0505/simedarbyhackathon (open it logged out; check the latest commit is there and the README renders) | [ ] |
 | Supporting documents | optional | links to `docs/prior-art.md`, `docs/evidence-summary.md`, `docs/commercial-case.md`, `docs/pilot-readiness.md`, `docs/judge-qa.md` in the repository | [ ] |
 
+## Repository and hosting (only the team can do these)
+- [ ] **Push, open the Actions tab and watch the first CI run** (`.github/workflows/tests.yml`). Fix whatever fails before anything else; a red badge on the first page a judge opens costs more than any missing feature.
+- [ ] **Add a LICENSE.** Choose it yourselves: the code can carry any licence you pick, but the data in `backend/data/cache/` includes OpenStreetMap-derived data (ODbL, share-alike and attribution) and Earth Engine processing under a noncommercial registration, so say in the licence note which parts are covered.
+- [ ] Set the GitHub repository **description, website and topics** (for example `urban-forestry`, `geospatial`, `fastapi`, `leaflet`, `sime-darby-hackathon`), and **tag the submission commit** (for example `v1.0-submission`).
+- [ ] **Clean-clone test:** in a fresh folder and a fresh virtual environment, run only the README's commands (`pip install -r backend/requirements.txt`, `uvicorn backend.api.main:app --port 8000`) and open the app. Fix the README if anything is missing.
+- [ ] **Deploy and test from another device.** Build the Docker image (it has not been built yet), deploy with `render.yaml`, set `CORS_ORIGINS` to the service's own address, leave `API_EXPOSE_DETAILS` unset, then open the link on a phone. The free plan sleeps when idle: open it a minute before presenting.
+- [ ] Check in Firefox and on a real phone (only Chromium has been tested), and open the CSV and GeoJSON exports in Excel and QGIS.
+
 ## Final checks on the content
 - [ ] No slide uses a word from the "avoid" list in the deck outline; the simulated sites are called simulated everywhere.
 - [ ] Every number on a slide matches `ml/reports/impact_reach.md`, `ml/reports/uncertainty.md` and `backend/data/cache/crosscheck.json` for the committed data version.

@@ -77,3 +77,9 @@ def test_meta_names_the_corridor_in_use():
     assert "approximate" in corridor_source(approx) and "OpenStreetMap" in corridor_source(approx)
     assert corridor_source(official) == "official polygon supplied"
     assert "approximate" in client.get("/meta").json()["corridor_source"]
+
+
+def test_cors_is_open_by_default_and_restrictable():
+    from backend.api.main import cors_origins
+    assert cors_origins(None) == ["*"] and cors_origins("  ") == ["*"]
+    assert cors_origins("https://a.example, https://b.example") == ["https://a.example", "https://b.example"]

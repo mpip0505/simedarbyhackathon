@@ -4,6 +4,7 @@ Errors are always small JSON bodies with a request id (also sent as the X-Reques
 traces go to the log, never to the client.
 """
 import logging
+import os
 import time
 import uuid
 from contextlib import asynccontextmanager
@@ -37,7 +38,13 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(title="Elmina Canopy Prioritiser API", version="0.3.0", lifespan=lifespan)
-app.add_middleware(CORSMiddleware, allow_origins=["*"], allow_methods=["GET"], allow_headers=["*"])
+def cors_origins(raw: Optional[str]) -> list:
+    """Open to every origin for the local demo; set CORS_ORIGINS to a comma-separated list (for example the hosted site's own address) to restrict it."""
+    listed = [o.strip() for o in (raw or "").split(",") if o.strip()]
+    return listed or ["*"]
+
+
+app.add_middleware(CORSMiddleware, allow_origins=cors_origins(os.environ.get("CORS_ORIGINS")), allow_methods=["GET"], allow_headers=["*"])
 
 
 @app.middleware("http")

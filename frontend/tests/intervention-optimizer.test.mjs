@@ -43,6 +43,11 @@ test("intervention review: Protect and Regenerate need a named ecologist; a name
   assert.equal(interventionReview({ intervention: "" }, sug).state, "suggested");
   assert.equal(interventionReview({ intervention: "regenerate", interventionBy: "" }, sug).state, "needs-ecologist");
   assert.equal(interventionReview({ intervention: "plant-shade", interventionBy: "" }, sug).state, "chosen");
+  // a named reviewer without a review date is not a recorded review
+  const noDate = interventionReview({ intervention: "protect", interventionBy: "Dr A", interventionOn: "" }, sug);
+  assert.equal(noDate.state, "needs-ecologist");
+  assert.match(noDate.text, /review date missing/);
+  assert.equal(interventionReview({ intervention: "plant-shade", interventionBy: "Dr A" }, sug).state, "chosen");
   const r = interventionReview({ intervention: "protect", interventionBy: "Dr A", interventionOn: "2026-10-20" }, sug);
   assert.equal(r.state, "reviewed");
   assert.match(r.text, /Dr A on 2026-10-20/);

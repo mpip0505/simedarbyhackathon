@@ -64,13 +64,15 @@ export function interventionCounts(features) {
 
 /**
  * Where the planner's review stands for one plan entry: { state, text }.
- * state: "suggested" (nothing chosen), "chosen" (chosen, nobody named as reviewer), "reviewed" (chosen and a reviewer named),
- * "needs-ecologist" (Protect or Regenerate chosen without a named reviewer).
+ * state: "suggested" (nothing chosen), "chosen" (chosen, but no reviewer or no review date), "reviewed" (chosen, a reviewer named and a review date recorded),
+ * "needs-ecologist" (Protect or Regenerate chosen without a named reviewer and a review date).
  */
 export function interventionReview(entry, suggestion) {
   const chosen = entry.intervention || "";
   if (!chosen) return { state: "suggested", text: `Suggested: ${suggestion.label} (not reviewed)` };
   const needsEcologist = chosen === "protect" || chosen === "regenerate";
   if (!entry.interventionBy) return { state: needsEcologist ? "needs-ecologist" : "chosen", text: `Chosen: ${INTERVENTION_LABEL[chosen]}${needsEcologist ? ", needs an ecologist's review" : ", reviewer not named"}` };
-  return { state: "reviewed", text: `Chosen: ${INTERVENTION_LABEL[chosen]}, reviewed by ${entry.interventionBy}${entry.interventionOn ? ` on ${entry.interventionOn}` : ""}` };
+  // a named reviewer with no date is not yet a recorded review: the date is what makes it checkable later
+  if (!entry.interventionOn) return { state: needsEcologist ? "needs-ecologist" : "chosen", text: `Chosen: ${INTERVENTION_LABEL[chosen]}, reviewer ${entry.interventionBy} named, review date missing` };
+  return { state: "reviewed", text: `Chosen: ${INTERVENTION_LABEL[chosen]}, reviewed by ${entry.interventionBy} on ${entry.interventionOn}` };
 }

@@ -861,7 +861,9 @@ try {
     assert.match(await text(), /Chosen: Regenerate habitat, needs an ecologist's review/);
     assert.match(await text(), /Regenerate is chosen: name the ecologist who reviewed it/);
     await setVal(`site:${first}:iv-by`, "Test ecologist");
-    assert.match(await text(), /Chosen: Regenerate habitat, reviewed by Test ecologist/);
+    assert.match(await text(), /Chosen: Regenerate habitat, reviewer Test ecologist named, review date missing/);
+    await setVal(`site:${first}:iv-on`, "2026-10-20");
+    assert.match(await text(), /Chosen: Regenerate habitat, reviewed by Test ecologist on 2026-10-20/);
     await setVal(`site:${first}:ready-owner`, "Township landscape team");
     assert.match(await text(), /Establishment and maintenance readiness: 1 of 6 recorded/);
     await evaluate(`${root}.querySelector('.pp-site details[data-key$=":ready"]').open = true; ${root}.querySelector('.pp-site .iv-plan').scrollIntoView({ block: 'start' })`);
