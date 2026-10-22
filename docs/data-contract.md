@@ -2,7 +2,7 @@
 
 ## Optional screening additions (22 October 2026)
 
-- `GET /screening/conflicts`: per-site mapped road/building/path triggers, `data_version`, OSM `input_hashes`, `thresholds_m`, `note` and `stale` (`false`: inputs match, `true`: changed, `null`: uncheckable). Missing/malformed reports return 404. These do not modify score/rank or human field checks.
+- `GET /screening/conflicts` (the siting screen; the route keeps its original name): per-site mapped road/building/path triggers (not wildlife), `data_version`, OSM `input_hashes`, `thresholds_m`, `note` and `stale` (`false`: inputs match, `true`: changed, `null`: uncheckable). Missing/malformed reports return 404. These do not modify score/rank or human field checks.
 - `GET /screening/open-data`: independent OSM-only FeatureCollection. Per-feature properties include simulated `OSM-` site ID, rank, proximity scores/distances and mapped triggers. Collection carries its own version, method, source hashes, attribution, caveats and `stale`. No normal sites/summary/scores required. Missing/malformed artifact returns 404.
 - Browser exposure scenarios require explicitly current `/ml/reach-sets`, complete site coverage and all assumptions. No new writes/API storage are introduced.
 

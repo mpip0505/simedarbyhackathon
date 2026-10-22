@@ -230,8 +230,8 @@ export function renderPilot(root, ctx) {
       el("div", { class: "plan-actions" },
         el("button", { type: "button", class: "btn btn-secondary btn-sm", disabled: !entries.length, onclick: () => {
           const rows = conflictRows(entries.map((e) => byId.get(e.id)).filter(Boolean), ctx.conflicts?.());
-          if (rows.length) ctx.download("elmina-plan-conflicts.csv", toCsv(rows, Object.keys(rows[0]).map((key) => ({ key, label: key }))));
-        } }, "Download mapped conflicts (CSV)"),
+          if (rows.length) ctx.download("elmina-plan-siting-screen.csv", toCsv(rows, Object.keys(rows[0]).map((key) => ({ key, label: key }))));
+        } }, "Download siting screen (CSV)"),
         el("button", { type: "button", class: "btn btn-secondary btn-sm", onclick: () => entries.length ? ctx.download("elmina-work-schedule.csv", toCsv(workSchedule(entries), SCHEDULE_COLUMNS)) : null }, "Download work schedule (CSV)"),
         el("button", { type: "button", class: "btn btn-secondary btn-sm", onclick: () => entries.length ? ctx.download("elmina-planting-plan.csv", toCsv(planRows(entries, byId, plan.trees(), plan.snapshot()), PLAN_COLUMNS)) : null }, "Download plan (CSV)")),
     ]);

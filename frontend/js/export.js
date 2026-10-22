@@ -16,13 +16,13 @@ export function toGeoJson(features, { scoreSource = "unknown", dataVersion = nul
       + (scoreSource === "ml" ? "" : " Scores are previews until the scoring model is connected."),
     score_source: scoreSource,
     data_version: dataVersion,
-    ...(conflicts ? { conflict_note: CONFLICT_CAVEAT } : {}),
+    ...(conflicts ? { siting_note: CONFLICT_CAVEAT } : {}),
     features: features.map((f) => ({
       type: "Feature",
       geometry: f.geometry,
       properties: {
         ...Object.fromEntries(KEEP.filter((k) => k in f.properties).map((k) => [k, f.properties[k]])),
-        ...(conflicts ? { mapped_conflicts: conflictFor(conflicts, f.properties.site_id) } : {}),
+        ...(conflicts ? { siting_screen: conflictFor(conflicts, f.properties.site_id) } : {}),
         ...(plan?.get(f.properties.site_id) ? { plan_status: plan.get(f.properties.site_id).status, plan_note: plan.get(f.properties.site_id).note } : {}),
       },
     })),

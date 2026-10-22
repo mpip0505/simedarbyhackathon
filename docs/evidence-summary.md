@@ -18,7 +18,7 @@ repository (named in the last column) so it can be re-run. **The short answer: w
 | **Automated tests** | Python and ML tests, frontend unit tests and a browser test (counts are in [status.md](status.md), measured by `tools/project_status.py`) that includes an accessibility scan and a hostile-data security test | `backend/tests`, `ml/tests`, `frontend/tests`, `frontend/tools/smoke.mjs` |
 
 ## What we did not do
-The [assessment response](assessment-response.md) documents the mapped conflict screen, resident exposure scenario and runnable OSM-only fallback. Their geometry/arithmetic and operation are software checks; they add no ground observations or measured planting benefit.
+The [assessment response](assessment-response.md) documents the siting screen (mapped roads, buildings and footpaths; not wildlife), resident exposure scenario and runnable OSM-only fallback. Their geometry/arithmetic and operation are software checks; they add no ground observations or measured planting benefit.
 
 - **No ground truth.** No tree inventory, LiDAR, drone survey or field plots. Nothing above shows the ranking is correct; it shows it is consistent and stable.
 - **No real planting-site list.** The 564 sites are simulated 30 m cells on open land, and every screen says so.

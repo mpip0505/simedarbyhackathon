@@ -2,7 +2,7 @@ import { el } from "./dom.js";
 import { CONFLICT_CAVEAT } from "./screening.js";
 
 export function conflictBlock(c) {
-  const title = { review: "Mapped conflict: field review needed", unknown: "Mapped conflicts: unknown", "no-trigger": "No mapped trigger; field checks still needed" }[c.state] ?? "Mapped conflicts: unknown";
+  const title = { review: "Siting screen: field review needed", unknown: "Siting screen: unknown", "no-trigger": "Siting screen: no mapped trigger; field checks still needed" }[c.state] ?? "Siting screen: unknown";
   return el("div", { class: "pp-conflicts", "data-map-conflict": c.state },
     el("p", {}, el("strong", {}, title)),
     c.flags.length ? el("ul", {}, c.flags.map((f) => el("li", {}, `${f.label} (${f.distance_m} m)`))) : null,

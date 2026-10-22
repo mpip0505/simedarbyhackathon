@@ -6,12 +6,12 @@ import { toGeoJson } from "../js/export.js";
 import { appPageUrl } from "../js/api.js";
 
 const report = { stale: false, data_version: "v1", sites: { A: { state: "review", flags: [{ code: "road-edge", label: "Road", distance_m: 10 }], unknown_layers: [], distances_m: { road: 10 } } } };
-test("missing, stale or uncheckable conflict data stays unknown", () => {
+test("missing, stale or uncheckable siting-screen data stays unknown", () => {
   assert.equal(conflictFor(report, "A").state, "review");
   for (const r of [null, { ...report, stale: true }, { ...report, stale: null }]) assert.equal(conflictFor(r, "A").state, "unknown");
   assert.equal(conflictFor(report, "missing").state, "unknown");
 });
-test("conflict exports include unknowns, caveats and version without altering scores", () => {
+test("siting-screen exports include unknowns, caveats and version without altering scores", () => {
   const features = [{ type: "Feature", geometry: null, properties: { site_id: "A", score_total: 90, source: "simulated" } }];
   const row = conflictRows(features, report)[0];
   assert.equal(row.map_state, "review");
@@ -19,7 +19,7 @@ test("conflict exports include unknowns, caveats and version without altering sc
   assert.match(row.caveat, /not an approval/);
   assert.equal(row.data_version, "v1");
   const geo = toGeoJson(features, { scoreSource: "ml", conflicts: report });
-  assert.equal(geo.features[0].properties.mapped_conflicts.state, "review");
+  assert.equal(geo.features[0].properties.siting_screen.state, "review");
   assert.equal(geo.features[0].properties.score_total, 90);
 });
 test("OSM-only exports retain provenance, status, methods and attribution", () => {

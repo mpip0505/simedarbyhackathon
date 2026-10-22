@@ -68,3 +68,17 @@ test("the pilot plan keeps its honesty wording: the planner's own entries, never
   assert.match(all, /Nothing is assumed: with a field left empty, the answer says Not set/);
   assert.match(all, /Reach counts what lies near the sites[\s\S]*It is not a benefit/);
 });
+
+test("the siting screen is not called a conflict screen anywhere a person reads, and it says it is not about wildlife", () => {
+  const readme = readFileSync(new URL("../../README.md", import.meta.url), "utf8");
+  const openData = read("open-data.html");
+  for (const [name, text] of [...shipped, ["open-data.html", openData], ["README.md", readme]]) {
+    for (const old of [/mapped conflicts?\b/i, /conflicts? only/i, /conflict-aware/i, /conflict screen/i, /Download mapped conflicts/i]) {
+      assert.doesNotMatch(text, old, `${name} still says ${old}`);
+    }
+  }
+  const all = shipped.map(([, t]) => t).join("\n");
+  assert.match(all, /does not assess wildlife/);
+  assert.match(all, /no forest-edge layer is mapped/);
+  assert.match(all, /Siting screen: field review needed/);
+});

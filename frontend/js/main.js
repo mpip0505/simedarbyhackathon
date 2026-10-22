@@ -187,7 +187,7 @@ async function boot() {
     .map((p) => p.catch(() => null)));
   const [spine, pathShade, overlays, uncertainty, shortlist, impact, tradeoff, reachSets, conflicts, ...osmList] = optional;
   $("#conflict-only").disabled = conflicts?.stale !== false;
-  $("#conflict-filter-note").textContent = conflicts?.stale === false ? "Map triggers only; field checks still needed." : "Current mapped conflict screen unavailable.";
+  $("#conflict-filter-note").textContent = conflicts?.stale === false ? "Map triggers only; field checks still needed." : "Current siting screen unavailable.";
   const osm = Object.fromEntries(OSM_NAMES.map((n, i) => [n, osmList[i]]));
   if (!osmList.some(Boolean)) $("#notices").append(el("div", { class: "notice" }, "No OpenStreetMap basemap in this data set; showing the sites only."));
 

@@ -668,7 +668,7 @@ try {
     await evaluate(`${clear}.click()`);
     assert.match(await evaluate(`document.querySelector('#card-plan').innerText`), /No sites yet/);
   });
-  await check("mapped conflict filter opens a flagged card without changing field checks or scores", async () => {
+  await check("siting-flag filter opens a flagged card without changing field checks or scores", async () => {
     const before = await rows();
     const mapped = await (await fetch(BASE + "/screening/conflicts")).json();
     const flaggedCount = Object.values(mapped.sites).filter((s) => s.state === "review").length;

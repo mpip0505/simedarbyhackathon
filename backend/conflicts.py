@@ -1,4 +1,5 @@
-"""Mapped planting conflicts: geometry heuristics for field review, never a safety clearance.
+"""The siting screen: mapped roads, buildings and footpaths near a site, as geometry heuristics for field review, never a safety clearance.
+It does not assess wildlife (no forest-edge layer is mapped).
 
 Run `python -m backend.conflicts` after the sites/OSM build. No changes to scores or the sites data version.
 """
@@ -14,6 +15,7 @@ from backend.provenance import file_hashes
 
 THRESHOLDS_M = {"road_edge": 15, "building_edge": 10, "path_overlap": 0}
 NOTE = ("Mapped geometry triggers for field review, not an approval or a legal setback check. "
+        "It looks only at mapped roads, buildings and footpaths (for tree-fall, clearance and access review) and does not assess wildlife: no forest-edge layer is mapped, and that would need an ecologist. "
         "Distances are from the edge of a simulated 30 m cell; the final tree position is unknown. "
         "OSM roads are centre lines, not kerbs. No mapped trigger does not establish safety. "
         "Utilities, overhead wires, sight lines, ownership, drainage and species/root clearances remain unknown until checked on site.")
@@ -59,7 +61,7 @@ def main() -> None:
     report["input_hashes"] = file_hashes(osm, [f"{key}.geojson" for key, value in layers.items() if value is not None])
     atomic.write_json(CACHE_DIR / "conflicts.json", report)
     counts = {state: sum(r["state"] == state for r in report["sites"].values()) for state in ("review", "unknown", "no-trigger")}
-    print(f"Mapped conflict screen: {counts}")
+    print(f"Siting screen: {counts}")
 
 
 if __name__ == "__main__":
