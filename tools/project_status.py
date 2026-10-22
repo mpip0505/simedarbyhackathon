@@ -51,7 +51,7 @@ def browser_checks() -> int:
     return len(re.findall(r"await check\(", (ROOT / "frontend" / "tools" / "smoke.mjs").read_text(encoding="utf-8")))
 
 
-VIEW_NAMES = {"prioritise": "Plant first", "report": "Before and after", "pilot": "Pilot plan"}
+VIEW_NAMES = {"start": "Home", "prioritise": "Map", "sites": "Sites", "report": "Trends", "tracker": "Tracker", "about": "Methods and limits", "pilot": "Advanced tools"}
 
 
 def views() -> list[str]:
