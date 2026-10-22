@@ -74,7 +74,7 @@ export function renderCard(body, feature, { weights, ctx, total, placeholder, st
         measure("Greenness within 250 m", fmt(p.ndvi_mean_250m, 2)),
         measure("Footpath within 50 m", fmtMetres(p.path_length_within_50m)),
         measure("...of which without shade", fmtMetres(p.uncovered_path_length_50m)),
-        measure("Distance to a corridor gap", fmtMetres(p.corridor_gap_dist_m)),
+        measure("Distance to a gap in the approximate corridor", fmtMetres(p.corridor_gap_dist_m)),
         measure("Distance to the nearest park", fmtMetres(p.dist_to_nearest_park_m)),
         measure("Buildings within 250 m", p.buildings_within_250m ?? fmt(null)),
         measure("Ground heat measured, not estimated", fmtPct(100 * p.lst_valid_frac, 0)),

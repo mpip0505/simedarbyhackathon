@@ -11,7 +11,7 @@ export const INTERVENTIONS = [
   { key: "protect", label: "Protect existing vegetation", principle: "Conserve",
     sees: "Preserve valuable existing trees or habitat; field review required", reviewer: "ecologist" },
   { key: "regenerate", label: "Regenerate habitat", principle: "Regenerate",
-    sees: "Consider restoration near a corridor gap, with ecologist input", reviewer: "ecologist" },
+    sees: "Consider restoration near a gap in the approximate corridor, with ecologist input", reviewer: "ecologist" },
   { key: "plant-shade", label: "Plant for pedestrian shade", principle: "Regenerate",
     sees: "Candidate planting near footpaths the satellite sees as poorly shaded", reviewer: "landscape" },
   { key: "inspect", label: "Inspect before deciding", principle: "Avoid",
@@ -49,7 +49,7 @@ export function suggestIntervention(p) {
     reasons = [why[key]];
   } else {
     key = "inspect";
-    reasons = ["No mapped corridor gap or poorly shaded footpath is close by, and the satellite does not see dense greenery: a visit should decide what, if anything, fits."];
+    reasons = ["No gap in the approximate corridor or poorly shaded footpath is close by, and the satellite does not see dense greenery: a visit should decide what, if anything, fits."];
   }
   const meta = INTERVENTIONS.find((i) => i.key === key);
   return { key, label: meta.label, principle: meta.principle, reasons, also: met.filter((k) => k !== key).map((k) => ({ key: k, label: INTERVENTION_LABEL[k], reason: why[k] })), reviewer: meta.reviewer };

@@ -73,7 +73,7 @@ export function createOptimizerPanel(ctx) {
       el("label", { class: "pp-field" }, el("span", {}, "What should the round reach?"),
         el("select", { class: "select", "data-key": "opt:obj", onchange: (e) => { state.objective = e.target.value; draw(); } }, OBJECTIVES.map((o) => el("option", { value: o.key, selected: o.key === state.objective ? "" : null }, o.label)))));
     box.append(el("h3", {}, "Best combination for your inspection capacity"),
-      el("p", { class: "pp-help" }, `The top ${state.k} scores can sit side by side and reach the same footpath, homes and corridor gaps. This picks, one at a time, the site that adds the most not yet reached, from the ${POOL} highest-priority sites, leaving out sites you rejected. The ranking itself does not change.`),
+      el("p", { class: "pp-help" }, `The top ${state.k} scores can sit side by side and reach the same footpath, homes and gaps in the approximate corridor. This picks, one at a time, the site that adds the most not yet reached, from the ${POOL} highest-priority sites, leaving out sites you rejected. The ranking itself does not change.`),
       controls);
     const best = bestCoverage(reach, ranked, state.k, state.objective, { exclude: rejected });
     if (!best || !best.ids.length) {
@@ -90,7 +90,7 @@ export function createOptimizerPanel(ctx) {
     const cell = (o, k, unit) => el("td", { class: "num" }, o.reach ? `${nf(o.reach[k])}${unit}${o.best && base ? delta(o.reach[k], base[k]) : ""}` : "–");
     box.append(el("div", { class: "table-scroll" }, el("table", { class: "plan-table opt-table" },
       el("caption", { class: "sr-only" }, "Three ways to choose the round, compared"),
-      el("thead", {}, el("tr", {}, ["Way to choose", "Footpath with little tree cover", "Mapped homes", "Corridor gap", "Average score"].map((h, i) => el("th", { scope: "col", class: i ? "num" : null }, h)))),
+      el("thead", {}, el("tr", {}, ["Way to choose", "Footpath with little tree cover", "Mapped homes", "Corridor gap (approximate)", "Average score"].map((h, i) => el("th", { scope: "col", class: i ? "num" : null }, h)))),
       el("tbody", {}, options.map((o) => el("tr", { class: o.best ? "opt-best" : null },
         el("th", { scope: "row" }, o.label),
         cell(o, "footpath_m", " m"), cell(o, "homes", ""), cell(o, "gap_m", " m"),

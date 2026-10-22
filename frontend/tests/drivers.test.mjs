@@ -89,8 +89,8 @@ test("mainReason names the strongest score's cause in a few words", () => {
   assert.equal(mainReason(hotBare, heatOnly, ctx), "hot and bare around it");
   assert.equal(mainReason({ ...hotBare, ndvi_mean_250m: 0.5 }, heatOnly, ctx), "hot surroundings");
   assert.equal(mainReason({ ...hotBare, lst_mean_250m: 36, ndvi_mean_250m: 0.3 }, heatOnly, ctx), "bare surroundings");
-  assert.equal(mainReason(hotBare, linkOnly, ctx), "next to a corridor gap");
-  assert.equal(mainReason({ ...hotBare, corridor_gap_flag: false }, linkOnly, ctx), "close to the corridor");
+  assert.equal(mainReason(hotBare, linkOnly, ctx), "next to a gap in the approximate corridor");
+  assert.equal(mainReason({ ...hotBare, corridor_gap_flag: false }, linkOnly, ctx), "close to the approximate corridor");
   assert.equal(mainReason(hotBare, shadeOnly, ctx), "unshaded footpath nearby");
   assert.equal(mainReason({ ...hotBare, uncovered_path_length_50m: 0 }, shadeOnly, ctx), "walkers nearby");
 });
@@ -105,7 +105,7 @@ test("mainReason follows the weights and copes with missing measurements", () =>
 
 test("siteHeadline is one readable sentence built from what is notable", () => {
   const s = siteHeadline(base, ctx);
-  assert.equal(s, "Hot, bare surroundings, a footpath with no shade and right next to a gap in the corridor.");
+  assert.equal(s, "Hot, bare surroundings, a footpath with no shade and right next to a gap in the approximate corridor.");
   assert.ok(s.endsWith(".") && s[0] === s[0].toUpperCase());
 });
 
@@ -113,7 +113,7 @@ test("siteHeadline with one or two facts, and with nothing notable", () => {
   const calm = { ...base, lst_mean_250m: 38, ndvi_mean_250m: 0.45, uncovered_path_length_50m: 0, corridor_gap_flag: false, corridor_gap_dist_m: 700 };
   assert.equal(siteHeadline(calm, ctx), "A moderate fit: nothing stands out on heat, shade or the corridor.");
   assert.equal(siteHeadline({ ...calm, uncovered_path_length_50m: 60 }, ctx), "A footpath with no shade.");
-  assert.equal(siteHeadline({ ...calm, corridor_gap_dist_m: 90 }, ctx), "Close to a gap in the corridor.");
+  assert.equal(siteHeadline({ ...calm, corridor_gap_dist_m: 90 }, ctx), "Close to a gap in the approximate corridor.");
   assert.equal(siteHeadline({ ...calm, lst_mean_250m: 44, uncovered_path_length_50m: 60 }, ctx), "Hot surroundings and a footpath with no shade.");
 });
 

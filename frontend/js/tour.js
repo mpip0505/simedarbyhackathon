@@ -7,7 +7,7 @@ export const TOUR_STEPS = [
   { target: "#sheet-matters", title: "What matters most?", text: "Move the three sliders. The list and the map re-rank at once, with the same formula as the server." },
   { target: "#sheet-top", title: "Top sites", text: "Each row gives a one-sentence reason. Spread out picks a first round that covers more areas." },
   { target: "#card-plan", title: "Planting plan", text: "Add sites, set a status and a note, and download the plan or a field sheet. These are your own entries, kept on this device, and not verified." },
-  { target: "#card-impact", title: "What the top sites reach", text: "Footpath, mapped homes and corridor gaps near the first sites, each counted once. Reach, not benefit." },
+  { target: "#card-impact", title: "What the top sites reach", text: "Footpath, mapped homes and gaps in the approximate corridor near the first sites, each counted once. Reach, not benefit." },
   { target: "#card-tradeoff", title: "Compare ways to choose", text: "The same first sites chosen five ways. A trade-off, not a league table: the planner decides what matters." },
   { target: "#layers-button", title: "Map layers", text: "Switch on footpath greenness, greenness and ground heat from satellite, or the street map." },
   { target: "#open-limits", title: "Limits of this data", text: "What we checked and what we did not. There are no field data yet, so nothing here proves the ranking is right." },

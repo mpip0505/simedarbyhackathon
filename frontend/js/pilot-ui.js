@@ -223,7 +223,7 @@ export function renderPilot(root, ctx) {
       el("h3", {}, "What the shortlist reaches, counted once"),
       el("div", { class: "table-scroll" }, el("table", { class: "plan-table" },
         el("caption", { class: "sr-only" }, "Unique reach of the shortlist"),
-        el("thead", {}, el("tr", {}, ["Sites", "Count", "250 m areas", "Footpath with little tree cover", "Mapped homes", "Corridor gap"].map((h, i) => el("th", { scope: "col", class: i > 0 ? "num" : null }, h)))),
+        el("thead", {}, el("tr", {}, ["Sites", "Count", "250 m areas", "Footpath with little tree cover", "Mapped homes", "Corridor gap (approximate)"].map((h, i) => el("th", { scope: "col", class: i > 0 ? "num" : null }, h)))),
         el("tbody", {}, reachRow("Everything in the plan", allIds), reachRow("Approved and planted", goIds)))),
       el("p", { class: "small-note" }, "Reach counts what lies near the sites, every footpath sample, home and gap once. It is not a benefit. The footpath figure is satellite greenness along mapped footpaths; mapped homes are the ones OpenStreetMap shows."),
       ctx.exposure ? exposurePanel(ctx.exposure, unionReach(reach, entries.filter((e) => e.status !== "rejected").map((e) => e.id)), ctx.download,

@@ -56,6 +56,10 @@ function setChip(id, text, kind) {
 
 function showStatus(meta) {
   const mock = meta.data_mode === "mock";
+  for (const chip of $$("[data-corridor-chip]")) {
+    chip.textContent = meta.corridor_approximate === false ? "Corridor: official polygon" : "Corridor: approximate (OpenStreetMap)";
+    chip.title = meta.corridor_source ?? "";
+  }
   setChip("#chip-mode", mock ? "Data: MOCK (invented)" : "Data: cached real data", mock ? "bad" : "quiet");
   const scores = {
     ml: ["Scores: scoring model", "ok"],

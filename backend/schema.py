@@ -68,6 +68,7 @@ class Meta(BaseModel):
     data_mode: Literal["mock", "cache"]
     site_count: int
     corridor_approximate: bool
+    corridor_source: Optional[str] = None       # which corridor the gap results use: approximate (OpenStreetMap parks) or an official polygon
     score_source: Literal["ml", "placeholder", "mock"]
     generated_at: Optional[str] = None  # when the cached data was built (None for mock data)
     data_version: Optional[str] = None          # hash of the current sites; ML scores echo it back

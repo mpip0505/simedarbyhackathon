@@ -90,6 +90,13 @@ def health_deep() -> JSONResponse:
     return JSONResponse(selfcheck.public_view(result), status_code=200 if result["ok"] else 503)
 
 
+def corridor_source(features: list) -> str:
+    """Which corridor every corridor-gap result in the app is measured against."""
+    if features and not any(f["properties"].get("approximate", True) for f in features):
+        return "official polygon supplied"
+    return "approximate: derived from OpenStreetMap parks, not the official outline"
+
+
 @app.get("/meta", response_model=Meta)
 def meta() -> Meta:
     corridor = store.load_corridor()["features"]
@@ -99,6 +106,7 @@ def meta() -> Meta:
         data_mode=store.data_mode(),
         site_count=len(feats),
         corridor_approximate=any(f["properties"].get("approximate", True) for f in corridor),
+        corridor_source=corridor_source(corridor),
         score_source=store.score_source(feats),
         generated_at=store.generated_at(),
         data_version=data.get("data_version"),

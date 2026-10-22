@@ -92,3 +92,13 @@ test("the OSM-only page says it is a licence fallback and a proximity screen, no
   assert.match(page, /does not replace the satellite method/);
   assert.doesNotMatch(page, /Open-data fallback<\/h1>/);
 });
+
+test("every on-screen 'corridor gap' says the corridor is approximate", () => {
+  for (const [name, text] of shipped) {
+    text.split("\n").forEach((line, i) => {
+      const code = line.trim();
+      if (/^(\/\/|\*|\/\*|<!--)/.test(code) || /corridor_gap/.test(code.replace(/corridor gap/gi, ""))) return;
+      if (/corridor gaps?\b/i.test(code)) assert.match(code, /approximate/i, `${name}:${i + 1} says "corridor gap" without "approximate"`);
+    });
+  }
+});

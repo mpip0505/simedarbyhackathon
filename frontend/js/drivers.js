@@ -44,7 +44,7 @@ export function mainReason(p, weights, ctx) {
     const hot = hotterThan(p, ctx) >= NOTABLE, bare = lessGreenThan(p, ctx) >= NOTABLE;
     return hot && bare ? "hot and bare around it" : hot ? "hot surroundings" : "bare surroundings";
   }
-  if (top === "connectivity") return p.corridor_gap_flag ? "next to a corridor gap" : "close to the corridor";
+  if (top === "connectivity") return p.corridor_gap_flag ? "next to a gap in the approximate corridor" : "close to the approximate corridor";
   return p.uncovered_path_length_50m > 0 ? "unshaded footpath nearby" : "walkers nearby";
 }
 
@@ -56,8 +56,8 @@ export function siteHeadline(p, ctx) {
   else if (hot) facts.push("hot surroundings");
   else if (bare) facts.push("little greenery around it");
   if (p.uncovered_path_length_50m > 0) facts.push("a footpath with no shade");
-  if (p.corridor_gap_flag) facts.push("right next to a gap in the corridor");
-  else if (Number.isFinite(p.corridor_gap_dist_m) && p.corridor_gap_dist_m <= 150) facts.push("close to a gap in the corridor");
+  if (p.corridor_gap_flag) facts.push("right next to a gap in the approximate corridor");
+  else if (Number.isFinite(p.corridor_gap_dist_m) && p.corridor_gap_dist_m <= 150) facts.push("close to a gap in the approximate corridor");
   if (!facts.length) return "A moderate fit: nothing stands out on heat, shade or the corridor.";
   const text = facts.length === 1 ? facts[0] : `${facts.slice(0, -1).join(", ")} and ${facts.at(-1)}`;
   return `${text.charAt(0).toUpperCase()}${text.slice(1)}.`;

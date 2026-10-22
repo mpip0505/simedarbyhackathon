@@ -68,3 +68,12 @@ def test_schema_rejects_out_of_range():
         SiteProperties(site_id="x", source="mock", area_m2=1, ndvi_mean=2, lst_c_mean=30,
                        canopy_pct_baseline=10, dist_to_path_m=1, path_length_within_50m=1,
                        corridor_gap_flag=False, corridor_gap_dist_m=0)
+
+
+def test_meta_names_the_corridor_in_use():
+    from backend.api.main import corridor_source
+    approx = [{"properties": {"approximate": True}}]
+    official = [{"properties": {"approximate": False}}]
+    assert "approximate" in corridor_source(approx) and "OpenStreetMap" in corridor_source(approx)
+    assert corridor_source(official) == "official polygon supplied"
+    assert "approximate" in client.get("/meta").json()["corridor_source"]

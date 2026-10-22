@@ -9,7 +9,7 @@ test("the strip counts sites, the top score, corridor-gap sites and sites with m
   const [sites, top, gap, heat] = plantStats(ranked, { placeholder: true, usingServer: true });
   assert.deepEqual(sites, { label: "Candidate sites", value: "4", unit: "", note: "simulated" });
   assert.deepEqual(top, { label: "Top preview score", value: "81.2", unit: "", note: "placeholder weights" });
-  assert.deepEqual(gap, { label: "Near a corridor gap", value: "2", unit: "sites", note: "within 50 m" });
+  assert.deepEqual(gap, { label: "Near a corridor gap", value: "2", unit: "sites", note: "within 50 m of the approximate corridor" });
   // 0.9 and 0.5 count as measured; 0.3 and a missing value count as estimated
   assert.deepEqual(heat, { label: "Reliable ground heat", value: "2", unit: "of 4", note: "2 are estimated" });
 });

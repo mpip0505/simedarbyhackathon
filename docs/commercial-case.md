@@ -36,7 +36,7 @@ An audit of the code (22 October 2026) found Elmina is built in at these points,
 | `backend/osm/extract.py` | the OpenStreetMap place name used to fetch the boundary | take a place name or a boundary file |
 | `backend/sites/generate.py` | site IDs start with `ELM-` | use a township prefix |
 | `backend/config.py` caveats and `docs/` | the cross-check sentence quotes Elmina's numbers (28%, 7% to 4%, 10%) | regenerate the cross-check and rewrite the sentence per township |
-| `backend/osm/corridor.py` | the corridor is built from OpenStreetMap parks; it is an approximation | use the official corridor polygon if the developer supplies one (already supported as `backend/data/input/corridor_official.geojson`) |
+| `backend/osm/corridor.py` | the corridor is built from OpenStreetMap parks; it is an approximation and the sidebar says so (`/meta.corridor_source`) | use the official corridor polygon if the developer supplies one (already supported as `backend/data/input/corridor_official.geojson`) |
 | frontend copy | headline and labels name City of Elmina | make the township name a setting |
 Our estimate, not measured: **about one to two days of careful engineering plus a test run** for the first additional township, then much less for each after, because the
 OpenStreetMap fetch and the cloud-masked composites are the same. The free map-data service we used was unreliable on busy days, so allow retries. **This has not been run on any other township.**

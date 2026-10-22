@@ -19,7 +19,7 @@ export function renderImpact(card, report) {
   }
   clear(card).append(
     el("div", { class: "card-head" }, el("h3", {}, "What the top sites reach"),
-      el("p", { class: "card-sub" }, "Footpath, homes and corridor gaps near the first sites in the default ranking")),
+      el("p", { class: "card-sub" }, "Footpath, homes and gaps in the approximate corridor near the first sites in the default ranking")),
     el("div", { class: "card-chips" }, el("span", { class: "chip chip-warn" }, "Reach, not benefit"),
       report.stale ? el("span", { class: "chip chip-bad" }, "Computed on older data") : null),
     el("div", { class: "seg seg-sm", role: "group", "aria-label": "How many sites" }, buttons),

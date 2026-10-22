@@ -63,6 +63,9 @@ No targets are set here, because nothing in our data supports a number; the deve
 - Which disclosure or internal report would use these numbers, and what level of evidence does it require?
 - Where must the data and the service live (their cloud, ours, on-premise)?
 
+## The corridor in use
+All corridor-gap results use an **approximate corridor** (the larger OpenStreetMap parks joined along footpaths and roads; about 2 km of spine against the stated 5 km). The sidebar shows "Corridor: approximate (OpenStreetMap)" and `/meta.corridor_source` says the same. **Asking Sime Darby Property for the official corridor polygon is the first data request**: drop it at `backend/data/input/corridor_official.geojson`, rebuild (`python -m backend.build_cache --skip-gee`) and re-run the ML reports, and the app will say "official polygon".
+
 ## What the app now supports for a pilot (and what it still needs)
 New since the 70/100 assessment: siting-screen triggers (mapped roads, buildings and footpaths; not wildlife) are visible independently of the five human field checks; step 3 adds an explicit-assumption resident shade-exposure scenario; and an OSM-only fallback supports reduced screening without Earth Engine. Methods, commands and evidence gaps are in [assessment-response.md](assessment-response.md). No field outcome or species match is claimed.
 
