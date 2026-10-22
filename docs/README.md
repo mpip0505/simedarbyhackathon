@@ -22,6 +22,7 @@ Test, browser-check and view counts are never typed into prose: they come from [
 | [pitch/submission-checklist.md](pitch/submission-checklist.md) | everything to tick before 23 October, 11:59 PM |
 | [pitch/deck-outline.md](pitch/deck-outline.md) | the slides, on the official Mechanism and Enabler structure |
 | [pitch/video-script.md](pitch/video-script.md) | the 5-minute video script |
+| [pitch/mentor-conversation.md](pitch/mentor-conversation.md) | the email, three questions and answer sheet for a 15-minute mentor call (not yet held) |
 | [pitch/user-flow.md](pitch/user-flow.md) | who uses it and what happens next, today versus the real-world steps |
 | [pitch/screens/](pitch/screens/) | screenshots used in the README and the deck |
 

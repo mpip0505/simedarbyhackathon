@@ -23,6 +23,9 @@ https://www.simedarbyproperty.com/universityhackathon/ . Tick each box only afte
 - [ ] **Deploy and test from another device.** Build the Docker image (it has not been built yet), deploy with `render.yaml`, set `CORS_ORIGINS` to the service's own address, leave `API_EXPOSE_DETAILS` unset, then open the link on a phone. The free plan sleeps when idle: open it a minute before presenting.
 - [ ] Check in Firefox and on a real phone (only Chromium has been tested), and open the CSV and GeoJSON exports in Excel and QGIS.
 
+## One conversation that is worth more than a feature
+- [ ] Ask a hackathon mentor for 15 minutes using [mentor-conversation.md](mentor-conversation.md): who owns the budget, how sites are chosen today, what reporting evidence is needed. Record the answers honestly and label them "one mentor conversation".
+
 ## Final checks on the content
 - [ ] No slide uses a word from the "avoid" list in the deck outline; the simulated sites are called simulated everywhere.
 - [ ] Every number on a slide matches `ml/reports/impact_reach.md`, `ml/reports/uncertainty.md` and `backend/data/cache/crosscheck.json` for the committed data version.
