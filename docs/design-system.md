@@ -94,7 +94,13 @@ the top of the step (each one a link to its field) and marks the fields themselv
 message with an alert icon under the field. They disappear as soon as the field is fixed. Optional fields say "(optional)", required
 ones say "(required)". A form that submits in place (recording a tree) shows the same field messages without redrawing, so what was
 typed stays. Checkboxes use the design system's `cb` class and file pickers
-use the `file` component (a secondary button plus the chosen name); the browser's own controls are never shown.
+use the `file` component (a secondary button plus the chosen name); the browser's own controls are never shown. Dates use the date picker (`dateInput` in `form-ui.js`): the
+browser's own calendar inside a normal field with our calendar icon, the whole field opens it, and `min`/`max` stop a visit or a planting
+being dated in the future. Selects use the combobox (`select-ui.js`): a button styled like a field that opens a list styled
+like our menus, with a tick on the current choice and greyed-out options that cannot be picked (their tooltip says why). The native
+`<select class="select">` stays inside, hidden, holding the value, so change handlers keep working; every `select.select` on the
+page is enhanced, including ones drawn later. Keyboard: Enter, Space or an arrow opens it; arrows, Home, End and a typed letter move;
+Enter picks; Escape closes without closing anything else.
 
 After the flow, the table page is where the work happens: tabs (Sites, Field results, Trees, Evidence), and one site opens on its own
 page rather than unfolding inside the table.

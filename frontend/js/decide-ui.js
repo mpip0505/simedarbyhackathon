@@ -22,6 +22,7 @@ export function interventionCardBlock(props) {
 
 /** The editable block in a pilot-plan site card: suggestion, the planner's choice, reviewer and date. */
 export function interventionPlanBlock(plan, entry, props, { field, select, input, key }) {
+  const dateInput = (value, k, label, onChange) => el("input", { type: "date", class: "input input-date", "data-key": k, "aria-label": label, value: value ?? "", onchange: (e) => onChange(e.target.value) });
   const s = props ? suggestIntervention(props) : null;
   const review = s ? interventionReview(entry, s) : null;
   const tone = { suggested: "chip chip-quiet", chosen: "chip chip-warn", "needs-ecologist": "chip chip-bad", reviewed: "chip chip-ok" }[review?.state] ?? "chip chip-quiet";
@@ -32,7 +33,7 @@ export function interventionPlanBlock(plan, entry, props, { field, select, input
       field("Chosen intervention", select([{ key: "", label: s ? `Not chosen (suggested: ${s.label})` : "Not chosen" }, ...INTERVENTIONS.map((i) => ({ key: i.key, label: `${i.label} (${i.principle})` }))],
         entry.intervention, key("iv"), `Chosen intervention for ${entry.id}`, (v) => plan.setIntervention(entry.id, v, "pilot"))),
       field("Reviewed by", input(entry.interventionBy, key("iv-by"), `Who reviewed the intervention for ${entry.id}`, (v) => plan.setInterventionBy(entry.id, v, "pilot"), { max: 60, placeholder: "ecologist or landscape lead" })),
-      field("Reviewed on", input(entry.interventionOn, key("iv-on"), `Review date for ${entry.id}, year-month-day`, (v) => plan.setInterventionOn(entry.id, v, "pilot"), { max: 10, placeholder: "2026-11-01" }))),
+      field("Reviewed on", dateInput(entry.interventionOn, key("iv-on"), `Review date for ${entry.id}`, (v) => plan.setInterventionOn(entry.id, v, "pilot")))),
     el("p", { class: "small-note" }, INTERVENTION_CAVEAT));
 }
 

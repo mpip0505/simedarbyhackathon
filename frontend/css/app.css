@@ -968,3 +968,31 @@ body.flow .tk-act + .pp-caption { width: 100%; max-width: 900px; margin-inline: 
 .plan-controls { display: flex; flex-direction: column; gap: 8px; padding: 12px; background: var(--accent-tint); border: 1px solid var(--accent-line); border-radius: var(--r-3); }
 .plan-controls h3 { margin: 0; font-size: 13px; line-height: 20px; }
 .btn-block { width: 100%; justify-content: center; }
+
+/* ---------- date picker: the browser's own calendar inside a design-system field, with our calendar icon ---------- */
+.input[type="date"] { position: relative; font-variant-numeric: tabular-nums; color: var(--text); cursor: pointer; }
+.input[type="date"]:not(:valid):not(:focus) { color: var(--text-muted); }
+@supports selector(::-webkit-calendar-picker-indicator) {
+  .input[type="date"] { padding-right: 34px; background: #fff url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%2378786F' stroke-width='1.75' stroke-linecap='round' stroke-linejoin='round'%3E%3Crect x='3' y='4.5' width='18' height='16.5' rx='2'/%3E%3Cpath d='M16 3v3M8 3v3M3 9.5h18'/%3E%3C/svg%3E") no-repeat right 10px center / 16px 16px; }
+  .input[type="date"]::-webkit-calendar-picker-indicator { position: absolute; inset: 0; width: auto; height: auto; margin: 0; padding: 0; opacity: 0; cursor: pointer; }   /* the whole field opens the calendar */
+  .input[type="date"]:hover { border-color: var(--border-strong); }
+}
+.input[type="date"]::-webkit-datetime-edit-fields-wrapper { padding: 0; }
+.input[type="date"][aria-invalid="true"] { border-color: var(--bad-dot); }
+
+/* ---------- select (combobox): our button and a menu-style list; the native select stays hidden inside, holding the value ---------- */
+.cselect { position: relative; display: block; min-width: 0; }
+.cselect > select { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 0; pointer-events: none; }
+.cselect-btn { display: flex; align-items: center; width: 100%; color: var(--text); font: inherit; font-size: 13px; text-align: left; cursor: pointer; }
+.cselect-value { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.cselect-btn:hover { border-color: var(--border-strong); }
+.cselect-btn:focus-visible, .cselect-btn[aria-expanded="true"] { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent-line); }
+.cselect-btn:disabled { background-color: var(--stone-50); color: var(--stone-500); cursor: not-allowed; }
+.cselect[aria-invalid="true"] .cselect-btn, .cselect-btn[aria-invalid="true"] { border-color: var(--bad-dot); }
+.cselect-list { position: fixed; z-index: 60; width: auto; max-width: min(360px, calc(100vw - 16px)); max-height: 280px; margin: 0; overflow-y: auto; list-style: none; outline: none; }
+.cselect-list[hidden] { display: none; }
+.cselect-option { height: auto; min-height: 32px; padding-top: 6px; padding-bottom: 6px; font-size: 13px; line-height: 18px; cursor: pointer; }
+.cselect-option.is-active { background: var(--hover); }
+.cselect-option[aria-selected="true"] { font-weight: 500; }
+.cselect-option[aria-selected="true"]::after { content: ""; flex: none; width: 14px; height: 14px; background: var(--accent-fill); -webkit-mask: var(--i-tick) center / contain no-repeat; mask: var(--i-tick) center / contain no-repeat; }
+.cselect-option[aria-disabled="true"] { color: var(--stone-400, #A8A8A1); cursor: not-allowed; }

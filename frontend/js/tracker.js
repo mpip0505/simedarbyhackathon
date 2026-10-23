@@ -9,7 +9,7 @@ import { CHECKS, CHECK_VALUES, FIELD_SHEET_COLUMNS, PLAN_CAVEAT, feasibility } f
 import { VERSION_COLUMNS, dateOK, versionedSheetRows } from "./review.js";
 import { TREE_COLUMNS, maintenanceSchedule, survivalReport, treeRows } from "./trees.js";
 import { NOT_SUITABLE, STAGES, approvalGaps, groupByStage, nextAction, stageOf, summaryLine } from "./tracker-logic.js";
-import { field, input, select, setError, errorNote } from "./form-ui.js";
+import { dateInput, field, input, select, setError, errorNote } from "./form-ui.js";
 import { createTreeUI } from "./trees-ui.js";
 import { createReviewUI } from "./review-ui.js";
 import { createSiteMap } from "./site-map.js";
@@ -235,7 +235,7 @@ export function renderTracker(root, ctx) {
   function recordStep(e, f, say) {
     const st = { observer: e.inspection?.observer ?? e.observed?.observer ?? "", date: e.inspection?.date ?? ctx.today(), reference: e.inspection?.reference ?? "", checks: { ...e.checks } };
     const observer = input(st.observer, "tk:observer", "Visited by", (v) => { st.observer = v; }, { max: 60, placeholder: "name of the person who went" });
-    const date = input(st.date, "tk:date", "Date of the visit", (v) => { st.date = v; }, { type: "date" });
+    const date = dateInput(st.date, "tk:date", "Date of the visit", (v) => { st.date = v; }, { max: ctx.today() });
     const reference = input(st.reference, "tk:reference", "Evidence reference", (v) => { st.reference = v; }, { max: 120, placeholder: "for example photo 12 or report name" });
     const errs = [errorNote("err-tk-observer"), errorNote("err-tk-date"), errorNote("err-tk-reference")];
     return el("div", { class: "pp-stack" },
@@ -272,7 +272,7 @@ export function renderTracker(root, ctx) {
     const gaps = approvalGaps(e);
     const st = { by: e.review?.reviewer ?? "", date: ctx.today(), reason: e.review?.reason ?? "" };
     const by = input(st.by, "tk:by", "Decided by", (v) => { st.by = v; }, { max: 60, placeholder: "your name" });
-    const date = input(st.date, "tk:decide-date", "Date of the decision", (v) => { st.date = v; }, { type: "date" });
+    const date = dateInput(st.date, "tk:decide-date", "Date of the decision", (v) => { st.date = v; }, { min: visitDate || null, max: ctx.today() });
     const reason = input(st.reason, "tk:reason", "Reason", (v) => { st.reason = v; }, { max: 200, placeholder: "for example: access confirmed and enough room" });
     const errs = [errorNote("err-tk-by"), errorNote("err-tk-decide-date"), errorNote("err-tk-reason")];
     const valid = () => {

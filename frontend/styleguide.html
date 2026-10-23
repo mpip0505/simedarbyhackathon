@@ -210,6 +210,9 @@
           <label class="check"><input class="rd" type="radio" name="sg-r" checked> All sites</label>
           <label class="check"><input class="rd" type="radio" name="sg-r"> Open land</label>
         </div>
+        <div class="sg-box"><h3>Date picker</h3>
+          <label class="pp-field"><span>Date of the visit (required)</span><input class="input input-date" type="date" value="2026-10-23" max="2026-10-23"><small class="pp-hint">The browser's own calendar opens from anywhere in the field. The value is always year-month-day.</small></label>
+        </div>
         <div class="sg-box"><h3>File picker</h3>
           <div class="pp-field"><span id="sg-file-label">Import completed field sheet</span>
             <div class="file"><input id="sg-file" class="file-input sr-only" type="file" accept=".csv" aria-labelledby="sg-file-label"><label class="btn btn-secondary btn-sm" for="sg-file">Choose file</label><span class="file-name">No file chosen</span></div></div>
@@ -572,6 +575,8 @@
   <script type="module">
     // A sample chart, to show the component. The numbers are made up and labelled as such on the page.
     import { barChart, chartLegend, mean, niceScale } from "./js/charts.js";
+    import { enhanceSelects } from "./js/select-ui.js";
+    enhanceSelects(document.body);           // selects here look and behave as in the app
     const values = [4, 9, 6, 12, 8];
     const ranges = [[2, 8], [5, 14], [3, 11], [7, 17], [4, 13]];
     const scale = niceScale(Math.max(...ranges.map((r) => r[1])));

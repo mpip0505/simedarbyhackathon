@@ -4,7 +4,7 @@ import { el } from "./dom.js";
 import { centroid } from "./csv.js";
 import { CONDITIONS } from "./plan.js";
 import { STATE_LABEL } from "./trees.js";
-import { YMD, errorNote, field, input, select, setError } from "./form-ui.js";
+import { YMD, dateInput, errorNote, field, input, select, setError } from "./form-ui.js";
 
 /** ctx: { plan, today() }. Returns { treeForm(planted, byId), treeCard(tree, scheduleRow) }. */
 export function createTreeUI({ plan, today }) {
@@ -13,16 +13,16 @@ export function createTreeUI({ plan, today }) {
     const state = { site: planted[0].id, species: "", date: "", owner: "", next: "" };
     const say = el("p", { class: "plan-say", role: "status" });
     const species = input("", "tree:new:species", "Species", (v) => { state.species = v; }, { max: 60, placeholder: "as recorded by the landscape team" });
-    const date = input("", "tree:new:date", "Planting date, year-month-day", (v) => { state.date = v; }, { max: 10, placeholder: "2026-11-15" });
-    const next = input("", "tree:new:next", "Next inspection date, year-month-day", (v) => { state.next = v; }, { max: 10, placeholder: "2027-02-15" });
+    const date = dateInput("", "tree:new:date", "Planting date", (v) => { state.date = v; }, { max: ctx.today() });
+    const next = dateInput("", "tree:new:next", "Next inspection date", (v) => { state.next = v; }, { min: ctx.today() });
     const speciesErr = errorNote("err-tree-species"), dateErr = errorNote("err-tree-date"), nextErr = errorNote("err-tree-next");
     return el("form", { class: "pp-treeform card", novalidate: true, onsubmit: (e) => {
       e.preventDefault();
       say.textContent = "";
       const missing = [];
       setError(species, speciesErr, state.species.trim() ? "" : "Enter the species.");
-      setError(date, dateErr, !state.date ? "Enter the planting date." : YMD.test(state.date) ? "" : "Use year-month-day, for example 2026-11-15.");
-      setError(next, nextErr, !state.next || YMD.test(state.next) ? "" : "Use year-month-day, for example 2027-02-15, or leave it empty.");
+      setError(date, dateErr, !state.date ? "Pick the planting date." : !YMD.test(state.date) ? "Pick a real date." : state.date > ctx.today() ? "The planting date cannot be in the future." : "");
+      setError(next, nextErr, !state.next || YMD.test(state.next) ? "" : "Pick a real date, or leave it empty.");
       for (const [control, note] of [[species, speciesErr], [date, dateErr], [next, nextErr]]) if (!note.hidden) missing.push(control);
       if (missing.length) { missing[0].focus(); return; }
       const f = byId.get(state.site);
@@ -43,9 +43,9 @@ export function createTreeUI({ plan, today }) {
 
   function treeCard(t, s) {
     const last = s.last;
-    const obs = { date: "", condition: "alive-good", note: "" };
+    const obs = { date: ctx.today(), condition: "alive-good", note: "" };
     const say = el("span", { class: "plan-say", role: "status" });
-    const date = input("", `tree:${t.id}:obs-date`, `Inspection date for ${t.id}`, (v) => { obs.date = v; }, { max: 10, placeholder: ctx.today() });
+    const date = dateInput(ctx.today(), `tree:${t.id}:obs-date`, `Inspection date for ${t.id}`, (v) => { obs.date = v; }, { min: t.planted_on, max: ctx.today() });
     const dateErr = errorNote(`err-tree-${t.id}-date`);
     return el("article", { class: `pp-tree pp-tree-${s.state}` },
       el("div", { class: "pp-site-head" },
@@ -56,7 +56,7 @@ export function createTreeUI({ plan, today }) {
       el("form", { class: "pp-obsform", novalidate: true, onsubmit: (e) => {
         e.preventDefault();
         say.textContent = "";
-        setError(date, dateErr, !obs.date ? "Enter the inspection date." : YMD.test(obs.date) ? "" : "Use year-month-day, for example 2027-02-15.");
+        setError(date, dateErr, !obs.date ? "Pick the inspection date." : !YMD.test(obs.date) ? "Pick a real date." : obs.date > ctx.today() ? "The inspection cannot be in the future." : "");
         if (!dateErr.hidden) { date.focus(); return; }
         if (!plan.addObservation(t.id, obs, "pilot")) say.textContent = "That inspection could not be saved: check the date is a real date.";
       } },
@@ -64,7 +64,7 @@ export function createTreeUI({ plan, today }) {
       field("Condition", select(CONDITIONS, "alive-good", `tree:${t.id}:obs-cond`, `Condition of ${t.id}`, (v) => { obs.condition = v; }), "Survival is counted from the latest condition of each inspected tree."),
       field("Note (optional)", input("", `tree:${t.id}:obs-note`, `Inspection note for ${t.id}`, (v) => { obs.note = v; }, { max: 200 })),
       el("button", { type: "submit", class: "btn btn-secondary btn-sm" }, "Record inspection"), say),
-      field("Next inspection", input(t.next_inspection, `tree:${t.id}:next`, `Next inspection date for ${t.id}`, (v) => plan.setTreeField(t.id, "next_inspection", v, "pilot"), { max: 10, placeholder: "2027-02-15" })),
+      field("Next inspection", dateInput(t.next_inspection, `tree:${t.id}:next`, `Next inspection date for ${t.id}`, (v) => plan.setTreeField(t.id, "next_inspection", v, "pilot")), "Used to flag the tree when a check is due."),
       el("button", { type: "button", class: "btn btn-ghost btn-sm", "aria-label": `Remove tree record ${t.id}`, onclick: () => plan.removeTree(t.id, "pilot") }, "Remove record"));
   }
   return { treeForm, treeCard };

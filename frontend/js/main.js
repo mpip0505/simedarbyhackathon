@@ -30,6 +30,7 @@ import { createPlan, planRows } from "./plan.js";
 import { renderPlanPanel } from "./plan-ui.js";
 import { renderPilot } from "./pilot-ui.js";
 import { renderTracker } from "./tracker.js";
+import { enhanceSelects } from "./select-ui.js";
 import { createExposure } from "./exposure.js";
 import { createWalks } from "./shade-walk.js";
 import { conflictFor } from "./screening.js";
@@ -554,4 +555,5 @@ async function boot() {
 }
 
 $("#fatal-retry").addEventListener("click", boot);
+enhanceSelects(document.body);          // every select.select becomes the design system's combobox, including ones drawn later
 boot();
