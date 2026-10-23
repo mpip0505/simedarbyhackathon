@@ -2,6 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'unsafe-inline' https://cdn.jsdelivr.net; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' file: data:">
 <title>Canopia: supporting materials</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -296,18 +297,23 @@ flowchart LR
   <p class="src">Map data (c) OpenStreetMap contributors (ODbL). Contains modified Copernicus Sentinel-2 data (European Space Agency). Landsat 8/9 Collection 2 Level-2 data courtesy of the U.S. Geological Survey. ESA WorldCover and Google Dynamic World used for the cross-check. Processed with Google Earth Engine (noncommercial use). Every figure in this document comes from a file in the repository and can be re-run.</p>
 </section>
 
-<script type="module">
-  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
-  mermaid.initialize({ startOnLoad: false, theme: "base", themeVariables: { fontFamily: "Urbanist, Segoe UI, Arial", primaryColor: "#f7f7f6", primaryBorderColor: "#a9a9a3", primaryTextColor: "#181816", lineColor: "#6a6a64", clusterBkg: "#fbfbfa", clusterBorder: "#d3d3ce", fontSize: "13px" } });
-  // measure text only after the web font has loaded, and draw one diagram at a time so none lands in another's box
-  await document.fonts.ready;
-  let n = 0;
-  for (const el of document.querySelectorAll("pre.mermaid")) {
-    const t = document.createElement("textarea"); t.innerHTML = el.innerHTML; // keeps <br/> as text, decodes &gt;
-    const { svg } = await mermaid.render(`d${n++}`, t.value);
-    const box = document.createElement("div"); box.innerHTML = svg; el.replaceWith(box);
-  }
-  document.body.dataset.ready = "1";
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js" integrity="sha384-WmdflGW9aGfoBdHc4rRyWzYuAjEmDwMdGdiPNacbwfGKxBW/SO6guzuQ76qjnSlr" crossorigin="anonymous"></script>
+<script>
+  // Mermaid is pinned to 10.9.1 and checked against its hash (subresource integrity). The rendered SVG is parsed, not injected as HTML.
+  (async () => {
+    mermaid.initialize({ startOnLoad: false, securityLevel: "strict", theme: "base", themeVariables: { fontFamily: "Urbanist, Segoe UI, Arial", primaryColor: "#f7f7f6", primaryBorderColor: "#a9a9a3", primaryTextColor: "#181816", lineColor: "#6a6a64", clusterBkg: "#fbfbfa", clusterBorder: "#d3d3ce", fontSize: "13px" } });
+    // measure text only after the web font has loaded, and draw one diagram at a time so none lands in another's box
+    await document.fonts.ready;
+    let n = 0;
+    for (const el of document.querySelectorAll("pre.mermaid")) {
+      const t = document.createElement("textarea"); t.innerHTML = el.innerHTML; // keeps <br/> as text, decodes &gt;
+      const { svg } = await mermaid.render(`d${n++}`, t.value);
+      // DOMParser never runs scripts; Mermaid labels contain HTML line breaks, so parse as HTML and take the svg element
+      const node = new DOMParser().parseFromString(svg, "text/html").querySelector("svg");
+      const box = document.createElement("div"); box.appendChild(document.importNode(node, true)); el.replaceWith(box);
+    }
+    document.body.dataset.ready = "1";
+  })();
 </script>
 </body>
 </html>
