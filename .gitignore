@@ -9,3 +9,5 @@ backend/data/input/
 backend/data/raw_osm/
 /cache/
 node_modules/
+
+.vercel

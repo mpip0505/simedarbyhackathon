@@ -1,0 +1,5 @@
+# Used by Vercel to serve the demo (api/index.py). Same pins as backend/requirements-serve.txt; the data pipeline,
+# scoring and tests need backend/requirements.txt instead.
+fastapi==0.115.6
+uvicorn==0.34.0
+pydantic==2.11.4

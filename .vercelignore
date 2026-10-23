@@ -1,0 +1,9 @@
+.git
+.github
+docs
+**/__pycache__
+**/node_modules
+backend/tests
+ml/tests
+frontend/tests
+*.pdf

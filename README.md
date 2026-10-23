@@ -145,7 +145,7 @@ Needs Python 3.12. No Earth Engine login and no internet are needed.
 pip install -r backend/requirements.txt
 uvicorn backend.api.main:app --port 8000
 ```
-Open http://localhost:8000/ (the interactive API is at http://localhost:8000/docs). **Live link:** not deployed yet; `Dockerfile` and `render.yaml` are ready ([developer guide](docs/developer-guide.md#the-web-app)).
+Open http://localhost:8000/ (the interactive API is at http://localhost:8000/docs). **Live link: https://canopia-app.vercel.app** (the same app and API, served from the committed data on Vercel; deploy config in `vercel.json` and `api/index.py`).
 
 A short path through the app:
 1. **Map:** click the site numbered 1 and read why it ranks there.
@@ -169,7 +169,7 @@ The official scoring is Impact 25, Innovation 20, Feasibility 20, Strategic Fit 
 |---|---|---|
 | **Impact and sustainability (25)** | Reach of the top sites, de-duplicated ([ml/reports/impact_reach.md](ml/reports/impact_reach.md)); resident shade-exposure scenario; pilot measurement plan ([docs/pilot-readiness.md](docs/pilot-readiness.md)) | Reach, not outcome: no ground truth, no walks done |
 | **Innovation (20)** | Rank steadiness, reach and trade-off, protect-before-plant, frozen-ranking review loop ([docs/prior-art.md](docs/prior-art.md)) | Not a new satellite method, and we do not claim one |
-| **Feasibility (20)** | Runs offline from committed data, tested, deterministic rebuild, field-check kit, Dockerfile ([docs/developer-guide.md](docs/developer-guide.md), [docs/status.md](docs/status.md)) | Not deployed; the Docker image has not been built or run here |
+| **Feasibility (20)** | Runs offline from committed data, tested, deterministic rebuild, field-check kit, Dockerfile ([docs/developer-guide.md](docs/developer-guide.md), [docs/status.md](docs/status.md)) | Live on Vercel (https://canopia-app.vercel.app); the Docker image itself has not been built |
 | **Strategic fit (15)** | Planet track, Township of Tomorrow, Avoid-Regenerate-Conserve suggestion ([docs/theme-fit.md](docs/theme-fit.md), [docs/decision-support.md](docs/decision-support.md)) | Priorities are attributed to public statements, not confirmed with mentors |
 | **Commercial (10)** | Users, replication steps, licensing point, labelled hypotheses ([docs/commercial-case.md](docs/commercial-case.md)) | Hypotheses only: nothing run on a second township, no buyer budget known |
 | **Team, evidence and pitch (10)** | Pitch kit ([docs/pitch/](docs/pitch/)), evidence summary ([docs/evidence-summary.md](docs/evidence-summary.md)), usability protocol ([docs/usability-test-protocol.md](docs/usability-test-protocol.md)), judge Q&A | No user test or field data yet; the video is not recorded |

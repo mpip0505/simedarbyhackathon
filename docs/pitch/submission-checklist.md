@@ -31,7 +31,7 @@ https://www.simedarbyproperty.com/universityhackathon/ . Tick each box only afte
 - [ ] Every number on a slide matches `ml/reports/impact_reach.md`, `ml/reports/uncertainty.md` and `backend/data/cache/crosscheck.json` for the committed data version.
 - [ ] The "Why your team should win" text is 100 words or fewer (the draft is 98).
 - [ ] The deck is also exported to PDF and opens on another computer.
-- [ ] If you have a live link: `node frontend/tools/smoke.mjs https://YOUR-LINK` passes (it drives a real browser and takes any address; it has only been run against localhost so far, so watch for surprises), and the first page load was tested cold.
+- [ ] Live link: **https://canopia-app.vercel.app** (deployed on Vercel, project `canopia`; open it in a private window before submitting). `node frontend/tools/smoke.mjs https://canopia-app.vercel.app` runs the browser test against it (it drives a real browser and takes any address, so watch for surprises), and the first page load was tested cold.
 - [ ] The repository has no secrets: search for tokens and your Google Cloud project ID before sharing (the push scans did not find any).
 
 ## After submitting
