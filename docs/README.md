@@ -19,6 +19,7 @@ Test, browser-check and view counts are never typed into prose: they come from [
 ## For the submission (deck, video, link)
 | Document | What it is |
 |---|---|
+| [supporting/canopia-supporting-materials.pdf](supporting/canopia-supporting-materials.pdf) | the 9-page supporting-materials PDF for the submission (source: the HTML file beside it) |
 | [pitch/submission-checklist.md](pitch/submission-checklist.md) | everything to tick before 23 October, 11:59 PM |
 | [pitch/deck-outline.md](pitch/deck-outline.md) | the slides, on the official Mechanism and Enabler structure |
 | [pitch/video-script.md](pitch/video-script.md) | the 5-minute video script |

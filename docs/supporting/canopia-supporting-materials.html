@@ -1,0 +1,313 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Canopia: supporting materials</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Urbanist:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+  @page { size: A4; margin: 16mm 15mm 16mm 15mm; }
+  :root { --ink: #181816; --body: #2d2d2a; --muted: #6a6a64; --line: #e4e4e0; --soft: #f7f7f6; --accent: #d13c06; --accent-tint: #fff4ee; --red: #cc1229; }
+  * { box-sizing: border-box; }
+  html { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  body { margin: 0; font-family: "Urbanist", "Segoe UI", Arial, sans-serif; color: var(--body); font-size: 10.6pt; line-height: 1.45; background: #fff; }
+  h1, h2, h3 { color: var(--ink); line-height: 1.15; margin: 0; }
+  h2 { font-size: 19pt; font-weight: 800; margin-bottom: 3mm; }
+  h3 { font-size: 12pt; font-weight: 700; margin: 5mm 0 2mm; }
+  p { margin: 0 0 2.6mm; }
+  a { color: var(--accent); text-decoration: none; }
+  .page { page-break-after: always; break-after: page; }
+  section.page:last-of-type { page-break-after: auto; break-after: auto; }
+  .kicker { font-size: 9pt; font-weight: 700; color: var(--accent); letter-spacing: .04em; margin-bottom: 1.5mm; }
+  .lead { font-size: 12pt; color: var(--muted); margin-bottom: 5mm; }
+  .note { font-size: 9pt; color: var(--muted); }
+  .src { font-size: 8.4pt; color: var(--muted); }
+  table { width: 100%; border-collapse: collapse; font-size: 9.4pt; margin: 1mm 0 3mm; }
+  th { text-align: left; font-weight: 700; color: var(--ink); background: var(--soft); border-bottom: 1px solid var(--line); padding: 1.8mm 2mm; vertical-align: bottom; }
+  td { border-bottom: 1px solid var(--line); padding: 1.8mm 2mm; vertical-align: top; }
+  td.num, th.num { text-align: right; white-space: nowrap; }
+  .caveat { background: var(--accent-tint); border-left: 3px solid var(--accent); padding: 3mm 4mm; margin: 4mm 0; font-size: 10pt; }
+  .stats { display: grid; grid-template-columns: repeat(4, 1fr); gap: 3mm; margin: 4mm 0; }
+  .stat { border: 1px solid var(--line); border-radius: 2.5mm; padding: 3mm; }
+  .stat b { display: block; font-size: 19pt; font-weight: 800; color: var(--ink); line-height: 1.05; }
+  .stat span { font-size: 8.8pt; color: var(--muted); }
+  .grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 4mm; }
+  figure { margin: 0; }
+  figure img { width: 100%; border: 1px solid var(--line); border-radius: 2mm; display: block; }
+  figcaption { font-size: 8.8pt; color: var(--muted); margin-top: 1.4mm; }
+  .diagram { border: 1px solid var(--line); border-radius: 2.5mm; padding: 3mm; margin: 2mm 0 3mm; text-align: center; }
+  .diagram { --h: 100mm; }
+  .diagram svg { max-width: 100% !important; max-height: var(--h); width: auto; height: auto; display: block; margin: 0 auto; }
+  .flow { display: flex; align-items: stretch; gap: 1.2mm; margin: 2mm 0 2mm; }
+  .flow .step { flex: 1; border: 1px solid var(--line); border-radius: 2mm; background: var(--soft); padding: 2mm; font-size: 8.4pt; line-height: 1.3; color: var(--ink); display: flex; align-items: center; }
+  .flow .arrow { align-self: center; color: var(--accent); font-weight: 700; }
+  .cover-banner { width: 100%; border-radius: 3mm; display: block; margin-bottom: 7mm; }
+  .cover h1 { font-size: 40pt; font-weight: 800; margin-bottom: 2mm; }
+  .links { display: grid; grid-template-columns: auto 1fr; gap: 1.2mm 4mm; font-size: 10pt; margin: 4mm 0; }
+  .links b { color: var(--ink); }
+  ul { margin: 0 0 2.6mm; padding-left: 5mm; }
+  li { margin-bottom: 1mm; }
+  .tag { display: inline-block; font-size: 8pt; font-weight: 700; padding: .4mm 2mm; border-radius: 10mm; background: var(--soft); color: var(--muted); }
+  footer.pg { position: fixed; bottom: -9mm; left: 0; right: 0; font-size: 7.6pt; color: var(--muted); display: flex; justify-content: space-between; }
+  .toc { columns: 2; font-size: 10pt; margin-top: 3mm; }
+  .toc div { margin-bottom: 1mm; }
+</style>
+</head>
+<body>
+
+<!-- 1. Cover and summary -->
+<section class="page cover">
+  <img class="cover-banner" src="../assets/banner.svg" alt="Canopia banner: a grid of 30 metre cells with the top five sites numbered">
+  <div class="kicker">SUPPORTING MATERIALS</div>
+  <p class="lead">A screening tool that ranks candidate tree-planting sites across a township from satellite measurements, explains every rank, and carries the shortlist through field checks to planting.</p>
+  <div class="links">
+    <b>Live demo</b><a href="https://canopia-app.vercel.app">https://canopia-app.vercel.app</a> <span></span><span class="note">no login needed</span>
+    <b>Code</b><a href="https://github.com/mpip0505/simedarbyhackathon">https://github.com/mpip0505/simedarbyhackathon</a>
+    <b>Team</b><span>Triple T, Universiti Malaya. Planet track, theme <i>Township of Tomorrow</i></span>
+    <b>Pilot township</b><span>City of Elmina, chosen to test the method so it can be repeated in other townships</span>
+  </div>
+  <div class="stats">
+    <div class="stat"><b>564</b><span>candidate 30 m sites ranked and explained</span></div>
+    <div class="stat"><b>+51%</b><span>more exposed footpath when 10 sites are chosen as a set</span></div>
+    <div class="stat"><b>14 of 20</b><span>top sites stay in the top 20 across 2,000 weightings</span></div>
+    <div class="stat"><b>75</b><span>already-green sites flagged to protect first</span></div>
+  </div>
+  <div class="caveat"><b>Read this first.</b> This is a pilot of the method on real Elmina satellite and map data, not a pilot of real planting. The candidate sites are <b>simulated</b> (we do not have Sime Darby Property's site list), there is <b>no ground truth</b>, and no field walks or user tests have been run yet. Canopia ranks where to look first. It is not a tree count, a carbon figure or an approval to plant.</div>
+  <h3>Contents</h3>
+  <div class="toc">
+    <div>1. Summary (this page)</div><div>2. The problem, the user, what is different</div><div>3. The working app</div><div>4. The user flow</div>
+    <div>5. How it works</div><div>6. Evidence: what we checked, what we did not</div><div>7. Impact and the pilot measurement plan</div><div>8. Comparison, commercial case and scale</div><div>9. Implementation and limitations</div>
+  </div>
+</section>
+
+<!-- 2. Problem, user, distinction -->
+<section class="page">
+  <div class="kicker">2. THE PROBLEM, THE USER, WHAT IS DIFFERENT</div>
+  <h2>Choosing where to plant first, with evidence</h2>
+  <p>Sime Darby Property has a stated target of 50,000 endangered trees by 2030 and, in City of Elmina, a 5 km Urban Biodiversity Corridor linking six parks. Every season someone decides which sites get trees first. Heat on bare ground, gaps in the corridor and unshaded footpaths all matter, and without a repeatable method each choice is hard to explain or compare. Satellite maps do not settle it: independent maps put Elmina's tree cover anywhere from about 4% to 28%.</p>
+  <h3>Who it is for</h3>
+  <table>
+    <tr><th>User</th><th>What they need</th><th>What Canopia gives them</th></tr>
+    <tr><td><b>Sustainability and landscape team</b> (primary, a hypothesis to confirm)</td><td>decide each season's planting and justify it</td><td>a ranked, explained shortlist, adjustable priorities, field sheets and a Tracker to planting</td></tr>
+    <tr><td><b>Township planners and management</b></td><td>explain why a site was chosen</td><td>a reason per site, rank steadiness, a frozen record of the original shortlist</td></tr>
+    <tr><td><b>Residents and wildlife</b> (beneficiaries)</td><td>shade on walking routes, habitat links</td><td>scores that target unshaded footpaths and corridor gaps</td></tr>
+  </table>
+  <h3>What makes Canopia different</h3>
+  <table>
+    <tr><th style="width:27%">Point</th><th>What it means, with a number you can check</th></tr>
+    <tr><td><b>Measured, not assumed</b></td><td>Every site score is computed from satellite measurements of the township: Sentinel-2 vegetation and Landsat ground heat (cloud-masked two-year medians), plus OpenStreetMap paths, parks and buildings. The sites are simulated; the measurements under them are real.</td></tr>
+    <tr><td><b>Township-wide, tied to the corridor</b></td><td>All 564 candidate sites across the township are ranked, and closing gaps in the Urban Biodiversity Corridor is one of the three scores.</td></tr>
+    <tr><td><b>The best set, not just top scores</b></td><td>Choosing 10 sites as a set reaches 51% more exposed footpath and about 3 times the corridor gap of the plain top 10, for a 6-point lower average score.</td></tr>
+    <tr><td><b>Says how sure it is</b></td><td>14 of the top 20 stay in the top 20 in at least 80% of 2,000 plausible weightings. The disagreement between independent canopy maps is shown on screen.</td></tr>
+    <tr><td><b>Protect before planting</b></td><td>75 sites are already green by satellite and are flagged for an ecologist before any planting, in Sime Darby Property's Avoid, Regenerate and Conserve terms (a screening suggestion, not a finding).</td></tr>
+    <tr><td><b>From ranking to the ground</b></td><td>A Tracker follows each site from shortlist to visit, decision and planting; blind field sheets and a validated import compare field results with the model. A real site list drops in with one command, tested to reproduce our scores exactly.</td></tr>
+    <tr><td><b>Built to be checked</b></td><td>One command rebuilds every number from free data in about 4 minutes. Automated tests run on every push, and the published test counts are generated from the code.</td></tr>
+  </table>
+</section>
+
+<!-- 3. Screens -->
+<section class="page">
+  <div class="kicker">3. THE WORKING APP</div>
+  <h2>Seven pages, live today</h2>
+  <p>Home, Map, Sites, Trends, Tracker, Methods and limits, and Advanced tools. Everything a planner enters is their own record, saved in the browser; nothing is inspected or approved by the tool.</p>
+  <div class="grid2">
+    <figure><img src="../pitch/screens/21-map-site-card.png" alt="Map with the top five sites numbered and the site card for site 1"><figcaption><b>Map and site card.</b> Site 1: "Hot, bare surroundings, a footpath with no shade and right next to a gap in the approximate corridor." Score 92.5; ranked first in every one of 2,000 weightings.</figcaption></figure>
+    <figure><img src="../pitch/screens/22-sites.png" alt="Sites table"><figcaption><b>Sites.</b> Every site in one sortable table, with its three scores, ground heat and distance to a corridor gap.</figcaption></figure>
+    <figure><img src="../pitch/screens/23-tracker.png" alt="Tracker board"><figcaption><b>Tracker.</b> Each picked site moves from Shortlisted to Visit planned, Visited, Approved and Planted, with one next step per card.</figcaption></figure>
+    <figure><img src="../pitch/screens/24-trends.png" alt="Trends page"><figcaption><b>Trends.</b> Tree-cover estimate 9.7% to 10.4%: within the yearly swing, so "no detectable change", beside the independent maps that disagree.</figcaption></figure>
+  </div>
+  <p class="src" style="margin-top:3mm">Screenshots of the deployed app, example sites (simulated), City of Elmina pilot.</p>
+</section>
+
+<!-- 4. User flow -->
+<section class="page">
+  <div class="kicker">4. THE USER FLOW</div>
+  <h2>From a ranked map to trees in the ground</h2>
+  <p>The two shaded boxes are the real-world work a pilot with Sime Darby Property adds; everything else runs in the app today.</p>
+  <div class="diagram" style="--h:100mm"><pre class="mermaid">
+flowchart TB
+  subgraph A["Map and Sites: choose"]
+    direction LR
+    A1["See the top sites<br/>numbered on the map"] --> A2["Read why a site ranks<br/>one sentence, three scores"]
+    A2 --> A3["Say what matters<br/>sliders re-rank live"]
+    A3 --> A4["Compare ways of choosing<br/>top 10 vs best set"]
+  end
+  subgraph B["Tracker: check"]
+    direction LR
+    B1["Shortlist<br/>original ranking frozen"] --> B2["Plan a visit<br/>blind field sheet"]
+    B2 --> B3["Record the visit<br/>five checks, evidence"]
+    B3 --> B4["Decide: approve or set aside<br/>named, dated, with a reason"]
+  end
+  subgraph C["Tracker: plant and learn"]
+    direction LR
+    C1["Mark planted"] --> C2["Record each tree<br/>species, date, owner"]
+    C2 --> C3["Tree checks over time"]
+    C3 --> C4["Survival among<br/>inspected trees only"]
+  end
+  A --> B --> C
+  B -.- F["Real world: a field team<br/>walks the sites"]:::real
+  C -.- L["Real world: the next season's<br/>shortlist uses what the field showed"]:::real
+  classDef real fill:#fff4ee,stroke:#d13c06,color:#181816
+</pre></div>
+  <h3>What a site goes through, and what the tool will not let a planner claim</h3>
+  <div class="diagram" style="--h:88mm"><pre class="mermaid">
+stateDiagram-v2
+  [*] --> Shortlisted: picked from the ranking
+  Shortlisted --> VisitPlanned: a person will look
+  VisitPlanned --> Visited: inspector, date, evidence
+  Visited --> Approved: five checks OK + named, dated review
+  Visited --> NotSuitable: named, dated, with a reason
+  NotSuitable --> VisitPlanned: next-ranked replacement
+  Approved --> Planted: a person marks it planted
+  Planted --> [*]: survival from inspections only
+</pre></div>
+  <p class="note">The five field checks are land access, utilities, space and soil, maintenance access and existing trees. Each starts as Not checked; completing them is never an approval on its own.</p>
+</section>
+
+<!-- 5. How it works -->
+<section class="page">
+  <div class="kicker">5. HOW IT WORKS</div>
+  <h2>A measured pipeline, served offline</h2>
+  <p>The build turns imagery and map data into versioned files; it needs Earth Engine and the network. The runtime serves those committed files with neither, so the demo works offline and on a read-only host.</p>
+  <div class="flow"><div class="step">Sentinel-2 greenness, Landsat ground heat, OpenStreetMap</div><span class="arrow">&rarr;</span><div class="step">Cloud-masked 2-year medians; approximate corridor</div><span class="arrow">&rarr;</span><div class="step">564 candidate cells, about 30 features each</div><span class="arrow">&rarr;</span><div class="step">Scoring model and reports</div><span class="arrow">&rarr;</span><div class="step">Committed files, versioned by a data_version hash</div><span class="arrow">&rarr;</span><div class="step">FastAPI, read-only</div><span class="arrow">&rarr;</span><div class="step">Web app, no build step</div></div>
+  <p class="note">Steps 1 to 5 run at build time (Earth Engine and the network). Steps 6 and 7 run anywhere with neither, including the public deployment.</p>
+  <h3>How a site is scored</h3>
+  <p>Three scores from eight named inputs, then a weighted total. There are no labels to fit to, so nothing is trained; every number traces to its inputs. The planner can change the three right-hand weights with sliders.</p>
+  <div class="diagram" style="--h:118mm"><pre class="mermaid">
+flowchart LR
+  H["Ground heat, 250 m"] -- 0.45 --> C["Heat relief"]
+  G["Low greenness, 250 m"] -- 0.30 --> C
+  BU["Built-up share, 250 m"] -- 0.25 --> C
+  GAP["Near a corridor gap"] -- 0.50 --> K["Links green areas"]
+  PK["Near a park"] -- 0.30 --> K
+  INC["Inside the corridor"] -- 0.20 --> K
+  UN["Unshaded footpath, 50 m"] -- 0.70 --> S["Shade for walkers"]
+  NP["Near a footpath"] -- 0.30 --> S
+  C -- 0.45 --> T["Total score<br/>rank 1 = plant first"]
+  K -- 0.30 --> T
+  S -- 0.25 --> T
+</pre></div>
+  <p class="note">Heat, greenness and built-up share are percentile ranks within the township ("hotter than 90% of sites"), because 100 m thermal data supports ranking, not exact temperatures. Distances use a smooth decay. The heat term is pulled towards the middle where ground temperature had to be filled in from neighbouring pixels.</p>
+</section>
+
+<!-- 6. Evidence -->
+<section class="page">
+  <div class="kicker">6. EVIDENCE</div>
+  <h2>What we checked, and what we did not</h2>
+  <p>We checked consistency and robustness thoroughly. We have no ground truth, so none of this shows the ranking is right; it shows it is consistent and stable.</p>
+  <table>
+    <tr><th style="width:28%">Check</th><th>Result</th></tr>
+    <tr><td><b>Imagery go or no-go</b>, before building anything</td><td>GO for both periods and both satellites: only 27 of 144 Sentinel-2 scenes in the baseline were under 40% cloud, yet every pixel had at least 3 clear looks.</td></tr>
+    <tr><td><b>Canopy threshold sensitivity</b></td><td>About 18%, 10% and 3% canopy at NDVI 0.5, 0.6 and 0.7, with a year-to-year swing of about 5 points. So canopy is used to rank sites, never quoted as a percentage.</td></tr>
+    <tr><td><b>Independent cross-check</b></td><td>ESA WorldCover about 28%, Google Dynamic World about 7% falling to 4%, ours about 10%. Best agreement at NDVI 0.6 (F1 0.51).</td></tr>
+    <tr><td><b>Rank steadiness</b></td><td>14 of the top 20 stay in the top 20 in at least 80% of 2,000 settings of the weights and judgement constants; rank correlation with the median ranking 0.999.</td></tr>
+    <tr><td><b>Method agreement</b></td><td>A heat-only ranking shares none of our top 20 sites; an equal-weights version shares 18 of 20. The weights matter, which is why the planner sets them.</td></tr>
+    <tr><td><b>Before and after</b></td><td>Our canopy proxy moved from 9.7% to 10.4%, inside its yearly swing: reported as "no detectable change", not as growth.</td></tr>
+    <tr><td><b>Reproducibility</b></td><td>A full rebuild took about 4 minutes and reproduced the committed sites; every build carries a data version and stale scores are flagged.</td></tr>
+    <tr><td><b>Your own site list</b></td><td>Scoring a simulated site's own centre point through the import reproduces its committed scores and rank exactly (automated test).</td></tr>
+    <tr><td><b>Software quality</b></td><td>Python, model and frontend unit tests run in CI on every push; a real-browser test covers every page, keyboard use, hostile data and an accessibility scan.</td></tr>
+  </table>
+  <h3>What we did not do</h3>
+  <ul>
+    <li><b>No ground truth:</b> no tree inventory, LiDAR, drone survey or field plots.</li>
+    <li><b>No real planting-site list:</b> the 564 sites are simulated 30 m cells on open land, and every screen says so.</li>
+    <li><b>No measured benefit:</b> reach numbers count what lies near the sites; they are not cooling, health, survival or carbon results.</li>
+    <li><b>No second township, no field walk, no user test yet.</b> The field kit is tested on synthetic answers only, and the usability protocol is written but not yet run.</li>
+  </ul>
+</section>
+
+<!-- 7. Impact -->
+<section class="page">
+  <div class="kicker">7. IMPACT</div>
+  <h2>What the first sites reach, and how a pilot would measure benefit</h2>
+  <p>Today Canopia measures <b>reach</b> (what lies near the sites, each footpath point, home and gap counted once), not <b>benefit</b>. For the first 50 sites in the default ranking:</p>
+  <div class="stats" style="grid-template-columns: repeat(3, 1fr)">
+    <div class="stat"><b>5,400 m</b><span>of footpath with little tree cover within 50 m (8% of the township's)</span></div>
+    <div class="stat"><b>349 of 968</b><span>mapped homes within 250 m</span></div>
+    <div class="stat"><b>70%</b><span>of the approximate corridor's gaps (about 1,150 of 1,650 m) within 50 m</span></div>
+  </div>
+  <p>Choosing sites as a set instead of by top score changes what a fixed budget reaches. For 10 sites, all three goals weighted equally:</p>
+  <table>
+    <tr><th>Way to choose 10 sites</th><th class="num">Footpath, little tree cover</th><th class="num">Mapped homes</th><th class="num">Corridor gap</th><th class="num">Average score</th></tr>
+    <tr><td>Top 10 by score</td><td class="num">2,120 m</td><td class="num">242</td><td class="num">350 m</td><td class="num">86.2</td></tr>
+    <tr><td>Spread out (at most 3 per 250 m block)</td><td class="num">2,280 m</td><td class="num">242</td><td class="num">410 m</td><td class="num">85.6</td></tr>
+    <tr><td><b>Best coverage</b></td><td class="num"><b>3,210 m (+51%)</b></td><td class="num"><b>262 (+8%)</b></td><td class="num"><b>1,030 m (+194%)</b></td><td class="num">80.0</td></tr>
+  </table>
+  <h3>The pilot measurement plan</h3>
+  <table>
+    <tr><th>What to measure</th><th>Baseline today</th><th>How a pilot would measure it</th><th>When</th></tr>
+    <tr><td>Footpath with little tree cover near planted sites</td><td>about 65,900 m township-wide; 5,400 m near the first 50 sites</td><td>re-run the count on new imagery; timed shade walks on the same routes</td><td>each season</td></tr>
+    <tr><td>Planted-tree survival</td><td>none</td><td>count live and dead trees at planted sites</td><td>6, 12, 24 months</td></tr>
+    <tr><td>Tree cover at planted sites</td><td>each site's canopy proxy</td><td>field or drone sample at planted and unplanted sites</td><td>12, 24 months</td></tr>
+    <tr><td>Does the ranking point at real shade gaps?</td><td>none</td><td>blind field sheet for top and lower ranked sites</td><td>before planting</td></tr>
+    <tr><td>Corridor gaps closed</td><td>about 1,650 m of gaps</td><td>re-count against the official corridor polygon</td><td>each season</td></tr>
+  </table>
+  <p class="note">No targets are set here, because nothing in our data supports a number; the developer's own targets are theirs to set against.</p>
+</section>
+
+<!-- 8. Comparison, commercial, scale -->
+<section class="page">
+  <div class="kicker">8. COMPARISON, COMMERCIAL CASE AND SCALE</div>
+  <h2>Where Canopia sits, and how it repeats</h2>
+  <h3>Compared with published canopy prioritisers</h3>
+  <table>
+    <tr><th>Tool</th><th>Scale</th><th>Ranks by</th></tr>
+    <tr><td>Tree Equity Score (American Forests)</td><td>US census block group</td><td>canopy gap plus equally weighted social and heat indicators</td></tr>
+    <tr><td>i-Tree Landscape (USDA Forest Service)</td><td>US census block group</td><td>user-chosen indices and weights</td></tr>
+    <tr><td>Right Place, Right Tree (Boston, 2020)</td><td>census tract</td><td>heat vulnerability plus Landsat surface temperature, where planting is feasible</td></tr>
+    <tr><td><b>Canopia</b></td><td><b>30 m candidate site</b></td><td><b>heat, corridor links and walkers' shade, with rank steadiness and a field loop</b></td></tr>
+  </table>
+  <p class="note">A 2025 comparison of five tools in Austin found they agree on broad areas but differ on specific top sites, which is why Canopia shows how steady each pick is. We do not claim a new satellite method or to beat these tools.</p>
+  <h3>Commercial case (hypotheses, to confirm with Sime Darby Property)</h3>
+  <ul>
+    <li><b>First customer:</b> the City of Elmina landscape operations team, with the sustainability team as reporting partner, through a bounded pilot: real sites, a sampled field inspection, and a comparison with the current shortlisting process.</li>
+    <li><b>Value multiplies</b> because the same pipeline and screens re-run for another township or question: more townships, corridor monitoring each season, where to inspect first after planting.</li>
+    <li><b>A real site list drops in today:</b> <code>python -m backend.my_sites</code> scores any list of points inside the study area with the same measurements and model, offline.</li>
+    <li><b>Another township</b> is estimated at a day or two of engineering (our estimate; not yet run elsewhere). What is Elmina-specific in the code is audited in the repository.</li>
+    <li><b>Costs</b> are low on data (free imagery and maps); the main costs are people and field checks.</li>
+    <li><b>Licensing, stated openly:</b> our Earth Engine registration is noncommercial. A runnable OpenStreetMap-only fallback exists; it is a proximity screen, not a second model, and whether the satellite workflow may be used commercially is a separate decision.</li>
+  </ul>
+</section>
+
+<!-- 9. Implementation, limitations -->
+<section class="page">
+  <div class="kicker">9. IMPLEMENTATION AND LIMITATIONS</div>
+  <h2>From a working pilot to a season-by-season tool</h2>
+  <table>
+    <tr><th style="width:18%">When</th><th>What</th></tr>
+    <tr><td><b>Now</b></td><td>Prototype live on City of Elmina data with simulated sites; Tracker from shortlist to planted; field sheets ready.</td></tr>
+    <tr><td><b>Weeks 1 to 4</b></td><td>Score Sime Darby Property's real site list and swap in the official corridor polygon. The code already supports both.</td></tr>
+    <tr><td><b>Months 1 to 3</b></td><td>Walk about 30 sites with a blind field sheet to test whether the ranking reflects real conditions; an ecologist reviews the protect and regenerate suggestions.</td></tr>
+    <tr><td><b>Planting season</b></td><td>Plant from one season's ranking, re-run it each season, and compare before and after with survey data.</td></tr>
+    <tr><td><b>Next</b></td><td>Adapt to other Sime Darby Property townships.</td></tr>
+  </table>
+  <p>What we need from Sime Darby Property: the planting-site list, the official corridor polygon, the current tree count, and one afternoon of field access.</p>
+  <h3>Limitations</h3>
+  <table>
+    <tr><th style="width:28%">Limit</th><th>What it means</th></tr>
+    <tr><td>Simulated sites</td><td>30 m cells on OpenStreetMap open land, not a real planting list; OpenStreetMap under-maps parts of the township.</td></tr>
+    <tr><td>Approximate corridor</td><td>Built from OpenStreetMap parks: about 2 km of connecting spine against the stated 5 km. Connectivity results inherit this until the official polygon is supplied.</td></tr>
+    <tr><td>Coarse thermal data</td><td>Landsat surface temperature is about 100 m native; about 18% of the area is filled from neighbouring pixels for site scoring.</td></tr>
+    <tr><td>Canopy is a proxy</td><td>NDVI at or above 0.6, not a tree count; strongly threshold-dependent and noisy year to year.</td></tr>
+    <tr><td>Siting screen</td><td>Flags mapped roads, buildings and footpaths near a site; it is not a wildlife assessment.</td></tr>
+    <tr><td>Records are local</td><td>Tracker entries are saved in one browser; a shared, audited version is the first thing a real pilot would build.</td></tr>
+  </table>
+  <h3>Data credits</h3>
+  <p class="src">Map data (c) OpenStreetMap contributors (ODbL). Contains modified Copernicus Sentinel-2 data (European Space Agency). Landsat 8/9 Collection 2 Level-2 data courtesy of the U.S. Geological Survey. ESA WorldCover and Google Dynamic World used for the cross-check. Processed with Google Earth Engine (noncommercial use). Every figure in this document comes from a file in the repository and can be re-run.</p>
+</section>
+
+<script type="module">
+  import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";
+  mermaid.initialize({ startOnLoad: false, theme: "base", themeVariables: { fontFamily: "Urbanist, Segoe UI, Arial", primaryColor: "#f7f7f6", primaryBorderColor: "#a9a9a3", primaryTextColor: "#181816", lineColor: "#6a6a64", clusterBkg: "#fbfbfa", clusterBorder: "#d3d3ce", fontSize: "13px" } });
+  // measure text only after the web font has loaded, and draw one diagram at a time so none lands in another's box
+  await document.fonts.ready;
+  let n = 0;
+  for (const el of document.querySelectorAll("pre.mermaid")) {
+    const t = document.createElement("textarea"); t.innerHTML = el.innerHTML; // keeps <br/> as text, decodes &gt;
+    const { svg } = await mermaid.render(`d${n++}`, t.value);
+    const box = document.createElement("div"); box.innerHTML = svg; el.replaceWith(box);
+  }
+  document.body.dataset.ready = "1";
+</script>
+</body>
+</html>

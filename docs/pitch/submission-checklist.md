@@ -13,7 +13,7 @@ https://www.simedarbyproperty.com/universityhackathon/ . Tick each box only afte
 | Pitch deck | yes | the official template, **10 main slides at most**, appendix allowed; content in [deck-outline.md](deck-outline.md) | [ ] |
 | Video or demo link | yes | a video of 5 minutes or less ([video-script.md](video-script.md)) **or** a live demo link; best: both, with the link tested in a private window | [ ] |
 | Prototype or code link | yes | https://github.com/mpip0505/simedarbyhackathon (open it logged out; check the latest commit is there and the README renders) | [ ] |
-| Supporting documents | optional | links to `docs/prior-art.md`, `docs/evidence-summary.md`, `docs/commercial-case.md`, `docs/pilot-readiness.md`, `docs/judge-qa.md` in the repository | [ ] |
+| Supporting documents | optional | **PDF ready:** [docs/supporting/canopia-supporting-materials.pdf](../supporting/canopia-supporting-materials.pdf) (9 pages; rebuild from the HTML beside it with Chrome's print to PDF). Also links to `docs/prior-art.md`, `docs/evidence-summary.md`, `docs/commercial-case.md`, `docs/pilot-readiness.md`, `docs/judge-qa.md` in the repository | [ ] |
 
 ## Repository and hosting (only the team can do these)
 - [ ] **Push, open the Actions tab and watch the first CI run** (`.github/workflows/tests.yml`). Fix whatever fails before anything else; a red badge on the first page a judge opens costs more than any missing feature.
