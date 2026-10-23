@@ -83,3 +83,13 @@ def test_cors_is_open_by_default_and_restrictable():
     from backend.api.main import cors_origins
     assert cors_origins(None) == ["*"] and cors_origins("  ") == ["*"]
     assert cors_origins("https://a.example, https://b.example") == ["https://a.example", "https://b.example"]
+
+
+def test_the_public_deployment_hides_internal_routes_and_cors_fails_closed(monkeypatch):
+    from backend.api.main import cors_origins
+    assert cors_origins(None, hosted=True) == [] and cors_origins("https://a.example", hosted=True) == ["https://a.example"]
+    monkeypatch.setenv("VERCEL_ENV", "production")
+    assert client.get("/health/deep").status_code == 404
+    assert client.get("/health").status_code == 200 and client.get("/meta").status_code == 200
+    monkeypatch.setenv("VERCEL_ENV", "preview")
+    assert client.get("/health/deep").status_code in (200, 503)

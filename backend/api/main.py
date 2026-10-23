@@ -37,14 +37,24 @@ async def lifespan(app: FastAPI):
     yield
 
 
-app = FastAPI(title="Canopia API", version="0.3.0", lifespan=lifespan)
-def cors_origins(raw: Optional[str]) -> list:
-    """Open to every origin for the local demo; set CORS_ORIGINS to a comma-separated list (for example the hosted site's own address) to restrict it."""
+def public_host() -> bool:
+    """True on the public Vercel production deployment, where internal routes are hidden and CORS fails closed."""
+    return os.environ.get("VERCEL_ENV") == "production"
+
+
+# the interactive API docs stay on for local runs and are switched off on the public deployment
+_docs = {} if not public_host() else {"docs_url": None, "redoc_url": None, "openapi_url": None}
+app = FastAPI(title="Canopia API", version="0.3.0", lifespan=lifespan, **_docs)
+
+
+def cors_origins(raw: Optional[str], hosted: bool = False) -> list:
+    """Open to every origin for the local demo; set CORS_ORIGINS to a comma-separated list to restrict it. On the public
+    deployment an unset CORS_ORIGINS means no cross-origin access at all (the web app is same-origin, so it needs none)."""
     listed = [o.strip() for o in (raw or "").split(",") if o.strip()]
-    return listed or ["*"]
+    return listed or ([] if hosted else ["*"])
 
 
-app.add_middleware(CORSMiddleware, allow_origins=cors_origins(os.environ.get("CORS_ORIGINS")), allow_methods=["GET"], allow_headers=["*"])
+app.add_middleware(CORSMiddleware, allow_origins=cors_origins(os.environ.get("CORS_ORIGINS"), public_host()), allow_methods=["GET"], allow_headers=["*"])
 
 
 @app.middleware("http")
@@ -88,7 +98,9 @@ def health() -> dict:
 @app.get("/health/deep")
 def health_deep() -> JSONResponse:
     """Checks every data file against the contract. 200 when sound, 503 otherwise. Clients get pass/fail and counts;
-    the detail is in the server log (and in the response only when API_EXPOSE_DETAILS=1)."""
+    the detail is in the server log (and in the response only when API_EXPOSE_DETAILS=1). Not served on the public deployment."""
+    if public_host():
+        raise HTTPException(status_code=404, detail="Not found")
     result = selfcheck.check()
     for p in result["problems"]:
         log.error("health/deep PROBLEM: %s", p)
