@@ -1,4 +1,4 @@
-# Pitch deck outline: Elmina Canopy Prioritiser (team Triple T)
+# Pitch deck outline: Canopia (team Triple T)
 
 Written for: the team member building the slides in the official template (10 main slides maximum, appendix allowed). Structured on the template's 8 areas **and** the official
 two-part pitch, **Mechanism** (the solution, how it works, who benefits, why it creates value for the township) and **Enabler** (how technology enables it, the user experience, implementation at township scale).
@@ -38,7 +38,7 @@ Track: **Planet** (one track only).
 - Their challenge: limited planting budget, no field data to hand, and a need to explain "why here" to management.
 
 ## Slide 3: Your Solution (Mechanism)
-**Elmina Canopy Prioritiser**: a map-first screening tool that ranks candidate planting sites by **heat relief**, **links between green areas** and **shade for walkers**, and explains every rank in a sentence.
+**Canopia**: a map-first screening tool that ranks candidate planting sites by **heat relief**, **links between green areas** and **shade for walkers**, and explains every rank in a sentence.
 Planners drag three sliders and the list and map update at once. It is a screening tool: **not a tree count and not a carbon figure.**
 - *Screen:* `screens/01-plant-first.png` and `screens/02-site-card.png`.
 
@@ -64,7 +64,7 @@ Free satellite and map data to ranked sites, in five steps:
 One command rebuilds everything in about 4 minutes and reproduced the committed data exactly.
 
 ## Slide 6: Impact (Mechanism)
-Optional live calculation: **resident shade exposure scenario** in Pilot plan step 3. Show the assumptions, current/scenario unshaded person-minutes per day and the horizon. Never present it as a measured benefit.
+Optional live calculation: **resident shade exposure scenario** in Advanced tools (Records tab). Show the assumptions, current/scenario unshaded person-minutes per day and the horizon. Never present it as a measured benefit.
 
 **Reach, not outcome** ([impact_reach.md](../../ml/reports/impact_reach.md)). With the default ML ranking on the simulated sites, the first 50 sites are:
 - within 50 m of about **5,400 m of footpath where the satellite sees little tree cover** (8% of the township's 65,860 m; 58% of what any site can reach);
@@ -84,14 +84,14 @@ Demo addition: the OSM-only fallback generates its own candidates without Earth 
 **User flow for a slide (see [user-flow.md](user-flow.md)):** Explore, Understand, Prioritise, Evaluate, Plan, Export, Field-verify, Implement. The first six are in the app; the last two are the pilot.
 
 ## Slide 8: Implementation (Enabler)
-1. **Now:** working prototype on simulated sites, with a Pilot plan: field checks that start Not checked, a blind field sheet out and the completed sheet back, keep or reject with next-ranked replacements, phases from your own numbers, tree records and recorded survival (the planner's own entries, saved on one device).
+1. **Now:** working prototype on simulated sites, with a Tracker and Advanced tools: field checks that start Not checked, a blind field sheet out and the completed sheet back, keep or reject with next-ranked replacements, phases from your own numbers, tree records and recorded survival (the planner's own entries, saved on one device).
 2. **Weeks 1 to 2:** load the real site list and the official corridor outline and rebuild (supported by the code).
 3. **One afternoon:** walk the blind field sheet for 30 sites (`python -m backend.scripts.field_sheet`) and run the check (`import_field_checks`), the first real test of the ranking ([evidence-summary.md](../evidence-summary.md)).
 4. **Plant a season** using the shortlist; count survival at 6, 12 and 24 months, including after any maintenance guarantee ends, and re-run the footpath and corridor reach on new imagery.
 5. **Scale:** another township after a day or two of adaptation (an audit lists what changes; not yet run elsewhere, [commercial-case.md](../commercial-case.md)).
 
 ## Slide 9: Visual Concept (Enabler)
-Four screenshots: the map with the numbered top five and sliders (`01`), a site card with its reason and steadiness (`02`), the reach card (`05`), and before and after with the honest verdict (`03`).
+Screenshots of the current app: the map with the site card (`21`), the Sites table (`22`), the Tracker (`23`) and Trends with the honest verdict (`24`), in `screens/`.
 Caption each: "Example sites (simulated). Scores from the scoring model."
 
 ## Slide 10: Why your team should win (98 words)

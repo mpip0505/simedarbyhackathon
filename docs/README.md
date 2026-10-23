@@ -40,6 +40,7 @@ Test, browser-check and view counts are never typed into prose: they come from [
 ## For engineers
 | Document | What it is |
 |---|---|
+| [architecture.md](architecture.md) | how it is built: repository map, build pipeline, data contract, API, request flow, deployment and tests, with diagrams |
 | [developer-guide.md](developer-guide.md) | run it, the API, rebuilding the data, reliability, security, tests, repository layout |
 | [data-contract.md](data-contract.md) | the field-by-field contract between data, API and app |
 | [data-dictionary.md](data-dictionary.md) | every site feature, its source and its unit |

@@ -1,5 +1,7 @@
 # Canopy dashboard system
 
+> Page names changed in the Canopia redesign: **Plant first** is now **Map**, **Before and after** is **Trends**, and the **Pilot plan** became the **Tracker** (the shortlist board) plus **Advanced tools**. The tokens and components below still apply; the page descriptions further down use the older names. Current pages: [architecture.md](architecture.md).
+
 Written for: anyone who restyles, extends or reviews the web app. The tokens and components below are installed in
 [`frontend/css/app.css`](../frontend/css/app.css), and every one of them is drawn on a live page,
 [`frontend/styleguide.html`](../frontend/styleguide.html) (open `http://localhost:8000/app/styleguide.html` while the API runs).

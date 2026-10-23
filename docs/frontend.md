@@ -1,7 +1,7 @@
 # Frontend: the dashboard build and designer brief
 
 Written for: whoever designs or extends the interface. The app is a **working dashboard**: a sidebar, a top bar and two views
-(Plant first, Before and after). Its look is the Canopy dashboard system, documented in [design-system.md](design-system.md) and
+(now seven pages after the Canopia redesign: Home, Map, Sites, Trends, Tracker, Methods and limits, Advanced tools). Its look is the Canopy dashboard system, documented in [design-system.md](design-system.md) and
 drawn live on `frontend/styleguide.html`. The look lives in `css/app.css` and can be replaced without touching the data or the
 maths. The UX it implements (journey, wording, states) is in [ux-wireframe.md](ux-wireframe.md), which describes the earlier
 map-first wireframe; the content, wording and honesty rules there still apply, the layout is now the one in the design system.
@@ -29,7 +29,7 @@ crafted link cannot make the page load data from someone else's server.
 | 2 | Status chips (Sites page header) | `/meta`: `data_mode`, `score_source`, `generated_at` | **Keep** "Example sites (simulated)" always, and the score-source chip (amber while scores are placeholders). |
 | 3 | Sidebar and top bar | none | Sidebar: a project switcher, then pages only (Home; Explore: Map, Sites, Trends, Tracker; More: Methods and limits, Advanced tools). A first visit opens on Home. The Map is full screen with floating panels; the figures, table, shortlist and analysis are on Sites. Top bar: breadcrumb, Take the tour, Share, Export (CSV, GIS file, planting brief) |
 | 4 | Notices | `/meta`: `data_mode`, `scores_error`, `scores_stale` | A preview-scores notice shows while scores are placeholders; red notices for mock data or a rejected score file |
-| 5 | Strip of figures | computed from `/sites` (Plant first) and `/summary` (Trends) | Four tiles over the map (sites, top score, near a corridor gap, reliable ground heat), five over the before/after maps |
+| 5 | Strip of figures | computed from `/sites` (Map) and `/summary` (Trends) | Four tiles over the map (sites, top score, near a corridor gap, reliable ground heat), five over the before/after maps |
 | 6 | Weight sliders | `/weights` (starting values) | Three sliders, 0 to 100, shown as a share of the total. Reset returns to the API's ranking |
 | 7 | Filters and search | `/sites` | Origin (all, open land, corridor edge) above the map and in Top sites (kept in step), and a site-id search |
 | 8 | Top sites list | `/sites` | Five rows in a window of fixed height ("See all" scrolls through the rest inside it, so the page never jumps), each with a one-sentence reason. Click or Enter selects; shared with the map. Numbered badges (up to 5) mark the top sites on the map; a rank of 100 or more gets a wider pill |
@@ -68,7 +68,7 @@ frontend/
     drivers.js          "what drives this site's rank": weighted points and plain-language notes. Reuse.
     scale.js            colour ramp, number formats, percentiles. Reuse.
     report-logic.js     honest wording and numbers for the before/after view (headline, verdicts, figures, bars). Reuse.
-    stats.js            the four figures above the Plant first map. Pure. Reuse.
+    stats.js            the four figures above the map. Pure. Reuse.
     sites-table.js      the Sites table's columns, filtering and sorting. Pure. Reuse.
     sites.js            draws the Sites table. Replace as needed.
     badge.js            sizes of the rank labels (circle, or a pill from 100) and the list's rank column. Pure. Reuse.

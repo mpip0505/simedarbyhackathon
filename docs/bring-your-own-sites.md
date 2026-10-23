@@ -20,7 +20,7 @@ Each point becomes a 30 m cell centred on it. The cell goes through **exactly th
 
 ## How to read the scores
 - Scores are **percentile ranks against the simulated Elmina candidate set**: "hotter than 90% of those sites". They show how a point compares with that set, not how good it is in absolute terms.
-- It is a **screening aid**. It knows nothing about land ownership, utilities, soil, tree health or what is on the ground; the field-check kit in the Pilot plan exists for that.
+- It is a **screening aid**. It knows nothing about land ownership, utilities, soil, tree health or what is on the ground; the field checks in the Tracker and Advanced tools exist for that.
 - The measurements inherit every limit in [limitations.md](limitations.md): the corridor is approximate, canopy is a proxy, thermal data is coarse.
 
 ## How we know it uses the same method

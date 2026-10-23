@@ -16,7 +16,7 @@ Open the app in a private window (so the planting plan starts empty), screen 144
 |---|---|---|---|
 | 1 | "You have a limited number of trees to plant this season. Find the site the tool ranks first and tell me why it ranks there." | says the one-sentence reason (heat, shade or corridor gap) in their own words | 3 min |
 | 2 | "Change what matters most so heat counts for everything. Did the top of the list change? How do you know?" | moves the sliders and reads the note about how many of the top 10 changed | 3 min |
-| 3 | "Choose five sites to look at first and put them on a shortlist." | five sites in the Pilot plan | 4 min |
+| 3 | "Choose five sites to look at first and put them on a shortlist." | five sites on the shortlist (Tracker) | 4 min |
 | 4 | "Pick two of them to inspect on the ground and get a sheet you can hand to someone." | original shortlist frozen, two sites marked Needs inspection and a versioned field sheet downloaded | 4 min |
 | 5 | "Someone walked those two sites and filled the sheet in (the facilitator takes the sheet they downloaded in task 4, types in made-up answers for the two sites, writes SYNTHETIC in the notes column, and hands the file back; `docs/field-check/example_completed_synthetic.csv` shows the format). Bring the answers back and tell me what you learn." | previews the file without changing observations, confirms import, and explains agree, disagree or insufficient evidence | 5 min |
 | 6 | "One site does not look right. Reject it and find a replacement." | named, dated rejection review with a reason; linked eligible replacement added as Needs inspection | 4 min |
@@ -24,7 +24,7 @@ Open the app in a private window (so the planting plan starts empty), screen 144
 
 ## What to record
 For each task: completed without help (yes or no), seconds taken, number of wrong clicks or backtracks, and any sentence they said out loud that shows confusion. After task 7 ask:
-1. "What would you do next, if this were your job?" (Does the answer match the Pilot plan steps?)
+1. "What would you do next, if this were your job?" (Does the answer match the Tracker's stages?)
 2. "Was anything on screen hard to read, find or understand?" (Note keyboard, screen reader or contrast problems if they use any.)
 3. "What would stop you using this in your real work?"
 
@@ -45,4 +45,4 @@ Completion rate per task, median time per task, total errors, and the three most
 After task 6, ask the participant to compare the original and revised reach, explain why equal-size method rows differ from reference rows, and download the evidence package. Record success, time and confusion separately. Ask them to distinguish a mapped trigger, an observation disagreement and a confirmed field issue. Use [usability-session-log.csv](usability-session-log.csv) for raw task records. The file intentionally contains headers only: no sessions have been run. Keep synthetic demonstration sheets clearly labelled and preserve their issued metadata.
 
 ## Facilitator rehearsal of tasks 4 to 7 (not a usability result)
-Before running people, the flow of tasks 4 to 7 was rehearsed by the automated browser test (`frontend/tools/smoke.mjs`, the Pilot plan check), which freezes the shortlist, marks sites Needs inspection, downloads the versioned field sheet, previews a synthetic completed sheet without changing observations, imports it, rejects a site with a reason and adds a linked replacement. Task 7 ("Which sites are safe to plant?") is answered by a summary line above the site cards: "0 of N sites have all five field checks marked OK ... None is approved for planting". This shows the flow is **completable**; it says nothing about whether a person can find their way through it. That is what the sessions above are for, and no sessions have been run.
+Before running people, the flow of tasks 4 to 7 was rehearsed by the automated browser test (`frontend/tools/smoke.mjs`, the pilot plan check, now under Advanced tools), which freezes the shortlist, marks sites Needs inspection, downloads the versioned field sheet, previews a synthetic completed sheet without changing observations, imports it, rejects a site with a reason and adds a linked replacement. Task 7 ("Which sites are safe to plant?") is answered by a summary line above the site cards: "0 of N sites have all five field checks marked OK ... None is approved for planting". This shows the flow is **completable**; it says nothing about whether a person can find their way through it. That is what the sessions above are for, and no sessions have been run.

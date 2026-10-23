@@ -11,7 +11,7 @@ They are screening numbers, not outcomes.
 
 ## 1. Intervention review (Avoid, Regenerate, Conserve)
 
-Code: `frontend/js/intervention.js`. Shown in the site card ("What might this place need?") and editable per site in the Pilot plan.
+Code: `frontend/js/intervention.js`. Shown in the site card ("What might this place need?") and editable per site in Advanced tools.
 
 The screen suggests one intervention per site from measured proxies. The first matching rule wins:
 
@@ -39,7 +39,7 @@ The model's top sites are almost all **corridor-gap restoration** candidates (Re
 
 ## 2. Best combination for your inspection capacity
 
-Code: `frontend/js/optimizer.js`. Shown at the top of Pilot plan, step 1.
+Code: `frontend/js/optimizer.js`. Shown in Advanced tools, *Edit pilot plan*, step 2 (*Check coverage*).
 
 The top 10 scores sit side by side in one corridor-edge strip, so they reach much of the same footpath, homes and corridor gap. The optimizer is a greedy marginal-reach selector: it repeatedly picks the site that adds the most **not yet reached** footpath, homes or gap. It chooses only from the 100 highest-priority sites and leaves out sites the planner rejected. It reuses the per-site reach sets in `ml/reports/reach_sets.json`, so every footpath sample, home and gap sample is counted once. The ranking itself does not change.
 
@@ -67,7 +67,7 @@ The trade-off is stated openly: the round gives up some average priority score t
 
 ## 3. Establishment and maintenance readiness
 
-Code: `readiness()` in `frontend/js/plan.js`. Shown per site in the Pilot plan.
+Code: `readiness()` in `frontend/js/plan.js`. Shown per site in Advanced tools.
 
 | Field | Starts as | Comes from |
 |---|---|---|

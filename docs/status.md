@@ -5,7 +5,7 @@ Other documents link here instead of quoting counts.
 
 | Measure | Count | How it is counted |
 |---|---|---|
-| Python tests | 316 | `pytest --collect-only` over `backend/tests` and `ml/tests` |
+| Python tests | 317 | `pytest --collect-only` over `backend/tests` and `ml/tests` |
 | Frontend unit tests | 229 | summary of `node --test frontend/tests/*.test.mjs` |
 | Browser checks | 49 | `await check(` calls in `frontend/tools/smoke.mjs` (needs a running API and Chrome to execute) |
 | Views | 7 (Home, Map, Sites, Trends, Tracker, Methods and limits, Advanced tools) | `data-view=` buttons in `frontend/index.html` |
